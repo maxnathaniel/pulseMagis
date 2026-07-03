@@ -1,7 +1,7 @@
 # PulseMagis
 **Heartbeat of the community — live polling, Q&A and candidate voting for the Church of St. Ignatius.**
 
-Built with React + Vite + Supabase. Deploy in ~15 minutes, completely free.
+Built with React + Vite + Supabase. Presenters sign in (email allow-listed); audiences join anonymously with a 6-digit code.
 
 ---
 
@@ -9,15 +9,15 @@ Built with React + Vite + Supabase. Deploy in ~15 minutes, completely free.
 | Layer | Technology |
 |-------|-----------|
 | Frontend | React 18 + Vite |
-| Database + Realtime | Supabase (PostgreSQL + WebSockets) |
-| Hosting | Any static host |
+| Database + Realtime + Auth | Supabase (PostgreSQL + WebSockets + Auth) |
+| Hosting | Docker container behind Caddy (see [DEPLOY.md](DEPLOY.md)), or any static host |
 
 ---
 
 ## Prerequisites
 - [Node.js 18+](https://nodejs.org/)
 - A free [Supabase](https://supabase.com) account
-- A static host of your choice (Vercel, Cloudflare Pages, GitHub Pages, etc.)
+- Docker Desktop (for the production deploy path, see [DEPLOY.md](DEPLOY.md)) — or a static host of your choice (Vercel, Cloudflare Pages, GitHub Pages, etc.) if deploying the built `dist/` folder yourself
 
 ---
 
@@ -35,7 +35,9 @@ Built with React + Vite + Supabase. Deploy in ~15 minutes, completely free.
 2. Paste the entire contents of `schema.sql`
 3. Click **Run**
 
-This creates 4 tables (`sessions`, `slides`, `responses`, `questions`), sets up Row Level Security, enables Realtime, and creates the atomic vote function.
+This creates the `sessions`, `slides`, `responses`, and `questions` tables, sets up Row Level Security, enables Realtime, and creates the atomic vote function.
+
+It also creates an `allowed_emails` table and a `check_email_allowlist` function that restricts signup to specific email addresses (edit the `INSERT INTO allowed_emails` list near the bottom of `schema.sql` before running). After running the schema, wire the function up manually: **Authentication → Hooks → "Before User Created"** in the Supabase dashboard, and select `check_email_allowlist`. Without this step, anyone can sign up.
 
 ---
 
@@ -54,12 +56,14 @@ This creates 4 tables (`sessions`, `slides`, `responses`, `questions`), sets up 
 cp .env.example .env
 ```
 
-Open `.env` and fill in the two values:
+Open `.env` and fill in your Supabase values:
 
 ```
 VITE_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
+
+`DEPLOY_SERVER` (also in `.env`) is only used by `deploy.ps1` for the Docker deploy path below — not needed for local dev.
 
 ---
 
@@ -70,36 +74,42 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) — the app is running.
+Open [http://localhost:5173](http://localhost:5173) — sign in (or sign up, if your email is on the allow-list) to reach the Home screen.
 
 To test the full flow, open two browser windows:
-- Window 1 → **New Pulse** → build slides → **Present** (note the 4-digit code)
-- Window 2 → **Join a Pulse** → enter the code → vote and ask questions
+- Window 1 (signed in) → **New Pulse** → build slides → **Present** (note the 6-digit code)
+- Window 2 → **Join a Pulse** → enter the code → vote and ask questions (no login needed)
 
 ---
 
 ## 6 — Deploy
 
+The production deployment is a Docker container (`./deploy.ps1`) shipped to a Linode server that shares an existing host-level Caddy instance — see [DEPLOY.md](DEPLOY.md) for the full one-time setup and redeploy steps.
+
+If you'd rather host it yourself on a static host instead:
+
 ```bash
 npm run build
 ```
 
-This produces a static `dist/` folder. Upload it to any static host (Vercel, Cloudflare Pages, GitHub Pages, S3, etc.), making sure to set the two environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) in that host's build/environment settings before deploying.
+This produces a static `dist/` folder. Upload it to any static host (Vercel, Cloudflare Pages, GitHub Pages, S3, etc.), making sure to set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in that host's build/environment settings before deploying (Vite inlines them at build time, so they must be present at build, not just at runtime).
 
 ---
 
 ## How to run a session
 
-1. **Presenter** opens the app → **New Pulse** → builds slides → optionally sets a Co-moderator PIN → clicks **Present**
-2. A 4-digit join code appears — display it on screen or share it
-3. **Audience** opens the app on their phones → **Join a Pulse** → enters the code → votes and asks questions
+1. **Presenter** signs in → **New Pulse** → builds slides (choice, word cloud, open-ended, Q&A, or plain rich-text) → optionally sets a Co-moderator PIN → clicks **Present**
+2. A 6-digit join code appears — display it on screen or share it
+3. **Audience** opens the app on their phones → **Join a Pulse** → enters the code → votes and asks questions (no account needed)
 4. **Co-moderators** (if PIN was set) join as audience → tap the **Moderate** tab → enter the PIN → approve/reject questions
 5. Presenter navigates slides with the ← → arrows; results update in real-time for everyone
+6. Presenter can end the presentation (audience joining afterward sees "this Pulse has ended" rather than "hasn't started yet")
 
 ---
 
 ## Features
-- Multiple choice, word cloud, and open-ended slides
+- Presenter accounts (Supabase Auth, email/password) with signup restricted to an allow-list; each presenter only sees their own Pulses
+- Slide types: multiple choice, word cloud, open-ended, Q&A, and plain rich-text (with per-slide layout, content image, and vertical alignment)
 - Candidate voting with headshot photo upload
 - Live results (WebSocket push, no polling lag)
 - Q&A with upvoting
