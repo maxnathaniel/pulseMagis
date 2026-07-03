@@ -1,0 +1,15 @@
+# Shares the Linode's existing host-level Caddy instance (the one already
+# proxying weddings.stignatius.org.sg and ministry-finder.stignatius.org.sg
+# via `reverse_proxy localhost:PORT`) — see DEPLOY.md for the one-time
+# Caddyfile site-block this depends on.
+services:
+  app:
+    image: pulsemagis-app:latest
+    build:
+      context: .
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+    restart: unless-stopped
+    ports:
+      - "3003:80"

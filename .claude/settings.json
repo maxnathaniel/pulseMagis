@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p shots)",
+      "Bash(node drive.js)",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(powershell -Command 'Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '\\\\''*vite*'\\\\'' -or $_.CommandLine -like '\\\\''*npm run dev*'\\\\'' } | Select-Object ProcessId, CommandLine')",
+      "Bash(powershell -Command \"Get-NetTCPConnection -State Listen -OwningProcess 48900 -ErrorAction SilentlyContinue | Select-Object LocalPort\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(npx --no-install playwright --version)",
+      "Bash(node -e ' *)",
+      "Bash(npx --yes playwright screenshot --viewport-size=1000,900 --wait-for-timeout=1500 \"http://localhost:5173/?debug=richtext\" \"C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-User-coding-pulsemagis\\\\5172cdea-3aaf-4897-821d-86dc2ffe265c\\\\scratchpad\\\\richtext-compare.png\")",
+      "Bash(npx --yes -p playwright node -e ' *)",
+      "Bash(npx --yes -p playwright node \"C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-User-coding-pulsemagis\\\\5172cdea-3aaf-4897-821d-86dc2ffe265c\\\\scratchpad\\\\zoom.js\")",
+      "Bash(node \"C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-User-coding-pulsemagis\\\\5172cdea-3aaf-4897-821d-86dc2ffe265c\\\\scratchpad\\\\zoom.js\")",
+      "Bash(cp \"C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-User-coding-pulsemagis\\\\5172cdea-3aaf-4897-821d-86dc2ffe265c\\\\scratchpad\\\\zoom.js\" \"C:\\\\Users\\\\User\\\\coding\\\\pulsemagis\\\\_zoom_debug.js\")",
+      "Bash(node _zoom_debug.js)",
+      "Bash(mv \"C:\\\\Users\\\\User\\\\coding\\\\pulsemagis\\\\_zoom_debug.js\" \"C:\\\\Users\\\\User\\\\coding\\\\pulsemagis\\\\_zoom_debug.cjs\")",
+      "Bash(node _zoom_debug.cjs)",
+      "Bash(ls -la \"C:\\\\Users\\\\User\\\\coding\\\\pulsemagis\\\\\"*.png \"C:\\\\Users\\\\User\\\\coding\\\\pulsemagis\\\\\"*.html 2>&1)",
+      "Read(//c/Users/User/coding/**)",
+      "Bash(powershell -Command \"Get-ChildItem -Path 'C:\\\\Users\\\\User\\\\AppData\\\\Roaming\\\\Code\\\\User\\\\History' -Recurse -ErrorAction SilentlyContinue | Select-String -Pattern 'preview-harness' \")",
+      "Bash(powershell -Command 'Get-ChildItem -Path '\\\\''C:\\\\Users\\\\User\\\\AppData\\\\Roaming\\\\Code\\\\User\\\\History'\\\\'' -Filter '\\\\''entries.json'\\\\'' -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $content = Get-Content $_.FullName -Raw; if \\($content -like '\\\\''*preview-harness*'\\\\''\\) { Write-Output $_.FullName } }')",
+      "Bash(node _debug_sidebar.cjs)"
+    ]
+  }
+}

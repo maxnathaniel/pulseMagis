@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.env
+.env.local
+deploy.ps1
+docker-compose.yml
+Caddyfile
+DEPLOY.md

@@ -1,0 +1,20 @@
+# Reference only — this is NOT run by this project (there's no Caddy
+# service in docker-compose.yml). Add this block to the EXISTING Caddyfile
+# already running on the server (the same one with the weddings and
+# ministry-finder blocks), then reload it:
+#   caddy reload --config /path/to/Caddyfile
+# (or `systemctl reload caddy` / restart whatever container runs it).
+#
+# Swap the domain below if pulse.stignatius.org.sg isn't what you want.
+
+pulse.stignatius.org.sg {
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        -Server
+    }
+
+    reverse_proxy localhost:3003
+}
