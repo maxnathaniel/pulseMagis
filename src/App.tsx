@@ -14,7 +14,6 @@ import { EmptyState } from './components/ui/EmptyState.tsx'
 import type { Draft, Session, Slide, SlideType, SlidePatch, Question, PulseSummary, ResponsesBySlide, ModerateAction, ResultsFormat } from './types.ts'
 
 type Screen = 'home' | 'build' | 'present' | 'join' | 'vote'
-type LoginMode = 'signin' | 'signup'
 
 // ════════════════════════════════════════════════════════════════════════════
 //  ROOT COMPONENT
@@ -62,9 +61,6 @@ export default function App() {
   // ── auth ─────────────────────────────────────────────────────────────────
   const [user,         setUser]         = useState<User | null>(null)
   const [loadingAuth,  setLoadingAuth]  = useState(true)
-  const [loginEmail,   setLoginEmail]   = useState('')
-  const [loginPassword,setLoginPassword]= useState('')
-  const [loginMode,    setLoginMode]    = useState<LoginMode>('signin')
   const [loginError,   setLoginError]   = useState('')
   const [loginLoading, setLoginLoading] = useState(false)
 
@@ -83,16 +79,15 @@ export default function App() {
     return () => sub.subscription.unsubscribe()
   }, [])
 
-  const submitLogin = async () => {
+  const signInWithGoogle = async () => {
     setLoginError('')
-    if (!loginEmail.trim()||!loginPassword) { setLoginError('Enter your email and password.'); return }
     setLoginLoading(true)
-    const {error} = loginMode==='signup'
-      ? await supabase.auth.signUp({email:loginEmail.trim(), password:loginPassword})
-      : await supabase.auth.signInWithPassword({email:loginEmail.trim(), password:loginPassword})
+    const {error} = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin }
+    })
     setLoginLoading(false)
-    if (error) { setLoginError(error.message); return }
-    setLoginEmail(''); setLoginPassword('')
+    if (error) setLoginError(error.message)
   }
   const logout = async () => { await supabase.auth.signOut() }
 
@@ -642,9 +637,7 @@ export default function App() {
       {loadingAuth
         ? <EmptyState text="Loading…"/>
         : (['home','build','present'] as Screen[]).includes(screen) && !user
-          ? <Login mode={loginMode} setMode={setLoginMode} email={loginEmail} setEmail={setLoginEmail}
-              password={loginPassword} setPassword={setLoginPassword}
-              loading={loginLoading} error={loginError} onSubmit={submitLogin}/>
+          ? <Login loading={loginLoading} error={loginError} onSubmit={signInWithGoogle}/>
           : <>
               {screen==='home'    && <Home pulses={pulses} pulsesLoading={pulsesLoading} userEmail={user?.email}
                 onCreateNew={createNewPulse} onJoin={()=>setScreen('join')} onResume={resumePulse}

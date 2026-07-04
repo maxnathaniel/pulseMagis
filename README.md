@@ -1,7 +1,7 @@
 # PulseMagis
 **Heartbeat of the community — live polling, Q&A and candidate voting for the Church of St. Ignatius.**
 
-Built with React + Vite + Supabase. Presenters sign in (email allow-listed); audiences join anonymously with a 6-digit code.
+Built with React + Vite + Supabase. Presenters sign in with Google (email allow-listed); audiences join anonymously with a 6-digit code.
 
 ---
 
@@ -37,11 +37,19 @@ Built with React + Vite + Supabase. Presenters sign in (email allow-listed); aud
 
 This creates the `sessions`, `slides`, `responses`, and `questions` tables, sets up Row Level Security, enables Realtime, and creates the atomic vote function.
 
-It also creates an `allowed_emails` table and a `check_email_allowlist` function that restricts signup to specific email addresses (edit the `INSERT INTO allowed_emails` list near the bottom of `schema.sql` before running). After running the schema, wire the function up manually: **Authentication → Hooks → "Before User Created"** in the Supabase dashboard, and select `check_email_allowlist`. Without this step, anyone can sign up.
+It also creates an `allowed_emails` table and a `check_email_allowlist` function that restricts signup to specific email addresses (edit the `INSERT INTO allowed_emails` list near the bottom of `schema.sql` before running). After running the schema, wire the function up manually: **Authentication → Hooks → "Before User Created"** in the Supabase dashboard, and select `check_email_allowlist`. Without this step, anyone with a Google account can sign up. This hook applies no matter which sign-in provider is used.
 
 ---
 
-## 3 — Get your API keys
+## 3 — Set up Google sign-in
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), create an **OAuth 2.0 Client ID** (Web application). Set the Authorized redirect URI to `https://<your-project-ref>.supabase.co/auth/v1/callback` (find your project ref in the Supabase Project URL).
+2. In the Supabase dashboard, go to **Authentication → Providers → Google**, enable it, and paste in the Client ID and Client Secret from step 1.
+3. In **Authentication → URL Configuration**, make sure the Site URL / Redirect URLs list includes `http://localhost:5173` (for local dev) and your production domain.
+
+---
+
+## 4 — Get your API keys
 
 1. Go to **Project Settings** → **API**
 2. Copy:
@@ -50,7 +58,7 @@ It also creates an `allowed_emails` table and a `check_email_allowlist` function
 
 ---
 
-## 4 — Configure environment variables
+## 5 — Configure environment variables
 
 ```bash
 cp .env.example .env
@@ -67,14 +75,14 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ---
 
-## 5 — Run locally
+## 6 — Run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) — sign in (or sign up, if your email is on the allow-list) to reach the Home screen.
+Open [http://localhost:5173](http://localhost:5173) — click **Sign in with Google** (with a Google account on the allow-list) to reach the Home screen.
 
 To test the full flow, open two browser windows:
 - Window 1 (signed in) → **New Pulse** → build slides → **Present** (note the 6-digit code)
@@ -82,7 +90,7 @@ To test the full flow, open two browser windows:
 
 ---
 
-## 6 — Deploy
+## 7 — Deploy
 
 The production deployment is a Docker container (`./deploy.ps1`) shipped to a Linode server that shares an existing host-level Caddy instance — see [DEPLOY.md](DEPLOY.md) for the full one-time setup and redeploy steps.
 
@@ -108,7 +116,7 @@ This produces a static `dist/` folder. Upload it to any static host (Vercel, Clo
 ---
 
 ## Features
-- Presenter accounts (Supabase Auth, email/password) with signup restricted to an allow-list; each presenter only sees their own Pulses
+- Presenter accounts (Supabase Auth, Google OAuth) with signup restricted to an allow-list; each presenter only sees their own Pulses
 - Slide types: multiple choice, word cloud, open-ended, Q&A, and plain rich-text (with per-slide layout, content image, and vertical alignment)
 - Candidate voting with headshot photo upload
 - Live results (WebSocket push, no polling lag)
