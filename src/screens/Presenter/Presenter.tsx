@@ -38,6 +38,22 @@ export function Presenter({session,slideIndex,responses,goToSlide,copyCode,copie
     onExit()
   }
 
+  useEffect(() => {
+    const handler=(e: KeyboardEvent) => {
+      const target=e.target as HTMLElement | null
+      if (target&&(target.tagName==='INPUT'||target.tagName==='TEXTAREA'||target.isContentEditable)) return
+      if (e.key==='ArrowLeft') goToSlide(slideIndex-1)
+      else if (e.key==='ArrowRight') goToSlide(slideIndex+1)
+      else if (e.key==='Escape'&&!document.fullscreenElement) handleExit()
+      // Escape while fullscreen is left to the browser's native fullscreen
+      // exit (which our fullscreenchange listener already picks up) — the
+      // keydown still fires with fullscreenElement set at this point, so the
+      // guard above skips ending the presentation on that same keypress.
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [slideIndex, session.slides.length])
+
   return(
     <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',minHeight:0}}>
       <PresenterSlideCard slide={slide} slideIndex={slideIndex} totalSlides={session.slides.length} list={list}
