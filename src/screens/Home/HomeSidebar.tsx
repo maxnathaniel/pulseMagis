@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { Home as HomeIcon, Ticket, Plus, ChevronDown, LogOut, type LucideIcon } from 'lucide-react'
+import { Home as HomeIcon, Ticket, LogOut, type LucideIcon } from 'lucide-react'
 import { C, FONT_DISPLAY } from '../../theme.ts'
-import { NewPulseMenu } from './NewPulseMenu.tsx'
 
 interface NavItemProps {
   icon: LucideIcon
@@ -26,31 +25,19 @@ function NavItem({icon:Icon,label,active,onClick,accent}: NavItemProps){
 }
 
 interface HomeSidebarProps {
-  onCreateNew: () => void
   onJoin: () => void
   onLogout: () => void
 }
 
-export function HomeSidebar({onCreateNew,onJoin,onLogout}: HomeSidebarProps){
-  const [newPulseOpen,setNewPulseOpen]=useState(false)
+export function HomeSidebar({onJoin,onLogout}: HomeSidebarProps){
   return(
-    <div style={{width:240,flexShrink:0,borderRight:`1.5px solid ${C.border}`,padding:16,
-      display:'flex',flexDirection:'column',gap:6,height:'100%'}}>
-      <div style={{position:'relative',marginBottom:10}}>
-        <button onClick={()=>setNewPulseOpen(o=>!o)}
-          style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'center',gap:8,
-            padding:'12px',borderRadius:5,border:'none',background:C.purple,color:'#fff',cursor:'pointer',
-            fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14.5,boxShadow:`0 4px 16px ${C.purpleBg}`}}>
-          <Plus size={16}/> New Pulse <ChevronDown size={14} style={{marginLeft:2}}/>
-        </button>
-        <NewPulseMenu open={newPulseOpen} onClose={()=>setNewPulseOpen(false)}
-          onPick={()=>{ setNewPulseOpen(false); onCreateNew() }}/>
-      </div>
-
+    <div style={{width:188,flexShrink:0,borderRight:`1.5px solid ${C.border}`,padding:16,
+      display:'flex',flexDirection:'column',alignItems:'center',gap:6,height:'100%'}}>
+      <img src="/images/favicon-96x96.png" alt="" width={48} height={48} style={{marginBottom:14}}/>
       <NavItem icon={HomeIcon} label="Home" active onClick={()=>{}}/>
       <NavItem icon={Ticket} label="Join a Pulse" accent={C.teal} onClick={onJoin}/>
 
-      <div style={{marginTop:'auto',paddingTop:10,borderTop:`1.5px solid ${C.borderLight}`}}>
+      <div style={{width:'100%',marginTop:'auto',paddingTop:10,borderTop:`1.5px solid ${C.borderLight}`}}>
         <NavItem icon={LogOut} label="Log out" accent={C.red} onClick={onLogout}/>
       </div>
     </div>
