@@ -7,12 +7,12 @@ import { PreviewModal } from './PreviewModal.tsx'
 import { RightRail } from './RightRail.tsx'
 import { EditPanel } from './EditPanel.tsx'
 import { ResultsView } from './ResultsView.tsx'
-import type { Draft, Slide, SlideType, ResponseMode } from '../../types.ts'
+import type { Draft, SlideType, SlidePatch, ResponseMode } from '../../types.ts'
 
 interface BuilderProps {
   draft: Draft
   setDraft: Dispatch<SetStateAction<Draft>>
-  updateSlide: (id: string, patch: Partial<Slide>) => void
+  updateSlide: (id: string, patch: SlidePatch) => void
   changeSlideType: (id: string, newType: SlideType) => void
   addSlide: (type: SlideType) => void
   removeSlide: (id: string) => void
@@ -22,7 +22,7 @@ interface BuilderProps {
   updateOption: (sid: string, oi: number, val: string) => void
   applyResponseModeToAll: (mode: ResponseMode) => void
   onBack: () => void
-  onPresent: () => void
+  onPresent: (startIndex: number) => void
 }
 
 export function Builder({draft,setDraft,updateSlide,changeSlideType,addSlide,removeSlide,reorderSlide,addOption,removeOption,updateOption,applyResponseModeToAll,onBack,onPresent}: BuilderProps){
@@ -51,11 +51,12 @@ export function Builder({draft,setDraft,updateSlide,changeSlideType,addSlide,rem
 
   const activeIndex=draft.slides.findIndex(s=>s.id===activeId)
   const slide=activeIndex>=0 ? draft.slides[activeIndex] : draft.slides[0]
+  const qaTakenByOtherActive=!!slide&&slide.type!=='qa'&&draft.slides.some(s=>s.type==='qa')
 
   return(
     <div style={{flex:1,display:'flex',flexDirection:'column',minHeight:0}}>
       <BuilderTopBar title={draft.title} onTitleChange={t=>setDraft(d=>({...d,title:t}))}
-        onBack={onBack} onPreview={()=>setPreviewOpen(true)} onPresent={onPresent}
+        onBack={onBack} onPreview={()=>setPreviewOpen(true)} onPresent={()=>onPresent(Math.max(activeIndex,0))}
         view={view} onViewChange={setView}/>
       {view==='results'
         ? <ResultsView draft={draft}/>
@@ -80,6 +81,7 @@ export function Builder({draft,setDraft,updateSlide,changeSlideType,addSlide,rem
             </div>
             {editPanelOpen&&slide&&(
               <EditPanel slide={slide} onChange={patch=>updateSlide(slide.id,patch)}
+                onChangeType={type=>changeSlideType(slide.id,type)} qaTakenByOther={qaTakenByOtherActive}
                 onApplyToAll={applyResponseModeToAll} onClose={()=>setEditPanelOpen(false)}/>
             )}
             <RightRail editOpen={editPanelOpen} onToggleEdit={()=>setEditPanelOpen(v=>!v)}/>

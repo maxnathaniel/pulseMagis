@@ -11,7 +11,7 @@ import { Presenter } from './screens/Presenter/Presenter.tsx'
 import { Join } from './screens/Join/Join.tsx'
 import { Vote } from './screens/Vote/Vote.tsx'
 import { EmptyState } from './components/ui/EmptyState.tsx'
-import type { Draft, Session, Slide, SlideType, Question, PulseSummary, ResponsesBySlide, ModerateAction } from './types.ts'
+import type { Draft, Session, Slide, SlideType, SlidePatch, Question, PulseSummary, ResponsesBySlide, ModerateAction } from './types.ts'
 
 type Screen = 'home' | 'build' | 'present' | 'join' | 'vote'
 type LoginMode = 'signin' | 'signup'
@@ -134,7 +134,7 @@ export default function App() {
   }, [user])
   useEffect(() => { if (screen==='home' && user) fetchPulses() }, [screen, user, fetchPulses])
 
-  const updateSlide = (id: string, patch: Partial<Slide>) =>
+  const updateSlide = (id: string, patch: SlidePatch) =>
     setDraft(d => ({ ...d, slides: d.slides.map(s => s.id===id ? {...s,...patch} as Slide : s) }))
   // Switching type via the 3-dot menu can't just patch {type} onto the slide
   // (updateSlide's job) — a slide changing INTO 'choice' needs options/
@@ -180,7 +180,7 @@ export default function App() {
   const qnaEnabled = draft.slides.some(s => s.type==='qa')
 
   // ── start presenting ──────────────────────────────────────────────────────
-  const startPresenting = async () => {
+  const startPresenting = async (startIndex = 0) => {
     // startPresenting does its own authoritative delete-and-reinsert of
     // slides below. Suppress the autosave "flush on leave" effect (fired by
     // the screen change to 'present' at the end of this function) so it
@@ -195,7 +195,7 @@ export default function App() {
     if (persistInFlight.current) await persistInFlight.current
     // Also wait for any in-flight current_slide_index write left over from
     // a just-ended presentation, so it can't land after (and overwrite) the
-    // reset-to-0 update below. See goToSlide's own comment for why this
+    // startIndex update below. See goToSlide's own comment for why this
     // matters.
     if (goToSlideInFlight.current) await goToSlideInFlight.current
     const isUpdate=!!draft.code
@@ -216,7 +216,7 @@ export default function App() {
 
     if (isUpdate) {
       const {error:sessUpdErr}=await supabase.from('sessions').update({
-        title, current_slide_index:0, qna_enabled:qnaEnabled,
+        title, current_slide_index:startIndex, qna_enabled:qnaEnabled,
         qna_moderation:draft.qnaModeration, pin_hash:pinHash, is_live:true, has_presented:true,
       }).eq('code',code)
       if (sessUpdErr) console.error(sessUpdErr)
@@ -224,7 +224,7 @@ export default function App() {
       if (delErr) console.error(delErr)
     } else {
       await supabase.from('sessions').insert({
-        code, title, owner_id:user!.id, current_slide_index:0, qna_enabled:qnaEnabled,
+        code, title, owner_id:user!.id, current_slide_index:startIndex, qna_enabled:qnaEnabled,
         qna_moderation:draft.qnaModeration, pin_hash:pinHash, is_live:true, has_presented:true,
       })
     }
@@ -238,9 +238,9 @@ export default function App() {
     }))).then(({error}) => { if (error) console.error(error) })
     setSession({ code, title,
       slides:draft.slides.map(s=>s.type==='choice' ? {...s,options:s.options.filter(o=>o.trim())} : s),
-      currentSlideIndex:0, qnaEnabled,
+      currentSlideIndex:startIndex, qnaEnabled,
       qnaModeration:draft.qnaModeration, pinHash, isLive:true, hasPresented:true })
-    setSlideIndex(0); setResponses({}); setQnaList([])
+    setSlideIndex(startIndex); setResponses({}); setQnaList([])
     setIsModerator(true); setScreen('present')
     setPulseUrl(code, 'present')
   }

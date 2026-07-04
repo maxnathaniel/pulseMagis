@@ -16,10 +16,13 @@ interface SlideBase {
   position?: number
 }
 
+export type ResultsFormat = 'bar' | 'donut' | 'pie' | 'dots'
+
 export interface ChoiceSlide extends SlideBase {
   type: 'choice'
   options: string[]
   optionImages: (string | null)[]
+  resultsFormat?: ResultsFormat
 }
 
 export interface PlainSlide extends SlideBase {
@@ -33,6 +36,16 @@ export interface SimpleSlide extends SlideBase {
 }
 
 export type Slide = ChoiceSlide | PlainSlide | SimpleSlide
+
+// Patch object accepted by updateSlide/onChange callbacks. Slide is a union,
+// and TS computes keyof a union as the intersection of each member's keys —
+// so Partial<Slide> can't express type-specific fields like `options` or
+// `resultsFormat`. Intersecting the members instead makes keyof their union.
+// `type` is omitted from each member first — each member's `type` is a
+// different literal, so intersecting them directly collapses the whole type
+// to `never`. Patching `type` isn't meaningful here anyway (that goes through
+// the dedicated changeSlideType/onChangeType, not this generic patch).
+export type SlidePatch = Partial<Omit<ChoiceSlide,'type'> & Omit<PlainSlide,'type'> & Omit<SimpleSlide,'type'>>
 
 // Loosest shape a slide preview renderer needs — satisfied structurally by
 // both a full Slide and the trimmed-down firstSlide summary fetchPulses

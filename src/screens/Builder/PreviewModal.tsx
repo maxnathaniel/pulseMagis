@@ -46,7 +46,9 @@ export function PreviewModal({draft,onClose}: PreviewModalProps){
           <div style={{height:440,display:'flex',justifyContent:'center'}}>
             <PresenterSlideCard slide={slide} slideIndex={idx} totalSlides={draft.slides.length} list={[]}
               revealedSlides={revealedSlides} onReveal={id=>setRevealedSlides(prev=>new Set(prev).add(id))}
-              qnaList={[]} session={session} onModerate={()=>{}} onToggleModeration={()=>setQnaModeration(v=>!v)}/>
+              qnaList={[]} session={session} onModerate={()=>{}} onToggleModeration={()=>setQnaModeration(v=>!v)}
+              showJoinPanel={false} joinCode="" audienceCount={0} copied={false}
+              onCopyJoinCode={()=>{}} onCloseJoinPanel={()=>{}}/>
           </div>
         </div>
 

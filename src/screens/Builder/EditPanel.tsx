@@ -1,9 +1,9 @@
-import { useRef } from 'react'
-import { AlignLeft, AlignRight, Image as ImageIcon, X, Copy, type LucideIcon } from 'lucide-react'
-import { C, FONT_DISPLAY, RESPONSE_MODES } from '../../theme.ts'
+import { useRef, useState } from 'react'
+import { AlignLeft, AlignRight, Image as ImageIcon, X, Copy, ChevronDown, type LucideIcon } from 'lucide-react'
+import { C, FONT_DISPLAY, RESPONSE_MODES, SLIDE_TYPES, RESULTS_FORMATS } from '../../theme.ts'
 import { compressImage } from '../../lib/helpers.ts'
 import { SectionLabel } from '../../components/ui/SectionLabel.tsx'
-import type { Slide, ResponseMode, Layout } from '../../types.ts'
+import type { Slide, SlidePatch, SlideType, ResponseMode, Layout } from '../../types.ts'
 
 const CONTENT_IMAGE_MAX_PX = 640
 
@@ -14,13 +14,17 @@ const LAYOUT_OPTIONS: [Layout, LucideIcon, string][] = [
 
 interface EditPanelProps {
   slide: Slide
-  onChange: (patch: Partial<Slide>) => void
+  onChange: (patch: SlidePatch) => void
+  onChangeType: (type: SlideType) => void
+  qaTakenByOther: boolean
   onApplyToAll: (mode: ResponseMode) => void
   onClose: () => void
 }
 
-export function EditPanel({slide,onChange,onApplyToAll,onClose}: EditPanelProps){
+export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToAll,onClose}: EditPanelProps){
   const fileRef=useRef<HTMLInputElement>(null)
+  const [typeMenuOpen,setTypeMenuOpen]=useState(false)
+  const currentType=SLIDE_TYPES.find(t=>t.key===slide.type)!
   const handleUpload=async(file: File | null | undefined)=>{
     if (!file) return
     try{ onChange({contentImage: await compressImage(file, CONTENT_IMAGE_MAX_PX)}) }
@@ -35,6 +39,71 @@ export function EditPanel({slide,onChange,onApplyToAll,onClose}: EditPanelProps)
           <X size={16}/>
         </button>
       </div>
+
+      <div style={{position:'relative'}}>
+        <SectionLabel>Question type</SectionLabel>
+        <button onClick={()=>setTypeMenuOpen(o=>!o)}
+          style={{marginTop:8,width:'100%',padding:'10px 12px',borderRadius:6,
+            border:`1.5px solid ${C.border}`,background:C.surfaceAlt,cursor:'pointer',
+            display:'flex',alignItems:'center',gap:9}}>
+          <currentType.icon size={15} color={C.purple}/>
+          <span style={{flex:1,textAlign:'left',fontFamily:FONT_DISPLAY,fontWeight:700,
+            fontSize:13,color:C.txt1}}>{currentType.label}</span>
+          <ChevronDown size={15} color={C.txt3}/>
+        </button>
+        {typeMenuOpen&&(
+          <>
+            <div onClick={()=>setTypeMenuOpen(false)}
+              style={{position:'fixed',inset:0,background:'transparent',zIndex:40}}/>
+            <div style={{position:'absolute',top:'100%',left:0,right:0,marginTop:6,
+              background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:4,
+              boxShadow:C.shadowHov,padding:4,zIndex:41}}>
+              {SLIDE_TYPES.map(t=>{
+                const Icon=t.icon
+                const isCurrent=t.key===slide.type
+                const disabled=isCurrent||(t.key==='qa'&&qaTakenByOther)
+                return(
+                  <button key={t.key} disabled={disabled}
+                    onClick={()=>{ if(!disabled){ setTypeMenuOpen(false); onChangeType(t.key) } }}
+                    style={{width:'100%',textAlign:'left',display:'flex',alignItems:'center',gap:9,
+                      padding:'8px 9px',borderRadius:4,border:'none',
+                      background:isCurrent?C.surfaceHov:'transparent',
+                      cursor:disabled?'not-allowed':'pointer',opacity:isCurrent?1:(disabled?0.5:1)}}
+                    onMouseEnter={e=>{ if (!disabled) e.currentTarget.style.background=C.surfaceHov }}
+                    onMouseLeave={e=>{ e.currentTarget.style.background=isCurrent?C.surfaceHov:'transparent' }}>
+                    <Icon size={14} color={isCurrent?C.purple:C.txt2}/>
+                    <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,
+                      color:isCurrent?C.purple:C.txt1}}>
+                      {t.label}{disabled&&!isCurrent?' (added)':''}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </>
+        )}
+      </div>
+
+      {slide.type==='choice'&&(
+        <div>
+          <SectionLabel>Results format</SectionLabel>
+          <div style={{display:'flex',marginTop:8,borderRadius:4,overflow:'hidden',border:`2px solid ${C.border}`}}>
+            {RESULTS_FORMATS.map(({key,label,icon:Icon},i)=>{
+              const active=(slide.resultsFormat||'bar')===key
+              const isLast=i===RESULTS_FORMATS.length-1
+              return(
+                <button key={key} onClick={()=>onChange({resultsFormat:key})} title={label}
+                  style={{flex:1,aspectRatio:'4 / 3',padding:0,border:'none',
+                    borderRight:isLast?'none':`2px solid ${C.border}`,
+                    background:active?C.purpleBg:C.surface,color:active?C.purple:C.txt3,
+                    cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  <Icon size={16}/>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       <div>
         <SectionLabel>Layout</SectionLabel>

@@ -2,11 +2,11 @@ import { Plus, Trash2, ShieldCheck, Lock, Cloud, MessageSquare } from 'lucide-re
 import { C, FONT_DISPLAY, PALETTE_BARS } from '../../theme.ts'
 import { ToggleChip } from '../../components/ui/ToggleChip.tsx'
 import { PlainSlideEditor } from './PlainSlideEditor.tsx'
-import type { Slide } from '../../types.ts'
+import type { Slide, SlidePatch } from '../../types.ts'
 
 interface SlideEditorProps {
   slide: Slide
-  onChange: (patch: Partial<Slide>) => void
+  onChange: (patch: SlidePatch) => void
   onAddOption: () => void
   onRemoveOption: (oi: number) => void
   onUpdateOption: (oi: number, val: string) => void

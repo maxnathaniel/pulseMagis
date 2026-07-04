@@ -22,7 +22,17 @@
       "Read(//c/Users/User/coding/**)",
       "Bash(powershell -Command \"Get-ChildItem -Path 'C:\\\\Users\\\\User\\\\AppData\\\\Roaming\\\\Code\\\\User\\\\History' -Recurse -ErrorAction SilentlyContinue | Select-String -Pattern 'preview-harness' \")",
       "Bash(powershell -Command 'Get-ChildItem -Path '\\\\''C:\\\\Users\\\\User\\\\AppData\\\\Roaming\\\\Code\\\\User\\\\History'\\\\'' -Filter '\\\\''entries.json'\\\\'' -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $content = Get-Content $_.FullName -Raw; if \\($content -like '\\\\''*preview-harness*'\\\\''\\) { Write-Output $_.FullName } }')",
-      "Bash(node _debug_sidebar.cjs)"
+      "Bash(node _debug_sidebar.cjs)",
+      "Bash(git status *)",
+      "Bash(npx tsc *)",
+      "Read(//c/tmp/**)",
+      "Bash(npx --yes tsc --noEmit --strict test_never.ts)",
+      "Bash(node_modules/.bin/tsc --noEmit --strict /tmp/test_never.ts)",
+      "Bash(\"c:\\\\Users\\\\User\\\\coding\\\\pulsemagis\\\\node_modules\\\\.bin\\\\tsc\" --noEmit --strict test_never.ts)",
+      "Bash(rm -f /tmp/test_never.ts /tmp/test_never2.ts)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
     ]
   }
 }

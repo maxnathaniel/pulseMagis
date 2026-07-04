@@ -1,10 +1,19 @@
+import { useState, type CSSProperties } from 'react'
+import { ChevronLeft, ChevronRight, Users, QrCode, X, Maximize2, Minimize2 } from 'lucide-react'
 import { C, FONT_DISPLAY, VERTICAL_ALIGN_CSS } from '../../theme.ts'
 import { ModerationPanel } from '../../components/ModerationPanel.tsx'
+import { JoinPanel } from '../../components/JoinPanel.tsx'
+import { NavBtn } from '../../components/ui/NavBtn.tsx'
 import { ChoiceResults } from '../../components/results/ChoiceResults.tsx'
 import { WordCloudResults } from '../../components/results/WordCloudResults.tsx'
 import { OpenResults } from '../../components/results/OpenResults.tsx'
 import { RichContentView } from '../../components/RichContentView.tsx'
 import type { Slide, Session, Question, ModerateAction } from '../../types.ts'
+
+const iconBtnStyle: CSSProperties = {
+  width:38,height:38,borderRadius:'50%',border:'none',background:C.surface,color:C.txt2,
+  boxShadow:C.shadow,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',flexShrink:0,
+}
 
 interface PresenterSlideCardProps {
   slide: Slide
@@ -17,20 +26,83 @@ interface PresenterSlideCardProps {
   session: Session | { title: string; qnaModeration: boolean }
   onModerate: (qId: string, action: ModerateAction) => void
   onToggleModeration: () => void
+  showJoinPanel: boolean
+  joinCode: string
+  audienceCount: number
+  copied: boolean
+  onCopyJoinCode: () => void
+  onCloseJoinPanel: () => void
+  // Floating corner chrome (exit/fullscreen/live/audience/nav) — omit on the
+  // Builder preview, which has no live session, fullscreen, or navigation.
+  showChrome?: boolean
+  onExit?: () => void
+  isFullscreen?: boolean
+  onToggleFullscreen?: () => void
+  onShowJoinPanel?: () => void
+  onPrev?: () => void
+  prevDisabled?: boolean
+  onNext?: () => void
+  nextDisabled?: boolean
 }
 
-export function PresenterSlideCard({slide,slideIndex,totalSlides,list,revealedSlides,onReveal,qnaList,session,onModerate,onToggleModeration}: PresenterSlideCardProps){
+export function PresenterSlideCard({slide,slideIndex,totalSlides,list,revealedSlides,onReveal,qnaList,session,onModerate,onToggleModeration,
+  showJoinPanel,joinCode,audienceCount,copied,onCopyJoinCode,onCloseJoinPanel,
+  showChrome,onExit,isFullscreen,onToggleFullscreen,onShowJoinPanel,onPrev,prevDisabled,onNext,nextDisabled}: PresenterSlideCardProps){
+  const [hovTopLeft,setHovTopLeft]=useState(false)
+  const [hovBottomLeft,setHovBottomLeft]=useState(false)
   const pendingCount=qnaList.filter(q=>q.status==='pending').length
   const imageCol=slide.contentImage&&(
     <div style={{flex:'0 0 20%',minWidth:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
       <img src={slide.contentImage} alt="" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:5}}/>
     </div>
   )
+  // The image column always bleeds flush to whichever card edge it sits
+  // against — the 48px/56px inset only applies to whichever item (content or
+  // the join panel) actually touches that edge instead.
+  const imageBeforeContent=!!imageCol&&slide.layout==='left'
+  const imageAfterContent=!!imageCol&&slide.layout!=='left'
+  const contentIsLeftEdge=!imageBeforeContent
+  const contentIsRightEdge=!imageAfterContent&&!showJoinPanel
   return(
-    <div style={{background:C.surface,borderRadius:4,boxShadow:C.shadow,padding:'48px 56px',
+    <div style={{position:'relative',background:C.surface,borderRadius:4,boxShadow:C.shadow,padding:'48px 0',
       width:'auto',maxWidth:'100%',height:'100%',aspectRatio:'16/9',overflowY:'auto',display:'flex',gap:24}}>
+      {showChrome&&(
+        <>
+          <div onMouseEnter={()=>setHovTopLeft(true)} onMouseLeave={()=>setHovTopLeft(false)}
+            style={{position:'absolute',top:0,left:0,width:140,height:100,zIndex:5,padding:16,display:'flex',alignItems:'flex-start'}}>
+            <div style={{display:'flex',gap:8,opacity:hovTopLeft?1:0,pointerEvents:hovTopLeft?'auto':'none',transition:'opacity .15s ease'}}>
+              <button onClick={onExit} title="End presentation" style={iconBtnStyle}><X size={16}/></button>
+              <button onClick={onToggleFullscreen} title={isFullscreen?'Exit full screen':'Full screen'} style={iconBtnStyle}>
+                {isFullscreen?<Minimize2 size={16}/>:<Maximize2 size={16}/>}
+              </button>
+            </div>
+          </div>
+
+          <div style={{position:'absolute',top:16,right:16,zIndex:5,display:'flex',alignItems:'center',gap:10}}>
+            <div style={{display:'flex',alignItems:'center',gap:6,fontSize:12,color:C.red,fontWeight:800,letterSpacing:.5}}>
+              <span style={{width:8,height:8,borderRadius:'50%',background:C.red,display:'inline-block',animation:'pulseDot 1.5s infinite'}}/> LIVE
+            </div>
+            <div title="People currently in the room" style={{display:'flex',alignItems:'center',gap:5,fontSize:13,color:C.txt2,fontWeight:700}}><Users size={15}/>{audienceCount}</div>
+            {!showJoinPanel&&(
+              <button onClick={onShowJoinPanel} title="Show join panel" style={iconBtnStyle}>
+                <QrCode size={14}/>
+              </button>
+            )}
+          </div>
+
+          <div onMouseEnter={()=>setHovBottomLeft(true)} onMouseLeave={()=>setHovBottomLeft(false)}
+            style={{position:'absolute',bottom:0,left:0,width:140,height:100,zIndex:5,padding:16,display:'flex',alignItems:'flex-end'}}>
+            <div style={{display:'flex',gap:12,opacity:hovBottomLeft?1:0,pointerEvents:hovBottomLeft?'auto':'none',transition:'opacity .15s ease'}}>
+              <NavBtn onClick={onPrev!} disabled={prevDisabled}><ChevronLeft size={18}/></NavBtn>
+              <NavBtn onClick={onNext!} disabled={nextDisabled}><ChevronRight size={18}/></NavBtn>
+            </div>
+          </div>
+        </>
+      )}
+
       {slide.layout==='left'&&imageCol}
-      <div style={{flex:'1 1 0%',minWidth:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+      <div style={{flex:'1 1 0%',minWidth:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
+        paddingLeft:contentIsLeftEdge?56:0,paddingRight:contentIsRightEdge?56:0}}>
         {slide.type==='qa'?(
           <>
             <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginBottom:16}}>
@@ -81,6 +153,12 @@ export function PresenterSlideCard({slide,slideIndex,totalSlides,list,revealedSl
         )}
       </div>
       {slide.layout!=='left'&&imageCol}
+      {showJoinPanel&&(
+        <div style={{flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',paddingRight:56}}>
+          <JoinPanel code={joinCode} audienceCount={audienceCount} copied={copied}
+            onCopy={onCopyJoinCode} onClose={onCloseJoinPanel}/>
+        </div>
+      )}
     </div>
   )
 }

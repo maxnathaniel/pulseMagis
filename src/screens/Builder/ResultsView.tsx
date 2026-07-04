@@ -111,7 +111,7 @@ export function ResultsView({draft}: {draft: Draft}){
                     <div style={{fontSize:12.5,color:C.txt3,fontWeight:600,marginBottom:16}}>
                       {list.length} response{list.length!==1?'s':''}
                     </div>
-                    {slide.type==='choice'   && <ChoiceResults slide={slide} list={list}/>}
+                    {slide.type==='choice'   && <ChoiceResults slide={slide} format={slide.resultsFormat} list={list}/>}
                     {slide.type==='wordcloud'&& <WordCloudResults list={list as string[]}/>}
                     {slide.type==='open'     && <OpenResults list={list}/>}
                   </div>

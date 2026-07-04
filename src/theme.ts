@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { BarChart3, Cloud, MessageSquare, MessageCircle, Type, type LucideIcon } from 'lucide-react'
-import type { SlideType, ResponseMode, VerticalAlign } from './types.ts'
+import { BarChart3, Cloud, MessageSquare, MessageCircle, Type, Donut, PieChart, Grip, type LucideIcon } from 'lucide-react'
+import type { SlideType, ResponseMode, ResultsFormat, VerticalAlign } from './types.ts'
 
 // ─── design tokens ───────────────────────────────────────────────────────────
 export const SLIDE_TYPES: { key: SlideType; label: string; icon: LucideIcon }[] = [
@@ -9,6 +9,13 @@ export const SLIDE_TYPES: { key: SlideType; label: string; icon: LucideIcon }[] 
   { key: 'open',      label: 'Open ended',       icon: MessageSquare },
   { key: 'qa',        label: 'Q&A',              icon: MessageCircle },
   { key: 'plain',     label: 'Text',             icon: Type },
+]
+
+export const RESULTS_FORMATS: { key: ResultsFormat; label: string; icon: LucideIcon }[] = [
+  { key: 'bar',   label: 'Bar chart',   icon: BarChart3 },
+  { key: 'donut', label: 'Donut chart', icon: Donut },
+  { key: 'pie',   label: 'Pie chart',   icon: PieChart },
+  { key: 'dots',  label: 'Dot matrix',  icon: Grip },
 ]
 
 // justifyContent values for a slide's vertical-align setting (plain slides only)
