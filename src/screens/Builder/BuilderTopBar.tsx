@@ -54,11 +54,12 @@ export function BuilderTopBar({title,onTitleChange,onBack,onPreview,onPresent,vi
           fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,cursor:'pointer'}}>
           <Eye size={16}/> Preview
         </button>
-        <button onClick={onPresent} style={{display:'flex',alignItems:'center',gap:7,
+        <button onClick={onPresent} disabled={view==='results'} title={view==='results'?'Switch to Create to start presenting':undefined}
+          style={{display:'flex',alignItems:'center',gap:7,
           padding:'10px 20px',borderRadius:4,border:'none',
-          background:C.purple,color:'#fff',
-          fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,cursor:'pointer',
-          boxShadow:`0 4px 16px ${C.purpleBg}`,transition:'all .2s ease'}}>
+          background:view==='results'?C.disabledBtn:C.purple,color:view==='results'?C.txtDis:'#fff',
+          fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,cursor:view==='results'?'not-allowed':'pointer',
+          boxShadow:view==='results'?'none':`0 4px 16px ${C.purpleBg}`,transition:'all .2s ease'}}>
           <Play size={16}/> Start Presentation
         </button>
       </div>

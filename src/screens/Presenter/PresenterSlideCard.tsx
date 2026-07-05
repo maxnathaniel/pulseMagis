@@ -131,7 +131,20 @@ export function PresenterSlideCard({slide,slideIndex,totalSlides,list,revealedSl
             <div style={{flex:1,minHeight:0,width:'100%',display:'flex',flexDirection:'column'}}>
               {(() => {
                 const mode=slide.responseMode||'instant'
-                if (mode==='private') return null
+                // Private: only a response count is shown (the line above,
+                // always rendered) — the breakdown itself must stay hidden
+                // and never reveal real proportions, but the chart's shape
+                // should still read as "this slide's chosen format" rather
+                // than vanishing outright. Force an empty list so it renders
+                // its normal zero-votes state and never updates as real
+                // votes come in, regardless of the real `list` prop.
+                if (mode==='private') {
+                  return (<>
+                    {slide.type==='choice'   &&<ChoiceResults slide={slide} format={slide.resultsFormat} list={[]}/>}
+                    {slide.type==='wordcloud'&&<WordCloudResults list={[]}/>}
+                    {slide.type==='open'     &&<OpenResults list={[]}/>}
+                  </>)
+                }
                 if (mode==='onclick'&&!revealedSlides.has(slide.id)) {
                   return (
                     <button onClick={()=>onReveal(slide.id)}
@@ -143,7 +156,7 @@ export function PresenterSlideCard({slide,slideIndex,totalSlides,list,revealedSl
                   )
                 }
                 return (<>
-                  {slide.type==='choice'   &&<ChoiceResults slide={slide} list={list}/>}
+                  {slide.type==='choice'   &&<ChoiceResults slide={slide} format={slide.resultsFormat} list={list}/>}
                   {slide.type==='wordcloud'&&<WordCloudResults list={list as string[]}/>}
                   {slide.type==='open'     &&<OpenResults list={list}/>}
                 </>)

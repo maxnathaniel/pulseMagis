@@ -5,6 +5,7 @@ export type SlideTypeDb = 'choice' | 'wordcloud' | 'open' | 'qa' | 'plain'
 export type LayoutDb = 'left' | 'right'
 export type ResponseModeDb = 'instant' | 'onclick' | 'private'
 export type VerticalAlignDb = 'top' | 'middle' | 'bottom'
+export type ResultsFormatDb = 'bar' | 'donut' | 'pie' | 'dots'
 export type QuestionStatusDb = 'pending' | 'visible'
 
 export interface Database {
@@ -62,6 +63,7 @@ export interface Database {
           response_mode: ResponseModeDb
           content: JSONContent | null
           vertical_align: VerticalAlignDb
+          results_format: ResultsFormatDb
           position: number
           created_at: string
         }
@@ -77,6 +79,7 @@ export interface Database {
           response_mode?: ResponseModeDb
           content?: JSONContent | null
           vertical_align?: VerticalAlignDb
+          results_format?: ResultsFormatDb
           position?: number
           created_at?: string
         }
@@ -92,6 +95,7 @@ export interface Database {
           response_mode?: ResponseModeDb
           content?: JSONContent | null
           vertical_align?: VerticalAlignDb
+          results_format?: ResultsFormatDb
           position?: number
           created_at?: string
         }

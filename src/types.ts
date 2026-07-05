@@ -59,6 +59,7 @@ export interface SlidePreviewData {
   contentImage?: string | null
   content?: JSONContent | null
   verticalAlign?: VerticalAlign
+  resultsFormat?: ResultsFormat
 }
 
 export interface Draft {
@@ -97,6 +98,7 @@ export interface PulseSummary {
   title: string
   created_at: string
   firstSlide: SlidePreviewData | null
+  firstSlideResponses?: (string | number)[]
 }
 
 // Response values collected per-slide, keyed by slide id.

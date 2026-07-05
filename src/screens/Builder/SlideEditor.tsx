@@ -1,11 +1,13 @@
-import { Plus, Trash2, ShieldCheck, Lock, Cloud, MessageSquare } from 'lucide-react'
-import { C, FONT_DISPLAY, PALETTE_BARS } from '../../theme.ts'
+import { ShieldCheck, Lock, Cloud, MessageSquare } from 'lucide-react'
+import { C, FONT_DISPLAY } from '../../theme.ts'
 import { ToggleChip } from '../../components/ui/ToggleChip.tsx'
 import { PlainSlideEditor } from './PlainSlideEditor.tsx'
+import { EditableChoiceOptions } from './EditableChoiceOptions.tsx'
 import type { Slide, SlidePatch } from '../../types.ts'
 
 interface SlideEditorProps {
   slide: Slide
+  list: (string | number)[]
   onChange: (patch: SlidePatch) => void
   onAddOption: () => void
   onRemoveOption: (oi: number) => void
@@ -16,7 +18,7 @@ interface SlideEditorProps {
   onChangeModeratorPin: (pin: string) => void
 }
 
-export function SlideEditor({slide,onChange,onAddOption,onRemoveOption,onUpdateOption,qnaModeration,moderatorPin,onToggleQnaModeration,onChangeModeratorPin}: SlideEditorProps){
+export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUpdateOption,qnaModeration,moderatorPin,onToggleQnaModeration,onChangeModeratorPin}: SlideEditorProps){
   const hasImage=!!slide.contentImage
   const imageFirst=hasImage&&slide.layout==='left'
 
@@ -32,29 +34,13 @@ export function SlideEditor({slide,onChange,onAddOption,onRemoveOption,onUpdateO
           outline:'none',marginBottom:28,flexShrink:0,textAlign:'center'}}/>
 
       {slide.type==='choice'&&(
-        <div style={{flex:1,minHeight:0,display:'flex',flexDirection:'column',gap:12}}>
-          {slide.options.map((opt,oi)=>{
-            const color=PALETTE_BARS[oi%PALETTE_BARS.length]
-            return(
-              <div key={oi} style={{flex:1,minHeight:48,display:'flex',gap:12,alignItems:'center'}}>
-                <div style={{flex:1,height:'100%',borderRadius:4,background:`${color}16`,
-                  border:`2px solid ${color}45`,display:'flex',alignItems:'center',padding:'0 16px'}}>
-                  <input value={opt} onChange={e=>onUpdateOption(oi,e.target.value)} placeholder={`Option ${oi+1}`}
-                    style={{flex:1,background:'transparent',border:'none',outline:'none',color:C.txt1,
-                      fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:16}}/>
-                </div>
-                {slide.options.length>2&&<button onClick={()=>onRemoveOption(oi)} title="Remove option"
-                  style={{background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:4,flexShrink:0}}><Trash2 size={14}/></button>}
-              </div>
-            )
-          })}
-          {slide.options.length<6&&(
-            <button onClick={onAddOption} style={{height:50,flexShrink:0,borderRadius:4,border:`2px dashed ${C.border}`,
-              background:'transparent',color:C.txt3,display:'flex',alignItems:'center',justifyContent:'center',
-              gap:7,cursor:'pointer',fontSize:14,fontWeight:700}}>
-              <Plus size={14}/> Add option
-            </button>
-          )}
+        // Capped so the response shape reads as a compact, dominant element rather
+        // than stretching edge-to-edge — 50% of the whole slide's width, which
+        // (since the image column is a fixed 20% of the slide when present)
+        // works out to 62.5% of this column's own width in that case.
+        <div style={{flex:1,minHeight:0,width:'100%',maxWidth:hasImage?'62.5%':'50%',margin:'0 auto',display:'flex'}}>
+          <EditableChoiceOptions slide={slide} list={list}
+            onUpdateOption={onUpdateOption} onRemoveOption={onRemoveOption} onAddOption={onAddOption}/>
         </div>
       )}
 

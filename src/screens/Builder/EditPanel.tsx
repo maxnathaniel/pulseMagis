@@ -93,7 +93,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
               const isLast=i===RESULTS_FORMATS.length-1
               return(
                 <button key={key} onClick={()=>onChange({resultsFormat:key})} title={label}
-                  style={{flex:1,aspectRatio:'4 / 3',padding:0,border:'none',
+                  style={{flex:1,aspectRatio:'16 / 9',padding:0,border:'none',
                     borderRight:isLast?'none':`2px solid ${C.border}`,
                     background:active?C.purpleBg:C.surface,color:active?C.purple:C.txt3,
                     cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -107,13 +107,17 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
 
       <div>
         <SectionLabel>Layout</SectionLabel>
-        <div style={{display:'flex',gap:8,marginTop:8}}>
-          {LAYOUT_OPTIONS.map(([key,Icon,label])=>{
+        <div style={{display:'flex',marginTop:8}}>
+          {LAYOUT_OPTIONS.map(([key,Icon,label],i)=>{
             const active=(slide.layout||'right')===key
+            const isFirst=i===0
+            const isLast=i===LAYOUT_OPTIONS.length-1
             return(
               <button key={key} onClick={()=>onChange({layout:key})} title={label}
-                style={{flex:1,padding:'10px 0',borderRadius:4,
+                style={{flex:1,padding:'10px 0',
+                  borderRadius:isFirst?'4px 0 0 4px':isLast?'0 4px 4px 0':0,
                   border:`2px solid ${active?C.purple:C.border}`,
+                  marginLeft:isFirst?0:-2,position:'relative',zIndex:active?1:0,
                   background:active?C.purpleBg:C.surface,color:active?C.purple:C.txt3,
                   cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:5}}>
                 <Icon size={16}/>
@@ -162,13 +166,19 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
           {RESPONSE_MODES.map(({key,label,description})=>{
             const active=(slide.responseMode||'instant')===key
             return(
-              <button key={key} onClick={()=>onChange({responseMode:key})}
+              <label key={key}
                 style={{textAlign:'left',padding:'10px 12px',borderRadius:4,
                   border:`2px solid ${active?C.purple:C.border}`,
-                  background:active?C.purpleBg:C.surface,cursor:'pointer'}}>
-                <div style={{fontSize:13,fontWeight:700,color:active?C.purple:C.txt1}}>{label}</div>
-                <div style={{fontSize:11,color:C.txt4,fontWeight:600,marginTop:2}}>{description}</div>
-              </button>
+                  background:active?C.purpleBg:C.surface,cursor:'pointer',
+                  display:'flex',alignItems:'flex-start',gap:9}}>
+                <input type="radio" name="responseMode" checked={active}
+                  onChange={()=>onChange({responseMode:key})}
+                  style={{marginTop:3,flexShrink:0,accentColor:C.purple,cursor:'pointer'}}/>
+                <div>
+                  <div style={{fontSize:13,fontWeight:700,color:active?C.purple:C.txt1}}>{label}</div>
+                  <div style={{fontSize:11,color:C.txt4,fontWeight:600,marginTop:2}}>{description}</div>
+                </div>
+              </label>
             )
           })}
         </div>

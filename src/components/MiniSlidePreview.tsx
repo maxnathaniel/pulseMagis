@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
-import { C, FONT_DISPLAY, PALETTE_BARS, VERTICAL_ALIGN_CSS } from '../theme.ts'
+import { C, FONT_DISPLAY, VERTICAL_ALIGN_CSS } from '../theme.ts'
 import { RichContentView } from './RichContentView.tsx'
+import { EditableChoiceOptions } from '../screens/Builder/EditableChoiceOptions.tsx'
 import type { SlidePreviewData } from '../types.ts'
 
 // Reference canvas plain-slide thumbnails are scaled down from — matches
@@ -9,15 +10,25 @@ import type { SlidePreviewData } from '../types.ts'
 const PLAIN_CANVAS_W = 800
 const PLAIN_CANVAS_H = 450
 
+// Choice slides use a taller reference canvas than the plain one above —
+// the Create tab's real chart (EditableDonutOptions/EditablePieOptions) is
+// 320px tall, which the plain canvas's 450px height (minus its own padding)
+// isn't tall enough to fit without clipping. Kept at the same 16:9 ratio as
+// the thumbnail box itself so scaling by width (the cqw trick below) also
+// fits the height exactly, with no clipping or leftover empty space.
+const CHOICE_CANVAS_W = 960
+const CHOICE_CANVAS_H = 540
+
 interface MiniSlidePreviewProps {
   slide: SlidePreviewData | null | undefined
+  list?: (string | number)[]
 }
 
 // Renders a scaled-down but genuine representation of what the slide will
 // actually look like once presented — the real question/title centered,
 // plus real option bars for choice slides — not a generic type-icon
 // summary.
-export function MiniSlidePreview({slide}: MiniSlidePreviewProps){
+export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
   if (!slide) return (
     <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}}>
       <span style={{fontSize:12,color:C.txt4,fontWeight:600}}>No slides yet</span>
@@ -37,32 +48,41 @@ export function MiniSlidePreview({slide}: MiniSlidePreviewProps){
 
   let body
   if (slide.type==='choice') {
-    const options=(slide.options||[]).filter(o=>o&&o.trim()).slice(0,4)
+    // Response values are option-index based against the ORIGINAL
+    // (unfiltered) options array — filtering out blanks for display would
+    // silently shift vote counts onto the wrong option unless the list is
+    // remapped through each entry's original index first.
+    const rawOptions=slide.options||[]
+    const validEntries=rawOptions
+      .map((opt,i)=>({opt,i}))
+      .filter(e=>e.opt&&e.opt.trim())
+    const indexMap=new Map(validEntries.map((e,newIdx)=>[e.i,newIdx]))
+    const remappedList=(list||[])
+      .map(v=>indexMap.get(v as number))
+      .filter((v): v is number => v!==undefined)
+    const previewSlide={options:validEntries.map(e=>e.opt), resultsFormat:slide.resultsFormat}
+
+    // True mirror of SlideEditor.tsx's real layout (same fontSize:34
+    // question, same maxWidth cap, same EditableChoiceOptions component in
+    // its readOnly mode) rendered at full size in a fixed reference canvas,
+    // then shrunk via transform:scale — same technique as the plain-slide
+    // branch below, so this can't independently drift from the real thing.
     body=(
-      <div style={{flex:1,minWidth:0,minHeight:0,display:'flex',flexDirection:'column',gap:3}}>
-        <div style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:10.5,color:C.txt2,textAlign:'center',
-          overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flexShrink:0,marginBottom:1}}>{question}</div>
-        {options.length
-          ? <div style={{flex:1,minHeight:0,display:'flex',flexDirection:'column',gap:3}}>
-              {options.map((opt,i)=>{
-                const optImg=(slide.optionImages||[])[i]||null
-                const color=PALETTE_BARS[i%PALETTE_BARS.length]
-                return(
-                  <div key={i} style={{flex:1,minHeight:0,display:'flex',alignItems:'center',gap:4,
-                    background:`${color}22`,border:`1px solid ${color}55`,borderRadius:3,
-                    padding:'0 6px',overflow:'hidden'}}>
-                    {optImg&&(
-                      <div style={{width:12,height:12,borderRadius:'50%',flexShrink:0,border:`1px solid ${color}`,overflow:'hidden'}}>
-                        <img src={optImg} alt="" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
-                      </div>
-                    )}
-                    <span style={{fontSize:9,fontWeight:700,color:C.txt2,
-                      overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{opt}</span>
-                  </div>
-                )
-              })}
-            </div>
-          : <div style={{fontSize:9.5,color:C.txt4,fontWeight:600,textAlign:'center'}}>No options yet</div>}
+      <div style={{flex:1,minWidth:0,minHeight:0,overflow:'hidden',position:'relative',containerType:'inline-size'} as CSSProperties}>
+        <div style={{position:'absolute',top:'50%',left:'50%',width:CHOICE_CANVAS_W,height:CHOICE_CANVAS_H,
+          padding:'48px 56px',boxSizing:'border-box',
+          transform:`translate(-50%,-50%) scale(calc(100cqw / ${CHOICE_CANVAS_W}px))`,transformOrigin:'center center',
+          display:'flex',flexDirection:'column'} as CSSProperties}>
+          <div style={{width:'100%',textAlign:'center',fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:700,
+            color:C.txt1,padding:'2px 0 12px',marginBottom:28,flexShrink:0,
+            overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{question}</div>
+          {validEntries.length
+            ? <div style={{flex:1,minHeight:0,width:'100%',maxWidth:hasImage?'62.5%':'50%',margin:'0 auto',display:'flex'}}>
+                <EditableChoiceOptions slide={previewSlide} list={remappedList} readOnly/>
+              </div>
+            : <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',
+                fontFamily:FONT_DISPLAY,fontSize:18,color:C.txt4,fontWeight:600}}>No options yet</div>}
+        </div>
       </div>
     )
   } else if (slide.type==='plain') {

@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import { C } from '../../theme.ts'
 import { SlideThumbnail } from './SlideThumbnail.tsx'
 import { AddSlideMenu } from './AddSlideMenu.tsx'
-import type { Slide, SlideType } from '../../types.ts'
+import type { Slide, SlideType, ResponsesBySlide } from '../../types.ts'
 
 interface SlideSidebarProps {
   slides: Slide[]
@@ -13,9 +13,10 @@ interface SlideSidebarProps {
   onRemove: (id: string) => void
   onAddSlide: (type: SlideType) => void
   onChangeType: (id: string, patch: { type: SlideType }) => void
+  responsesBySlide: ResponsesBySlide
 }
 
-export function SlideSidebar({slides,activeIndex,onSelect,onReorder,onRemove,onAddSlide,onChangeType}: SlideSidebarProps){
+export function SlideSidebar({slides,activeIndex,onSelect,onReorder,onRemove,onAddSlide,onChangeType,responsesBySlide}: SlideSidebarProps){
   const [pickerOpen,setPickerOpen]=useState(false)
   const [dragIndex,setDragIndex]=useState<number | null>(null)
   const [overIndex,setOverIndex]=useState<number | null>(null)
@@ -30,6 +31,7 @@ export function SlideSidebar({slides,activeIndex,onSelect,onReorder,onRemove,onA
             active={i===activeIndex} dropIndicator={dragIndex!==null&&dragIndex!==i&&overIndex===i}
             onSelect={()=>onSelect(slide.id)} onRemove={()=>onRemove(slide.id)}
             onChangeType={type=>onChangeType(slide.id,{type})} qaTakenByOther={qaTakenByOther}
+            list={responsesBySlide[slide.id]||[]}
             onDragStart={()=>setDragIndex(i)}
             onDragOver={e=>{ e.preventDefault(); setOverIndex(i) }}
             onDrop={e=>{

@@ -18,7 +18,7 @@ export function DonutResults({slide,list}: DonutResultsProps){
   if (!total) {
     return(
       <div style={{flex:1,minHeight:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:12}}>
-        <svg width={180} height={180} viewBox="0 0 200 200">
+        <svg width={320} height={320} viewBox="0 0 200 200">
           <circle cx={CX} cy={CY} r={R} fill="none" stroke={C.border} strokeWidth={28}/>
         </svg>
         <EmptyState text="No responses yet"/>
@@ -37,7 +37,7 @@ export function DonutResults({slide,list}: DonutResultsProps){
 
   return(
     <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',gap:32}}>
-      <svg width={180} height={180} viewBox="0 0 200 200" style={{flexShrink:0}}>
+      <svg width={320} height={320} viewBox="0 0 200 200" style={{flexShrink:0}}>
         <g transform={`rotate(-90 ${CX} ${CY})`}>
           {segments.map(seg=>(
             <circle key={seg.i} cx={CX} cy={CY} r={R} fill="none" stroke={seg.color}

@@ -8,6 +8,7 @@ import type { SlidePreviewData } from '../../types.ts'
 interface PulseTileProps {
   code: string
   firstSlide: SlidePreviewData | null
+  list?: (string | number)[]
   title: string
   dateLabel: string
   onClick: () => void
@@ -15,7 +16,7 @@ interface PulseTileProps {
   onRename: (newTitle: string) => void
 }
 
-export function PulseTile({code,firstSlide,title,dateLabel,onClick,onDelete,onRename}: PulseTileProps){
+export function PulseTile({code,firstSlide,list,title,dateLabel,onClick,onDelete,onRename}: PulseTileProps){
   const [hov,setHov]=useState(false)
   const [menuOpen,setMenuOpen]=useState(false)
   const [renaming,setRenaming]=useState(false)
@@ -36,7 +37,7 @@ export function PulseTile({code,firstSlide,title,dateLabel,onClick,onDelete,onRe
         background:C.surface,border:`2px solid ${C.border}`,boxShadow:C.shadow}}>
 
       <div style={{position:'relative',aspectRatio:'16/9',background:C.purpleBg,display:'flex',padding:'12px 14px'}}>
-        <MiniSlidePreview slide={firstSlide}/>
+        <MiniSlidePreview slide={firstSlide} list={list}/>
       </div>
 
       <div style={{padding:'12px 14px',background:C.surfaceAlt}}>

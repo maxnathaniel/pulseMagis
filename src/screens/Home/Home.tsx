@@ -66,7 +66,8 @@ export function Home({pulses,pulsesLoading,onCreateNew,onJoin,onResume,onDeleteP
               ? <EmptyState text="No Pulses yet — create one to get started."/>
               : <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(320px, 1fr))',gap:18}}>
                   {pulses.map(p=>(
-                    <PulseTile key={p.code} code={p.code} firstSlide={p.firstSlide} title={p.title||'Untitled presentation'}
+                    <PulseTile key={p.code} code={p.code} firstSlide={p.firstSlide} list={p.firstSlideResponses||[]}
+                      title={p.title||'Untitled presentation'}
                       dateLabel={formatDate(p.created_at)}
                       onClick={()=>onResume(p.code)}
                       onDelete={()=>setPendingDelete(p)}

@@ -1,5 +1,5 @@
 import type { Database } from './database.types.ts'
-import type { Slide, Question, Layout, ResponseMode, VerticalAlign } from '../types.ts'
+import type { Slide, Question, Layout, ResponseMode, VerticalAlign, ResultsFormat } from '../types.ts'
 
 type SlideRow = Database['public']['Tables']['slides']['Row']
 type QuestionRow = Database['public']['Tables']['questions']['Row']
@@ -43,7 +43,8 @@ export const mapSlide = (s: SlideRow): Slide => {
     position: s.position,
   }
   if (s.type === 'choice') {
-    return { ...base, type: 'choice', options: s.options || [], optionImages: s.option_images || [] }
+    return { ...base, type: 'choice', options: s.options || [], optionImages: s.option_images || [],
+      resultsFormat: (s.results_format || 'bar') as ResultsFormat }
   }
   if (s.type === 'plain') {
     return { ...base, type: 'plain', content: s.content || null, verticalAlign: (s.vertical_align || 'middle') as VerticalAlign }
@@ -71,7 +72,7 @@ export const mapSlideForBuilder = (s: SlideRow): Slide => {
   const options = s.options && s.options.length ? s.options : ['', '']
   const rawImages = s.option_images || []
   const optionImages = options.map((_, i) => rawImages[i] ?? null)
-  return { ...base, type: 'choice', options, optionImages }
+  return { ...base, type: 'choice', options, optionImages, resultsFormat: (s.results_format || 'bar') as ResultsFormat }
 }
 
 export const mapQuestion = (q: QuestionRow): Question => ({

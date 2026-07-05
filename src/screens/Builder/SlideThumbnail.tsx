@@ -14,6 +14,7 @@ interface SlideThumbnailProps {
   onRemove: () => void
   onChangeType: (type: SlideType) => void
   qaTakenByOther: boolean
+  list: (string | number)[]
   onDragStart: () => void
   onDragOver: (e: DragEvent<HTMLDivElement>) => void
   onDrop: (e: DragEvent<HTMLDivElement>) => void
@@ -21,15 +22,17 @@ interface SlideThumbnailProps {
 }
 
 export function SlideThumbnail({slide,index,total,active,dropIndicator,onSelect,onRemove,
-  onChangeType,qaTakenByOther,onDragStart,onDragOver,onDrop,onDragEnd}: SlideThumbnailProps){
+  onChangeType,qaTakenByOther,list,onDragStart,onDragOver,onDrop,onDragEnd}: SlideThumbnailProps){
   const [hov,setHov]=useState(false)
   const [menuOpen,setMenuOpen]=useState(false)
   return(
     <div draggable onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop} onDragEnd={onDragEnd}
       onMouseEnter={()=>setHov(true)} onMouseLeave={()=>{setHov(false);setMenuOpen(false)}}
-      style={{display:'flex',alignItems:'center',gap:6,width:'100%',cursor:'grab'}}>
+      style={{display:'flex',alignItems:'stretch',gap:6,width:'100%',cursor:'grab'}}>
 
-      <div style={{position:'relative',width:22,flexShrink:0,display:'flex',justifyContent:'center'}}>
+      <div style={{width:22,flexShrink:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'space-between'}}>
+        <div style={{fontSize:10.5,fontWeight:700,color:active?C.purple:C.txt4}}>{index+1}</div>
+        <div style={{position:'relative',display:'flex',justifyContent:'center'}}>
         {hov&&(
           <>
             <button onClick={e=>{e.stopPropagation();setMenuOpen(o=>!o)}}
@@ -74,6 +77,7 @@ export function SlideThumbnail({slide,index,total,active,dropIndicator,onSelect,
             )}
           </>
         )}
+        </div>
       </div>
 
       <div onClick={onSelect} style={{position:'relative',flex:1,minWidth:0,aspectRatio:'16/9',
@@ -84,11 +88,7 @@ export function SlideThumbnail({slide,index,total,active,dropIndicator,onSelect,
         userSelect:'none',WebkitUserSelect:'none',
         outline:dropIndicator?`2px dashed ${C.purple}`:'none',outlineOffset:2} as CSSProperties}>
 
-        <span style={{position:'absolute',top:6,right:6,width:20,height:20,borderRadius:4,
-          background:active?C.purple:C.purpleBg,color:active?'#fff':C.purple,fontSize:10.5,fontWeight:700,
-          display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,zIndex:1}}>{index+1}</span>
-
-        <MiniSlidePreview slide={slide}/>
+        <MiniSlidePreview slide={slide} list={list}/>
       </div>
     </div>
   )

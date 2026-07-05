@@ -11,7 +11,7 @@ import { Presenter } from './screens/Presenter/Presenter.tsx'
 import { Join } from './screens/Join/Join.tsx'
 import { Vote } from './screens/Vote/Vote.tsx'
 import { EmptyState } from './components/ui/EmptyState.tsx'
-import type { Draft, Session, Slide, SlideType, SlidePatch, Question, PulseSummary, ResponsesBySlide, ModerateAction } from './types.ts'
+import type { Draft, Session, Slide, SlideType, SlidePatch, Question, PulseSummary, ResponsesBySlide, ModerateAction, ResultsFormat } from './types.ts'
 
 type Screen = 'home' | 'build' | 'present' | 'join' | 'vote'
 type LoginMode = 'signin' | 'signup'
@@ -118,18 +118,31 @@ export default function App() {
     if (error) console.error(error)
     const codes=(data||[]).map(p=>p.code)
     let firstSlideByCode: Record<string, PulseSummary['firstSlide']> = {}
+    let responsesByCode: Record<string, (string | number)[]> = {}
     if (codes.length) {
       const {data:slideRows,error:slideError}=await supabase.from('slides')
-        .select('session_code,type,question,options,content_image,layout,content,vertical_align').in('session_code',codes).eq('position',0)
-        .returns<{session_code:string; type:SlideType; question:string; options:string[] | null; content_image:string | null; layout:'left'|'right'; content:JSONContent | null; vertical_align:'top'|'middle'|'bottom'}[]>()
+        .select('id,session_code,type,question,options,content_image,layout,content,vertical_align,results_format').in('session_code',codes).eq('position',0)
+        .returns<{id:string; session_code:string; type:SlideType; question:string; options:string[] | null; content_image:string | null; layout:'left'|'right'; content:JSONContent | null; vertical_align:'top'|'middle'|'bottom'; results_format:ResultsFormat}[]>()
       if (slideError) console.error(slideError)
       firstSlideByCode=Object.fromEntries((slideRows||[]).map(s=>[s.session_code, {
         type:s.type, question:s.question, options:s.options,
         contentImage:s.content_image, layout:s.layout,
-        content:s.content, verticalAlign:s.vertical_align,
+        content:s.content, verticalAlign:s.vertical_align, resultsFormat:s.results_format,
       }]))
+      const slideIdToCode=Object.fromEntries((slideRows||[]).map(s=>[s.id,s.session_code]))
+      const slideIds=(slideRows||[]).map(s=>s.id)
+      if (slideIds.length) {
+        const {data:responseRows,error:responseError}=await supabase.from('responses')
+          .select('slide_id,value').in('slide_id',slideIds)
+          .returns<{slide_id:string; value:string|number}[]>()
+        if (responseError) console.error(responseError)
+        ;(responseRows||[]).forEach(r => {
+          const code=slideIdToCode[r.slide_id]
+          if (code) (responsesByCode[code]=responsesByCode[code]||[]).push(r.value)
+        })
+      }
     }
-    setPulses((data||[]).map(p=>({...p, firstSlide:firstSlideByCode[p.code]||null})))
+    setPulses((data||[]).map(p=>({...p, firstSlide:firstSlideByCode[p.code]||null, firstSlideResponses:responsesByCode[p.code]||[]})))
     setPulsesLoading(false)
   }, [user])
   useEffect(() => { if (screen==='home' && user) fetchPulses() }, [screen, user, fetchPulses])
@@ -214,28 +227,59 @@ export default function App() {
       pinHash=null
     }
 
+    // Checked and blocking, same reasoning as the slides insert below: the
+    // isUpdate path deletes the Pulse's existing slides right after this, so
+    // silently logging-and-continuing past a failed sessions write (as this
+    // used to do) still runs that delete even though the session itself
+    // never actually got marked live/updated — wiping slides for no benefit.
     if (isUpdate) {
       const {error:sessUpdErr}=await supabase.from('sessions').update({
         title, current_slide_index:startIndex, qna_enabled:qnaEnabled,
         qna_moderation:draft.qnaModeration, pin_hash:pinHash, is_live:true, has_presented:true,
       }).eq('code',code)
-      if (sessUpdErr) console.error(sessUpdErr)
+      if (sessUpdErr) {
+        console.error(sessUpdErr)
+        window.alert(`Couldn't start presenting — the session failed to update (${sessUpdErr.message}). Your Pulse has NOT started; please fix the issue and try again before making further changes.`)
+        return
+      }
       const {error:delErr}=await supabase.from('slides').delete().eq('session_code',code)
-      if (delErr) console.error(delErr)
+      if (delErr) {
+        console.error(delErr)
+        window.alert(`Couldn't start presenting — clearing the old slides failed (${delErr.message}). Please fix the issue and try again before making further changes.`)
+        return
+      }
     } else {
-      await supabase.from('sessions').insert({
+      const {error:sessInsertError}=await supabase.from('sessions').insert({
         code, title, owner_id:user!.id, current_slide_index:startIndex, qna_enabled:qnaEnabled,
         qna_moderation:draft.qnaModeration, pin_hash:pinHash, is_live:true, has_presented:true,
       })
+      if (sessInsertError) {
+        console.error(sessInsertError)
+        window.alert(`Couldn't start presenting — the session failed to save (${sessInsertError.message}).`)
+        return
+      }
     }
 
-    await supabase.from('slides').insert(draft.slides.map((s,idx) => ({
+    // Checked and blocking (unlike the other writes above, which only log):
+    // this insert follows a delete of the Pulse's existing slides on the
+    // isUpdate path, so silently swallowing a failure here — as a schema
+    // mismatch (e.g. a column added without a PostgREST schema-cache
+    // reload) previously did — leaves the Pulse's slides deleted with
+    // nothing reinserted, while the code below still proceeds to show a
+    // "live" presenter screen as if it worked. Surface it and abort instead.
+    const {error:slidesInsertError}=await supabase.from('slides').insert(draft.slides.map((s,idx) => ({
       id:s.id, session_code:code, type:s.type, question:s.question,
       options:s.type==='choice'?s.options.filter(o=>o.trim()):null,
       option_images:s.type==='choice'?(s.optionImages||null):null, position:idx,
       layout:s.layout||'right', content_image:s.contentImage||null, response_mode:s.responseMode||'instant',
       content:s.type==='plain'?(s.content||null):null, vertical_align:s.type==='plain'?(s.verticalAlign||'middle'):'middle',
-    }))).then(({error}) => { if (error) console.error(error) })
+      results_format:s.type==='choice'?(s.resultsFormat||'bar'):'bar',
+    })))
+    if (slidesInsertError) {
+      console.error(slidesInsertError)
+      window.alert(`Couldn't start presenting — the slides failed to save (${slidesInsertError.message}). Your Pulse has NOT started; please fix the issue and try again before making further changes.`)
+      return
+    }
     setSession({ code, title,
       slides:draft.slides.map(s=>s.type==='choice' ? {...s,options:s.options.filter(o=>o.trim())} : s),
       currentSlideIndex:startIndex, qnaEnabled,
@@ -329,6 +373,7 @@ export default function App() {
       option_images:s.type==='choice'?(s.optionImages||null):null, position:idx,
       layout:s.layout||'right', content_image:s.contentImage||null, response_mode:s.responseMode||'instant',
       content:s.type==='plain'?(s.content||null):null, vertical_align:s.type==='plain'?(s.verticalAlign||'middle'):'middle',
+      results_format:s.type==='choice'?(s.resultsFormat||'bar'):'bar',
     }))
     const {error:upsertError}=await supabase.from('slides').upsert(slideRows)
     if (upsertError) console.error(upsertError)

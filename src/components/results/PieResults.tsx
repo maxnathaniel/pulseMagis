@@ -17,7 +17,7 @@ export function PieResults({slide,list}: PieResultsProps){
   if (!total) {
     return(
       <div style={{flex:1,minHeight:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:12}}>
-        <svg width={180} height={180} viewBox="0 0 200 200">
+        <svg width={320} height={320} viewBox="0 0 200 200">
           <circle cx={CX} cy={CY} r={R} fill={C.border}/>
         </svg>
         <EmptyState text="No responses yet"/>
@@ -46,7 +46,7 @@ export function PieResults({slide,list}: PieResultsProps){
 
   return(
     <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',gap:32}}>
-      <svg width={180} height={180} viewBox="0 0 200 200" style={{flexShrink:0}}>
+      <svg width={320} height={320} viewBox="0 0 200 200" style={{flexShrink:0}}>
         <g transform={`rotate(-90 ${CX} ${CY})`}>
           {wedges.map(w=>w.full
             ? <circle key={w.i} cx={CX} cy={CY} r={R} fill={w.color}/>

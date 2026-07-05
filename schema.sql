@@ -28,6 +28,24 @@
 -- Without this, presenting a deck will fail on the slides insert (unknown
 -- columns) once the app starts sending layout/content_image/response_mode.
 --
+-- Similarly, if your live `slides` table predates the choice-slide "Results
+-- format" picker, add the column manually:
+--
+--   ALTER TABLE slides ADD COLUMN IF NOT EXISTS results_format TEXT NOT NULL DEFAULT 'bar'
+--     CHECK (results_format IN ('bar','donut','pie','dots'));
+--   NOTIFY pgrst, 'reload schema';
+--
+-- The NOTIFY is required — without it, PostgREST's cached schema doesn't
+-- know about the new column yet, and every slides insert/upsert that
+-- includes it (i.e. all of them, from now on) fails outright with a
+-- PGRST204 "column not found in schema cache" error, silently rejecting
+-- the WHOLE write as one unit. Concretely: since startPresenting deletes a
+-- Pulse's existing slides before reinserting the new set, hitting this on
+-- an already-presented Pulse deletes all its slides and then fails to put
+-- any back — same failure mode already documented above for
+-- is_live/has_presented/plain-slide-type, repeated here because this one
+-- shipped without the NOTIFY the first time and cost a real user's slides.
+--
 -- Additionally, if your live `sessions` table predates login, it will be
 -- missing the owner_id column used to scope Pulses to their creator. Run
 -- this once, manually, in the Supabase SQL editor:
@@ -116,6 +134,7 @@ CREATE TABLE IF NOT EXISTS slides (
   response_mode TEXT NOT NULL DEFAULT 'instant' CHECK (response_mode IN ('instant','onclick','private')),
   content       JSONB,          -- TipTap rich-text document (plain slides only; null otherwise)
   vertical_align TEXT NOT NULL DEFAULT 'middle' CHECK (vertical_align IN ('top','middle','bottom')),
+  results_format TEXT NOT NULL DEFAULT 'bar' CHECK (results_format IN ('bar','donut','pie','dots')),
   position      INTEGER NOT NULL DEFAULT 0,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
