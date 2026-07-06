@@ -36,7 +36,7 @@ export function PulseTile({code,firstSlide,list,title,dateLabel,onClick,onDelete
       style={{position:'relative',width:'100%',cursor:'pointer',borderRadius:6,overflow:'hidden',
         background:C.surface,border:`2px solid ${C.border}`,boxShadow:C.shadow}}>
 
-      <div style={{position:'relative',aspectRatio:'16/9',background:C.purpleBg,display:'flex',padding:'12px 14px'}}>
+      <div style={{position:'relative',aspectRatio:'16/9',background:C.surface,display:'flex',padding:'12px 14px'}}>
         <MiniSlidePreview slide={firstSlide} list={list}/>
       </div>
 

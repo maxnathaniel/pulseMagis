@@ -26,13 +26,13 @@ export default function App() {
   const createSlide = (type: SlideType): Slide => {
     if (type === 'choice') {
       return { id: uid(), type, question: '', options: ['', '', '', ''], optionImages: [null, null, null, null],
-        layout: 'right', contentImage: null, responseMode: 'instant' }
+        layout: 'right', contentImage: null, contentImageOriginal: null, responseMode: 'instant' }
     }
     if (type === 'plain') {
-      return { id: uid(), type, question: '', layout: 'right', contentImage: null, responseMode: 'instant',
+      return { id: uid(), type, question: '', layout: 'right', contentImage: null, contentImageOriginal: null, responseMode: 'instant',
         content: EMPTY_RICH_DOC, verticalAlign: 'middle' }
     }
-    return { id: uid(), type, question: '', layout: 'right', contentImage: null, responseMode: 'instant' }
+    return { id: uid(), type, question: '', layout: 'right', contentImage: null, contentImageOriginal: null, responseMode: 'instant' }
   }
 
   const [screen, setScreen]         = useState<Screen>('home')
@@ -158,7 +158,8 @@ export default function App() {
   const changeSlideType = (id: string, newType: SlideType) =>
     setDraft(d => ({ ...d, slides: d.slides.map((s): Slide => {
       if (s.id!==id || s.type===newType) return s
-      const shared={question:s.question, layout:s.layout, contentImage:s.contentImage, responseMode:s.responseMode}
+      const shared={question:s.question, layout:s.layout, contentImage:s.contentImage,
+        contentImageOriginal:s.contentImageOriginal, responseMode:s.responseMode}
       if (newType==='choice') return { id:s.id, type:newType, ...shared,
         options: s.type==='choice' && s.options.length ? s.options : ['','','',''],
         optionImages: s.type==='choice' && s.optionImages.length ? s.optionImages : [null,null,null,null] }
@@ -262,7 +263,7 @@ export default function App() {
       id:s.id, session_code:code, type:s.type, question:s.question,
       options:s.type==='choice'?s.options.filter(o=>o.trim()):null,
       option_images:s.type==='choice'?(s.optionImages||null):null, position:idx,
-      layout:s.layout||'right', content_image:s.contentImage||null, response_mode:s.responseMode||'instant',
+      layout:s.layout||'right', content_image:s.contentImage||null, content_image_original:s.contentImageOriginal||null, response_mode:s.responseMode||'instant',
       content:s.type==='plain'?(s.content||null):null, vertical_align:s.type==='plain'?(s.verticalAlign||'middle'):'middle',
       results_format:s.type==='choice'?(s.resultsFormat||'bar'):'bar',
     }))
@@ -372,7 +373,7 @@ export default function App() {
       id:s.id, session_code:code, type:s.type, question:s.question,
       options:s.type==='choice'?s.options.filter(o=>o.trim()):null,
       option_images:s.type==='choice'?(s.optionImages||null):null, position:idx,
-      layout:s.layout||'right', content_image:s.contentImage||null, response_mode:s.responseMode||'instant',
+      layout:s.layout||'right', content_image:s.contentImage||null, content_image_original:s.contentImageOriginal||null, response_mode:s.responseMode||'instant',
       content:s.type==='plain'?(s.content||null):null, vertical_align:s.type==='plain'?(s.verticalAlign||'middle'):'middle',
       results_format:s.type==='choice'?(s.resultsFormat||'bar'):'bar',
     }))

@@ -81,7 +81,7 @@ export function SlideThumbnail({slide,index,total,active,dropIndicator,onSelect,
       </div>
 
       <div onClick={onSelect} style={{position:'relative',flex:1,minWidth:0,aspectRatio:'16/9',
-        background:active?C.purpleBg:C.surface,
+        background:C.surface,
         border:`2px solid ${dropIndicator?C.purple:(active?C.purple:C.border)}`,borderRadius:4,
         cursor:'pointer',display:'flex',padding:'8px 10px 8px 8px',
         boxShadow:active?`0 2px 10px ${C.purpleBg}`:C.shadow,

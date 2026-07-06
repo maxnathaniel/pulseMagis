@@ -1,16 +1,20 @@
 import { useRef, useState } from 'react'
-import { AlignLeft, AlignRight, Image as ImageIcon, X, Copy, ChevronDown, type LucideIcon } from 'lucide-react'
+import { AlignLeft, AlignRight, Image as ImageIcon, X, Copy, ChevronDown, Crop, type LucideIcon } from 'lucide-react'
 import { C, FONT_DISPLAY, RESPONSE_MODES, SLIDE_TYPES, RESULTS_FORMATS } from '../../theme.ts'
-import { compressImage } from '../../lib/helpers.ts'
+import { readFileAsDataUrl, compressDataUrl } from '../../lib/helpers.ts'
 import { SectionLabel } from '../../components/ui/SectionLabel.tsx'
+import { ImageCropModal } from './ImageCropModal.tsx'
 import type { Slide, SlidePatch, SlideType, ResponseMode, Layout } from '../../types.ts'
-
-const CONTENT_IMAGE_MAX_PX = 640
 
 const LAYOUT_OPTIONS: [Layout, LucideIcon, string][] = [
   ['left', AlignLeft, 'Image left'],
   ['right', AlignRight, 'Image right'],
 ]
+
+// Cap for the preserved uncropped "original" — high enough to re-crop into
+// a sharp 640px final image, low enough to not store multi-megabyte photos
+// inline in the DB.
+const ORIGINAL_MAX_PX = 1600
 
 interface EditPanelProps {
   slide: Slide
@@ -24,11 +28,37 @@ interface EditPanelProps {
 export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToAll,onClose}: EditPanelProps){
   const fileRef=useRef<HTMLInputElement>(null)
   const [typeMenuOpen,setTypeMenuOpen]=useState(false)
+  const [cropSrc,setCropSrc]=useState<string|null>(null)
+  // The uncropped image to save alongside the next crop confirmation — kept
+  // separate from cropSrc since on "Edit crop" the two start out equal but
+  // cropSrc gets replaced by the new crop while this stays the same source.
+  const [pendingOriginal,setPendingOriginal]=useState<string|null>(null)
+  // The slide's currently-saved crop result, passed to the modal only when
+  // re-editing an existing crop (not a fresh upload) so it can detect that
+  // crop's aspect ratio and reopen showing the same shape instead of always
+  // resetting to the "Perfect" default.
+  const [reCropCurrent,setReCropCurrent]=useState<string|null>(null)
   const currentType=SLIDE_TYPES.find(t=>t.key===slide.type)!
   const handleUpload=async(file: File | null | undefined)=>{
     if (!file) return
-    try{ onChange({contentImage: await compressImage(file, CONTENT_IMAGE_MAX_PX)}) }
+    try{
+      const raw=await readFileAsDataUrl(file)
+      setPendingOriginal(await compressDataUrl(raw, ORIGINAL_MAX_PX))
+      setReCropCurrent(null)
+      setCropSrc(raw)
+    }
     catch(e){ console.error(e) }
+  }
+  // Re-crop from the preserved uncropped original when available, falling
+  // back to the current (possibly already-cropped) contentImage for slides
+  // that predate contentImageOriginal — either way, that same source is
+  // what gets saved back as the original alongside the new crop.
+  const openEditCrop=()=>{
+    const source=slide.contentImageOriginal||slide.contentImage
+    if (!source) return
+    setPendingOriginal(source)
+    setReCropCurrent(slide.contentImage)
+    setCropSrc(source)
   }
   return(
     <div style={{width:280,flexShrink:0,borderLeft:`1.5px solid ${C.border}`,
@@ -134,21 +164,28 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
           onChange={e=>handleUpload(e.target.files?.[0])}/>
         {slide.contentImage?(
           <div style={{marginTop:8,display:'flex',alignItems:'center',gap:10}}>
-            <div onClick={()=>fileRef.current?.click()} title="Click to replace" style={{position:'relative',
+            <div onClick={openEditCrop} title="Click to edit crop" style={{position:'relative',
               width:56,height:56,flexShrink:0,cursor:'pointer'}}>
               <img src={slide.contentImage} alt="" style={{width:'100%',height:'100%',objectFit:'cover',
                 borderRadius:5,border:`1.5px solid ${C.border}`,display:'block'}}/>
-              <button onClick={e=>{e.stopPropagation();onChange({contentImage:null})}} title="Remove image"
+              <button onClick={e=>{e.stopPropagation();onChange({contentImage:null,contentImageOriginal:null})}} title="Remove image"
                 style={{position:'absolute',top:-6,right:-6,width:20,height:20,borderRadius:'50%',
                   border:`1.5px solid ${C.surface}`,background:C.red,color:'#fff',cursor:'pointer',
                   display:'flex',alignItems:'center',justifyContent:'center'}}>
                 <X size={11}/>
               </button>
             </div>
-            <button onClick={()=>fileRef.current?.click()}
-              style={{background:'none',border:'none',color:C.purple,cursor:'pointer',fontSize:12.5,fontWeight:700}}>
-              Replace image
-            </button>
+            <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:4}}>
+              <button onClick={openEditCrop}
+                style={{background:'none',border:'none',color:C.purple,cursor:'pointer',fontSize:12.5,fontWeight:700,
+                  display:'flex',alignItems:'center',gap:5,padding:0}}>
+                <Crop size={12}/> Edit crop
+              </button>
+              <button onClick={()=>fileRef.current?.click()}
+                style={{background:'none',border:'none',color:C.txt3,cursor:'pointer',fontSize:12.5,fontWeight:700,padding:0}}>
+                Replace image
+              </button>
+            </div>
           </div>
         ):(
           <button onClick={()=>fileRef.current?.click()} style={{marginTop:8,width:'100%',
@@ -159,6 +196,15 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
           </button>
         )}
       </div>
+
+      {cropSrc&&(
+        <ImageCropModal imageSrc={cropSrc} currentImageSrc={reCropCurrent||undefined}
+          onCancel={()=>{ setCropSrc(null); setPendingOriginal(null); setReCropCurrent(null) }}
+          onConfirm={dataUrl=>{
+            onChange({contentImage:dataUrl, contentImageOriginal:pendingOriginal})
+            setCropSrc(null); setPendingOriginal(null); setReCropCurrent(null)
+          }}/>
+      )}
 
       <div>
         <SectionLabel>Show responses</SectionLabel>

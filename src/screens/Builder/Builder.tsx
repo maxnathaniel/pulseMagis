@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react'
+import { useState, useEffect, useRef, type Dispatch, type SetStateAction, type CSSProperties } from 'react'
 import { C } from '../../theme.ts'
 import { supabase } from '../../lib/supabase.ts'
 import { BuilderTopBar, type BuilderView } from './BuilderTopBar.tsx'
@@ -82,10 +82,18 @@ export function Builder({draft,setDraft,updateSlide,changeSlideType,addSlide,rem
             <SlideSidebar slides={draft.slides} activeIndex={activeIndex} onSelect={setActiveId}
               onReorder={reorderSlide} onRemove={removeSlide} onAddSlide={addSlide}
               onChangeType={(id,patch)=>changeSlideType(id,patch.type)} responsesBySlide={responsesBySlide}/>
-            <div style={{flex:1,overflowY:'auto',padding:32,display:'flex',alignItems:'stretch',justifyContent:'center',minWidth:0}}>
+            <div style={{flex:1,overflowY:'auto',padding:32,display:'flex',alignItems:'center',justifyContent:'center',minWidth:0,containerType:'size'} as CSSProperties}>
               {slide&&(
-                <div style={{background:C.surface,borderRadius:4,boxShadow:C.shadow,padding:'48px 0',
-                  width:'auto',maxWidth:'100%',height:'100%',aspectRatio:'16/9',overflowY:'auto',display:'flex',flexDirection:'column'}}>
+                // A plain height:'100%'+aspectRatio:'16/9' box silently loses the aspect
+                // ratio once the available width is narrower than a true 16:9 slide at
+                // that height would need (aspect-ratio doesn't renegotiate an already-set
+                // height once maxWidth clamps the auto side) — it just fills the available
+                // box and stops being 16:9, shrinking everything inside proportionally,
+                // most visibly the image column. Sizing both dimensions off container
+                // query units picks whichever axis is the binding constraint instead.
+                <div style={{background:C.surface,borderRadius:4,boxShadow:C.shadow,
+                  width:'min(100cqw, calc(100cqh * 16 / 9))',height:'min(100cqh, calc(100cqw * 9 / 16))',
+                  overflowY:'auto',display:'flex',flexDirection:'column'} as CSSProperties}>
                   <SlideEditor slide={slide} list={responsesBySlide[slide.id]||[]}
                     onChange={patch=>updateSlide(slide.id,patch)}
                     onAddOption={()=>addOption(slide.id)}
@@ -105,7 +113,7 @@ export function Builder({draft,setDraft,updateSlide,changeSlideType,addSlide,rem
             <RightRail editOpen={editPanelOpen} onToggleEdit={()=>setEditPanelOpen(v=>!v)}/>
           </div>
       }
-      {previewOpen&&<PreviewModal draft={draft} onClose={()=>setPreviewOpen(false)}/>}
+      {previewOpen&&<PreviewModal draft={draft} startIndex={Math.max(activeIndex,0)} onClose={()=>setPreviewOpen(false)}/>}
     </div>
   )
 }

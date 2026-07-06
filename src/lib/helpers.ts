@@ -14,23 +14,54 @@ export async function hashPin(pin: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-export async function compressImage(file: File, maxPx = 220): Promise<string> {
-  return new Promise((resolve) => {
+export function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload = (e) => {
-      const img = new Image()
-      img.onload = () => {
-        const scale = Math.min(maxPx / img.width, maxPx / img.height, 1)
-        const canvas = document.createElement('canvas')
-        canvas.width = Math.round(img.width * scale)
-        canvas.height = Math.round(img.height * scale)
-        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
-        resolve(canvas.toDataURL('image/jpeg', 0.78))
-      }
-      img.src = e.target?.result as string
-    }
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(reader.error)
     reader.readAsDataURL(file)
   })
+}
+
+// Downscales (never upscales) a data-URL image so its longer side is at
+// most maxPx, re-encoding as JPEG — the shared scale/compress step behind
+// both compressImage and the "preserve an uncropped original" flow in
+// ImageCropModal.
+export function compressDataUrl(dataUrl: string, maxPx: number): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => {
+      const scale = Math.min(maxPx / img.width, maxPx / img.height, 1)
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(img.width * scale)
+      canvas.height = Math.round(img.height * scale)
+      canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+      resolve(canvas.toDataURL('image/jpeg', 0.78))
+    }
+    img.src = dataUrl
+  })
+}
+
+export async function compressImage(file: File, maxPx = 220): Promise<string> {
+  return compressDataUrl(await readFileAsDataUrl(file), maxPx)
+}
+
+// Crops `img` to the given rect (in the units of the img's own *displayed*
+// size, e.g. straight from a react-image-crop PixelCrop against an onscreen
+// <img>) then scales/compresses the result exactly like compressImage above,
+// so cropped content images stay consistent with every other image this app
+// stores (same JPEG quality, same maxPx cap semantics).
+export function cropAndCompress(img: HTMLImageElement, crop: { x: number; y: number; width: number; height: number }, maxPx = 640): string {
+  const scaleX = img.naturalWidth / img.width
+  const scaleY = img.naturalHeight / img.height
+  const cropW = crop.width * scaleX
+  const cropH = crop.height * scaleY
+  const scale = Math.min(maxPx / cropW, maxPx / cropH, 1)
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.round(cropW * scale)
+  canvas.height = Math.round(cropH * scale)
+  canvas.getContext('2d')!.drawImage(img, crop.x * scaleX, crop.y * scaleY, cropW, cropH, 0, 0, canvas.width, canvas.height)
+  return canvas.toDataURL('image/jpeg', 0.78)
 }
 
 // ─── DB → JS mappers ────────────────────────────────────────────────────────
@@ -39,6 +70,7 @@ export const mapSlide = (s: SlideRow): Slide => {
     id: s.id, question: s.question,
     layout: (s.layout || 'right') as Layout,
     contentImage: s.content_image || null,
+    contentImageOriginal: s.content_image_original || null,
     responseMode: (s.response_mode || 'instant') as ResponseMode,
     position: s.position,
   }
@@ -61,6 +93,7 @@ export const mapSlideForBuilder = (s: SlideRow): Slide => {
     id: s.id, question: s.question,
     layout: (s.layout || 'right') as Layout,
     contentImage: s.content_image || null,
+    contentImageOriginal: s.content_image_original || null,
     responseMode: (s.response_mode || 'instant') as ResponseMode,
   }
   if (s.type === 'plain') {

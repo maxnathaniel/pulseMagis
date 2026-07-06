@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { C, FONT_DISPLAY, PALETTE_BARS } from '../../theme.ts'
 
@@ -11,6 +12,11 @@ interface EditableBarOptionsProps {
 }
 
 export function EditableBarOptions({slide,list,readOnly,onUpdateOption,onRemoveOption,onAddOption}: EditableBarOptionsProps){
+  const [mounted,setMounted]=useState(false)
+  useEffect(() => {
+    const t=requestAnimationFrame(()=>setMounted(true))
+    return ()=>cancelAnimationFrame(t)
+  }, [])
   const counts=slide.options.map((_,i)=>list.filter(v=>v===i).length)
   const max=Math.max(1,...counts), total=list.length
   return(
@@ -28,9 +34,9 @@ export function EditableBarOptions({slide,list,readOnly,onUpdateOption,onRemoveO
               </div>
             )}
             <div style={{flex:1,width:'100%',borderRadius:4,background:`${color}16`,display:'flex',alignItems:'flex-end'}}>
-              <div style={{width:'100%',height:`${(c/max)*100}%`,background:`${color}30`,borderRadius:4,
+              <div style={{width:'100%',height:mounted?`${(c/max)*100}%`:'0%',background:`${color}30`,borderRadius:4,
                 border:c>0?`2px solid ${color}45`:'none',boxSizing:'border-box',
-                transition:'height .6s cubic-bezier(.22,1,.36,1)'}}/>
+                transition:`height .6s cubic-bezier(.22,1,.36,1) ${oi*70}ms`}}/>
             </div>
             {!readOnly&&(
               <input value={opt} onChange={e=>onUpdateOption?.(oi,e.target.value)} placeholder={`Option ${oi+1}`}

@@ -10,7 +10,7 @@ export function WordCloudResults({list,hideEmptyLabel}: {list: string[]; hideEmp
   return(
     <div style={{display:'flex',flexWrap:'wrap',gap:'10px 16px',justifyContent:'center',padding:'10px 0'}}>
       {entries.map(([word,count],i)=>(
-        <span key={word} style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14+(count/max)*28,color:PALETTE_BARS[i%PALETTE_BARS.length],animation:'fadeUp .4s ease',lineHeight:1}}>{word}</span>
+        <span key={word} style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14+(count/max)*28,color:PALETTE_BARS[i%PALETTE_BARS.length],animation:`fadeUp .4s ease ${i*30}ms both`,lineHeight:1}}>{word}</span>
       ))}
     </div>
   )

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { C, PALETTE_BARS } from '../../theme.ts'
 import { EditableChartLegend } from './EditableChartLegend.tsx'
 
@@ -14,6 +15,11 @@ interface EditableDonutOptionsProps {
 }
 
 export function EditableDonutOptions({slide,list,readOnly,onUpdateOption,onRemoveOption,onAddOption}: EditableDonutOptionsProps){
+  const [mounted,setMounted]=useState(false)
+  useEffect(() => {
+    const t=requestAnimationFrame(()=>setMounted(true))
+    return ()=>cancelAnimationFrame(t)
+  }, [])
   const counts=slide.options.map((_,i)=>list.filter(v=>v===i).length)
   const total=list.length
 
@@ -32,8 +38,9 @@ export function EditableDonutOptions({slide,list,readOnly,onUpdateOption,onRemov
         <g transform={`rotate(-90 ${CX} ${CY})`}>
           {segments.map(seg=>(
             <circle key={seg.i} cx={CX} cy={CY} r={R} fill="none" stroke={seg.color}
-              strokeWidth={28} strokeDasharray={`${seg.dash} ${seg.gap}`}
-              strokeDashoffset={seg.offset} strokeLinecap="butt"/>
+              strokeWidth={28} strokeDasharray={mounted?`${seg.dash} ${seg.gap}`:`0 ${CIRCUMFERENCE}`}
+              strokeDashoffset={seg.offset} strokeLinecap="butt"
+              style={{transition:`stroke-dasharray .8s cubic-bezier(.22,1,.36,1) ${seg.i*90}ms`}}/>
           ))}
         </g>
       ) : (

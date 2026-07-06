@@ -60,6 +60,7 @@ export interface Database {
           option_images: (string | null)[] | null
           layout: LayoutDb
           content_image: string | null
+          content_image_original: string | null
           response_mode: ResponseModeDb
           content: JSONContent | null
           vertical_align: VerticalAlignDb
@@ -76,6 +77,7 @@ export interface Database {
           option_images?: (string | null)[] | null
           layout?: LayoutDb
           content_image?: string | null
+          content_image_original?: string | null
           response_mode?: ResponseModeDb
           content?: JSONContent | null
           vertical_align?: VerticalAlignDb
@@ -92,6 +94,7 @@ export interface Database {
           option_images?: (string | null)[] | null
           layout?: LayoutDb
           content_image?: string | null
+          content_image_original?: string | null
           response_mode?: ResponseModeDb
           content?: JSONContent | null
           vertical_align?: VerticalAlignDb

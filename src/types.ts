@@ -12,6 +12,12 @@ interface SlideBase {
   question: string
   layout: Layout
   contentImage: string | null
+  // The uncropped source contentImage was cropped from (capped at 1600px,
+  // never itself cropped) — kept so "Edit crop" can re-crop from the full
+  // framing instead of re-cropping an already-cropped image. Null for
+  // slides created before this field existed, in which case "Edit crop"
+  // falls back to re-cropping contentImage itself.
+  contentImageOriginal: string | null
   responseMode: ResponseMode
   position?: number
 }

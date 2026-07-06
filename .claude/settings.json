@@ -44,7 +44,17 @@
       "Bash(git check-ignore *)",
       "Bash(git -C c:/Users/User/coding/pulsemagis log --oneline -10 -- src/screens/Builder/PreviewModal.tsx src/components/MiniSlidePreview.tsx src/screens/Home/PulseTile.tsx)",
       "Skill(run)",
-      "Skill(run:*)"
+      "Skill(run:*)",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/react-image-crop/package.json'\\).version\\)\")",
+      "Bash(ls .claude/skills)",
+      "Bash(grep -Hm1 '^description:' .claude/skills/*/SKILL.md)",
+      "Bash(npx --version)",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
+      "Bash(npx -y playwright --version)",
+      "Bash(where chromium-cli *)",
+      "Bash(chromium-cli --help)",
+      "Bash(NODE_PATH=\"/c/Users/User/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules\" node \"C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-User-coding-pulsemagis\\\\c37fee98-0bf3-42c7-9e93-a3222e4f651f\\\\scratchpad\\\\measure.js\")",
+      "Bash(NODE_PATH=\"/c/Users/User/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules\" node \"C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-User-coding-pulsemagis\\\\c37fee98-0bf3-42c7-9e93-a3222e4f651f\\\\scratchpad\\\\shot.js\")"
     ],
     "additionalDirectories": [
       "\\tmp"

@@ -21,11 +21,12 @@ const PRESENTER_CANVAS_H = 720
 
 interface PreviewModalProps {
   draft: Draft
+  startIndex?: number
   onClose: () => void
 }
 
-export function PreviewModal({draft,onClose}: PreviewModalProps){
-  const [idx,setIdx]=useState(0)
+export function PreviewModal({draft,startIndex,onClose}: PreviewModalProps){
+  const [idx,setIdx]=useState(startIndex||0)
   const [revealedSlides,setRevealedSlides]=useState<Set<string>>(() => new Set())
   const [choiceInput,setChoiceInput]=useState<number | null>(null)
   const [textInput,setTextInput]=useState('')

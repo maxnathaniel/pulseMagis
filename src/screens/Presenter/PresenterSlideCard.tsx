@@ -48,7 +48,6 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
   showChrome,onExit,isFullscreen,onToggleFullscreen,onShowJoinPanel,onPrev,prevDisabled,onNext,nextDisabled}: PresenterSlideCardProps){
   const [hovTopLeft,setHovTopLeft]=useState(false)
   const [hovBottomLeft,setHovBottomLeft]=useState(false)
-  const pendingCount=qnaList.filter(q=>q.status==='pending').length
   // The panel column stays permanently mounted and is animated via a
   // max-width/opacity transition (rather than unmounting) so the adjacent
   // slide content — which is flex:1 — reflows on the same timeline instead
@@ -69,8 +68,8 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
     setPanelOpen(false)
   }, [showJoinPanel])
   const imageCol=slide.contentImage&&(
-    <div style={{flex:'0 0 20%',minWidth:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <img src={slide.contentImage} alt="" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:5}}/>
+    <div style={{flex:'0 0 25%',minWidth:0,overflow:'hidden',borderRadius:5}}>
+      <img src={slide.contentImage} alt="" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
     </div>
   )
   // The image column always bleeds flush to whichever card edge it sits
@@ -123,17 +122,20 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
         paddingLeft:contentIsLeftEdge?56:0,paddingRight:contentIsRightEdge?56:0,
         transition:'padding 1.1s cubic-bezier(0.34,1.15,0.64,1)'}}>
         {slide.type==='qa'?(
-          <>
-            <div style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'flex-start',gap:8,marginBottom:16}}>
+          <div style={{flex:1,minHeight:0,width:'100%',display:'flex',flexDirection:'column'}}>
+            <div style={{width:'100%',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'flex-start',gap:8,marginBottom:16}}>
               <h2 style={{fontFamily:FONT_DISPLAY,fontSize:'clamp(22px,3.5vw,30px)',fontWeight:700,textAlign:'left',margin:0,color:C.txt1}}>
                 {slide.question||'Ask a question'}
               </h2>
-              {pendingCount>0&&<span style={{background:C.red,color:'#fff',fontSize:11,fontWeight:800,borderRadius:999,minWidth:20,height:20,display:'flex',alignItems:'center',justifyContent:'center',padding:'0 5px'}}>{pendingCount}</span>}
             </div>
-            <div style={{width:'100%'}}>
-              <ModerationPanel session={session as Session} qnaList={qnaList} onModerate={onModerate} onToggleModeration={onToggleModeration}/>
+            <div style={{width:'100%',flex:1,minHeight:0,display:'flex',flexDirection:'column'}}>
+              {/* PresenterSlideCard always renders the presented/projected
+                slide — in both the live session and the Builder's preview
+                mockup — so moderation controls never belong here; they're
+                host-only and have no surface in this component. */}
+              <ModerationPanel session={session as Session} qnaList={qnaList} onModerate={onModerate} onToggleModeration={onToggleModeration} audienceView/>
             </div>
-          </>
+          </div>
         ):slide.type==='plain'?(
           <>
             <div style={{flex:1,minHeight:0,width:'100%',display:'flex',flexDirection:'column',
@@ -148,9 +150,9 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
               // Matches Builder's SlideEditor sizing for the same content so a
               // choice slide's response shape doesn't grow to fill the far
               // wider presenter stage — 70% of the whole slide's width, which
-              // (since the image column is a fixed 20% of the slide when
-              // present) works out to 87.5% of this column's own width.
-              maxWidth:slide.type==='choice'?(imageCol?'87.5%':'70%'):undefined,
+              // (since the image column is a fixed 25% of the slide when
+              // present) works out to 93.33% of this column's own width.
+              maxWidth:slide.type==='choice'?(imageCol?'93.33%':'70%'):undefined,
               margin:slide.type==='choice'?'0 auto':undefined,
               display:'flex',flexDirection:'column'}}>
               {(() => {

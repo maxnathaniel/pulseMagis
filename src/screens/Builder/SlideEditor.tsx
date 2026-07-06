@@ -21,14 +21,16 @@ interface SlideEditorProps {
 export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUpdateOption,qnaModeration,moderatorPin,onToggleQnaModeration,onChangeModeratorPin}: SlideEditorProps){
   const hasImage=!!slide.contentImage
   const imageFirst=hasImage&&slide.layout==='left'
-  // Mirrors PresenterSlideCard: the image column always bleeds flush to
-  // whichever card edge it sits against, so the 56px inset only applies to
-  // whichever edge the main column itself touches.
+  // The image column always bleeds flush to every card edge it sits against
+  // (top, bottom, and whichever side) so it renders as tall as the card
+  // allows — unlike PresenterSlideCard, which insets it vertically too. The
+  // 56px/48px insets below apply only to the main column, not the image.
   const contentIsLeftEdge=!imageFirst
   const contentIsRightEdge=!(hasImage&&!imageFirst)
 
   const mainCol=(
     <div style={{display:'flex',flexDirection:'column',height:'100%',flex:'1 1 0%',minWidth:0,
+      paddingTop:48,paddingBottom:48,
       paddingLeft:contentIsLeftEdge?56:0,paddingRight:contentIsRightEdge?56:0}}>
       {slide.type==='plain' ? (
         <PlainSlideEditor key={slide.id} slide={slide} onChange={onChange}/>
@@ -42,10 +44,14 @@ export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUp
       {slide.type==='choice'&&(
         // Capped so the response shape reads as a compact, dominant element rather
         // than stretching edge-to-edge — 70% of the whole slide's width, which
-        // (since the image column is a fixed 20% of the slide when present)
-        // works out to 87.5% of this column's own width in that case.
-        <div style={{flex:1,minHeight:0,width:'100%',maxWidth:hasImage?'87.5%':'70%',margin:'0 auto',display:'flex'}}>
-          <EditableChoiceOptions slide={slide} list={list}
+        // (since the image column is a fixed 25% of the slide when present)
+        // works out to 93.33% of this column's own width in that case.
+        <div style={{flex:1,minHeight:0,width:'100%',maxWidth:hasImage?'93.33%':'70%',margin:'0 auto',display:'flex'}}>
+          {/* Keyed by slide id so switching the active slide always mounts a
+            fresh chart instance — the same entrance-animation reasoning as
+            PresenterSlideCard's results, otherwise React just updates props
+            on the same instance and the reveal animation never replays. */}
+          <EditableChoiceOptions key={slide.id} slide={slide} list={list}
             onUpdateOption={onUpdateOption} onRemoveOption={onRemoveOption} onAddOption={onAddOption}/>
         </div>
       )}
@@ -68,7 +74,8 @@ export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUp
             Audience can ask questions and upvote others during this slide.
           </div>
           <div style={{display:'flex',flexWrap:'wrap',gap:10}}>
-            <ToggleChip icon={ShieldCheck} label="Moderate questions before shown"
+            <ToggleChip icon={qnaModeration?ShieldCheck:Lock}
+              label={qnaModeration?'Moderation on — new questions need approval':'Moderation off — questions post instantly'}
               active={qnaModeration} onClick={onToggleQnaModeration}/>
           </div>
           <div style={{background:C.surfaceAlt,border:`1.5px solid ${C.border}`,borderRadius:4,padding:'14px 16px',display:'flex',flexDirection:'column',gap:8}}>
@@ -89,9 +96,8 @@ export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUp
   )
 
   const imageCol=hasImage&&(
-    <div style={{flex:'0 0 20%',minWidth:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <img src={slide.contentImage ?? undefined} alt="" style={{width:'100%',height:'100%',
-        objectFit:'cover',borderRadius:5}}/>
+    <div style={{flex:'0 0 25%',minWidth:0,overflow:'hidden',borderRadius:5}}>
+      <img src={slide.contentImage ?? undefined} alt="" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
     </div>
   )
 

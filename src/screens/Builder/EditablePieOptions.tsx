@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { C, PALETTE_BARS } from '../../theme.ts'
 import { EditableChartLegend } from './EditableChartLegend.tsx'
 
@@ -13,6 +14,11 @@ interface EditablePieOptionsProps {
 }
 
 export function EditablePieOptions({slide,list,readOnly,onUpdateOption,onRemoveOption,onAddOption}: EditablePieOptionsProps){
+  const [mounted,setMounted]=useState(false)
+  useEffect(() => {
+    const t=requestAnimationFrame(()=>setMounted(true))
+    return ()=>cancelAnimationFrame(t)
+  }, [])
   const counts=slide.options.map((_,i)=>list.filter(v=>v===i).length)
   const total=list.length
 
@@ -37,9 +43,12 @@ export function EditablePieOptions({slide,list,readOnly,onUpdateOption,onRemoveO
     <svg width={320} height={320} viewBox="0 0 200 200" style={{flexShrink:0}}>
       {total ? (
         <g transform={`rotate(-90 ${CX} ${CY})`}>
-          {wedges.map(w=>w.full
-            ? <circle key={w.i} cx={CX} cy={CY} r={R} fill={w.color}/>
-            : <path key={w.i} d={w.path} fill={w.color}/>)}
+          {wedges.map(w=>{
+            const style={opacity:mounted?1:0,transition:`opacity .5s ease ${w.i*90}ms`}
+            return w.full
+              ? <circle key={w.i} cx={CX} cy={CY} r={R} fill={w.color} style={style}/>
+              : <path key={w.i} d={w.path} fill={w.color} style={style}/>
+          })}
         </g>
       ) : (
         <circle cx={CX} cy={CY} r={R} fill={C.border}/>

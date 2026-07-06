@@ -41,7 +41,7 @@ export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
   const imageFirst=hasImage&&slide.layout==='left'
 
   const imageCol=hasImage&&(
-    <div style={{flex:'0 0 20%',minWidth:0,borderRadius:3,overflow:'hidden'}}>
+    <div style={{flex:'0 0 25%',minWidth:0,borderRadius:3,overflow:'hidden'}}>
       <img src={slide.contentImage ?? undefined} alt="" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
     </div>
   )
@@ -67,17 +67,20 @@ export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
     // its readOnly mode) rendered at full size in a fixed reference canvas,
     // then shrunk via transform:scale — same technique as the plain-slide
     // branch below, so this can't independently drift from the real thing.
+    // Anchored top-left (not center, unlike the plain branch) since the
+    // question must stay flush with the slide's top-left corner regardless
+    // of any aspect-ratio mismatch between this canvas and its container.
     body=(
-      <div style={{flex:1,minWidth:0,minHeight:0,overflow:'hidden',position:'relative',containerType:'inline-size'} as CSSProperties}>
-        <div style={{position:'absolute',top:'50%',left:'50%',width:CHOICE_CANVAS_W,height:CHOICE_CANVAS_H,
+      <div style={{flex:1,minWidth:0,minHeight:0,overflow:'hidden',position:'relative',containerType:'size'} as CSSProperties}>
+        <div style={{position:'absolute',top:0,left:0,width:CHOICE_CANVAS_W,height:CHOICE_CANVAS_H,
           padding:'48px 56px',boxSizing:'border-box',
-          transform:`translate(-50%,-50%) scale(calc(100cqw / ${CHOICE_CANVAS_W}px))`,transformOrigin:'center center',
+          transform:`scale(min(calc(100cqw / ${CHOICE_CANVAS_W}px), calc(100cqh / ${CHOICE_CANVAS_H}px)))`,transformOrigin:'top left',
           display:'flex',flexDirection:'column'} as CSSProperties}>
           <div style={{width:'100%',textAlign:'left',fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:700,
             color:C.txt1,padding:'2px 0 12px',marginBottom:28,flexShrink:0,
             overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{question}</div>
           {validEntries.length
-            ? <div style={{flex:1,minHeight:0,width:'100%',maxWidth:hasImage?'87.5%':'70%',margin:'0 auto',display:'flex'}}>
+            ? <div style={{flex:1,minHeight:0,width:'100%',maxWidth:hasImage?'93.33%':'70%',margin:'0 auto',display:'flex'}}>
                 <EditableChoiceOptions slide={previewSlide} list={remappedList} readOnly/>
               </div>
             : <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',
@@ -105,12 +108,12 @@ export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
       </div>
     )
   } else {
-    // wordcloud/open/qa: the real presented slide is just the question as a
-    // big centered title (plus a live response area that's empty here) —
-    // so the preview shows exactly that, no type icon.
+    // wordcloud/open/qa: the real presented slide pins the question to the
+    // top-left (plus a live response area that's empty here) — so the
+    // preview shows exactly that, no type icon.
     body=(
       <div style={{flex:1,minWidth:0,minHeight:0,overflow:'hidden',display:'flex',flexDirection:'column',
-        alignItems:'flex-start',justifyContent:'center'}}>
+        alignItems:'flex-start',justifyContent:'flex-start'}}>
         <div style={{width:'100%',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:12,color:C.txt1,textAlign:'left',
           overflow:'hidden',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',lineHeight:1.35} as CSSProperties}>
           {question}
