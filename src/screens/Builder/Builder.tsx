@@ -84,7 +84,7 @@ export function Builder({draft,setDraft,updateSlide,changeSlideType,addSlide,rem
               onChangeType={(id,patch)=>changeSlideType(id,patch.type)} responsesBySlide={responsesBySlide}/>
             <div style={{flex:1,overflowY:'auto',padding:32,display:'flex',alignItems:'stretch',justifyContent:'center',minWidth:0}}>
               {slide&&(
-                <div style={{background:C.surface,borderRadius:4,boxShadow:C.shadow,padding:'48px 56px',
+                <div style={{background:C.surface,borderRadius:4,boxShadow:C.shadow,padding:'48px 0',
                   width:'auto',maxWidth:'100%',height:'100%',aspectRatio:'16/9',overflowY:'auto',display:'flex',flexDirection:'column'}}>
                   <SlideEditor slide={slide} list={responsesBySlide[slide.id]||[]}
                     onChange={patch=>updateSlide(slide.id,patch)}

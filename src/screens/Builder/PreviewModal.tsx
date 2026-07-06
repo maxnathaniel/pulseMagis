@@ -1,11 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { ChevronLeft, ChevronRight, X, Monitor, Smartphone } from 'lucide-react'
 import { C } from '../../theme.ts'
 import { Modal } from '../../components/ui/Modal.tsx'
 import { NavBtn } from '../../components/ui/NavBtn.tsx'
 import { PresenterSlideCard } from '../Presenter/PresenterSlideCard.tsx'
 import { AudienceSlideView } from '../Vote/AudienceSlideView.tsx'
-import type { Draft } from '../../types.ts'
+import type { Draft, Slide } from '../../types.ts'
+
+// PresenterSlideCard sizes its type via vw-relative clamp()s, which are
+// meant to track the real full-screen presenter viewport — inside this
+// modal's much narrower box those units instead read against the whole
+// browser window, rendering text far too large for the box and forcing a
+// scrollbar. Rendering the card at a realistic full-size reference canvas
+// (so the same vw units resolve close to how they would on an actual
+// presenter screen) and then shrinking the whole thing with transform:scale
+// keeps every proportion — text, padding, charts — identical to the real
+// slide, just smaller. Same technique as MiniSlidePreview's thumbnails.
+const PRESENTER_CANVAS_W = 1280
+const PRESENTER_CANVAS_H = 720
 
 interface PreviewModalProps {
   draft: Draft
@@ -20,14 +32,31 @@ export function PreviewModal({draft,onClose}: PreviewModalProps){
   const [voted,setVoted]=useState(false)
   const [qnaDraft,setQnaDraft]=useState('')
   const [qnaModeration,setQnaModeration]=useState(!!draft.qnaModeration)
-  const slide=draft.slides[idx]
+  const rawSlide=draft.slides[idx]
 
   useEffect(() => {
     setChoiceInput(null); setTextInput(''); setVoted(false); setQnaDraft('')
   }, [idx])
 
-  if (!slide) return null
+  if (!rawSlide) return null
   const session={title:draft.title||'Untitled presentation',qnaModeration}
+
+  // Mirrors MiniSlidePreview's placeholder text and App.tsx's blank-option
+  // filtering (applied server-side before a Pulse actually goes live) — so a
+  // still-being-edited slide previews identically to its Home tile/thumbnail
+  // instead of showing a blank title or empty option rows that will never
+  // actually appear once presented.
+  const question=rawSlide.question?.trim()||(rawSlide.type==='qa'?'Ask a question':'Untitled question')
+  const slide: Slide = rawSlide.type==='choice'
+    ? (() => {
+        const validEntries=rawSlide.options
+          .map((opt,i)=>({opt,i}))
+          .filter(e=>e.opt&&e.opt.trim())
+        return {...rawSlide, question,
+          options:validEntries.map(e=>e.opt),
+          optionImages:validEntries.map(e=>(rawSlide.optionImages||[])[e.i]??null)}
+      })()
+    : {...rawSlide, question}
 
   return(
     <Modal onClose={onClose} maxWidth={920}>
@@ -43,12 +72,16 @@ export function PreviewModal({draft,onClose}: PreviewModalProps){
           <div style={{display:'flex',alignItems:'center',gap:6,justifyContent:'center',marginBottom:12,color:C.txt3,fontWeight:700,fontSize:12,letterSpacing:1}}>
             <Monitor size={14}/> DESKTOP · PRESENTER SCREEN
           </div>
-          <div style={{height:440,display:'flex',justifyContent:'center'}}>
-            <PresenterSlideCard slide={slide} list={[]}
-              revealedSlides={revealedSlides} onReveal={id=>setRevealedSlides(prev=>new Set(prev).add(id))}
-              qnaList={[]} session={session} onModerate={()=>{}} onToggleModeration={()=>setQnaModeration(v=>!v)}
-              showJoinPanel={false} joinCode="" audienceCount={0} copied={false}
-              onCopyJoinCode={()=>{}} onCloseJoinPanel={()=>{}}/>
+          <div style={{width:'100%',aspectRatio:'16/9',overflow:'hidden',position:'relative',containerType:'inline-size'} as CSSProperties}>
+            <div style={{position:'absolute',top:'50%',left:'50%',width:PRESENTER_CANVAS_W,height:PRESENTER_CANVAS_H,
+              transform:`translate(-50%,-50%) scale(calc(100cqw / ${PRESENTER_CANVAS_W}px))`,transformOrigin:'center center',
+              display:'flex',justifyContent:'center'}}>
+              <PresenterSlideCard slide={slide} list={[]}
+                revealedSlides={revealedSlides} onReveal={id=>setRevealedSlides(prev=>new Set(prev).add(id))}
+                qnaList={[]} session={session} onModerate={()=>{}} onToggleModeration={()=>setQnaModeration(v=>!v)}
+                showJoinPanel={false} joinCode="" audienceCount={0} copied={false}
+                onCopyJoinCode={()=>{}} onCloseJoinPanel={()=>{}}/>
+            </div>
           </div>
         </div>
 

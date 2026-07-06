@@ -21,9 +21,15 @@ interface SlideEditorProps {
 export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUpdateOption,qnaModeration,moderatorPin,onToggleQnaModeration,onChangeModeratorPin}: SlideEditorProps){
   const hasImage=!!slide.contentImage
   const imageFirst=hasImage&&slide.layout==='left'
+  // Mirrors PresenterSlideCard: the image column always bleeds flush to
+  // whichever card edge it sits against, so the 56px inset only applies to
+  // whichever edge the main column itself touches.
+  const contentIsLeftEdge=!imageFirst
+  const contentIsRightEdge=!(hasImage&&!imageFirst)
 
   const mainCol=(
-    <div style={{display:'flex',flexDirection:'column',height:'100%',flex:'1 1 0%',minWidth:0}}>
+    <div style={{display:'flex',flexDirection:'column',height:'100%',flex:'1 1 0%',minWidth:0,
+      paddingLeft:contentIsLeftEdge?56:0,paddingRight:contentIsRightEdge?56:0}}>
       {slide.type==='plain' ? (
         <PlainSlideEditor key={slide.id} slide={slide} onChange={onChange}/>
       ) : (<>

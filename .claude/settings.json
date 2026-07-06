@@ -41,7 +41,10 @@
       "Bash(npx --yes playwright --version)",
       "Bash(npx playwright *)",
       "PowerShell($conn = Get-NetTCPConnection -LocalPort 5175 -ErrorAction SilentlyContinue; if \\($conn\\) { $conn | Select-Object -First 1 -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force; \"Killed PID $_\" } } else { \"no listener found\" })",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(git -C c:/Users/User/coding/pulsemagis log --oneline -10 -- src/screens/Builder/PreviewModal.tsx src/components/MiniSlidePreview.tsx src/screens/Home/PulseTile.tsx)",
+      "Skill(run)",
+      "Skill(run:*)"
     ],
     "additionalDirectories": [
       "\\tmp"

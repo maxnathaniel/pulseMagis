@@ -16,8 +16,8 @@ export function EditableDotsOptions({slide,list,readOnly,onUpdateOption,onRemove
   const total=list.length
 
   return(
-    <div style={{flex:1,minHeight:0,overflowY:'auto',display:'flex',flexDirection:'column',gap:20,
-      justifyContent:readOnly?'center':undefined}}>
+    <div style={{flex:1,minHeight:0,overflowY:'auto',display:'flex',flexDirection:'column',gap:12,
+      justifyContent:'center'}}>
       {slide.options.map((opt,i)=>{
         const c=counts[i], pct=total?Math.round((c/total)*100):0
         const color=PALETTE_BARS[i%PALETTE_BARS.length]
@@ -30,16 +30,18 @@ export function EditableDotsOptions({slide,list,readOnly,onUpdateOption,onRemove
                 <input value={opt} onChange={e=>onUpdateOption?.(i,e.target.value)} placeholder={`Option ${i+1}`}
                   style={{flex:1,minWidth:0,background:'transparent',border:'none',outline:'none',color:C.txt1,
                     fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,borderBottom:`1.5px solid ${C.border}`,padding:'2px 0'}}/>
-                <span style={{fontSize:12,fontWeight:700,color:C.txt3,flexShrink:0}}>{c} · {pct}%</span>
                 {slide.options.length>2&&<button onClick={()=>onRemoveOption?.(i)} title="Remove option"
                   style={{background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:2,flexShrink:0}}><Trash2 size={13}/></button>}
               </div>
             )}
-            <div style={{display:'flex',alignItems:'center',gap:8}}>
-              <HoneycombDots count={c} color={color}/>
-              {overflow>0&&(
-                <span style={{fontSize:11,fontWeight:700,color:C.txt3}}>+{overflow}</span>
-              )}
+            <div style={{display:'flex',alignItems:'center',gap:12}}>
+              <div style={{display:'flex',alignItems:'center',gap:8,flexShrink:0}}>
+                <HoneycombDots count={c} color={color}/>
+                {overflow>0&&(
+                  <span style={{fontSize:11,fontWeight:700,color:C.txt3}}>+{overflow}</span>
+                )}
+              </div>
+              {!readOnly&&<span style={{fontSize:12,fontWeight:700,color:C.txt3}}>{c} · {pct}%</span>}
             </div>
           </div>
         )

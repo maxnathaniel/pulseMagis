@@ -17,12 +17,26 @@ export function DonutResults({slide,list,hideEmptyLabel}: DonutResultsProps){
   const total=list.length
 
   if (!total) {
+    const emptyCircle=<svg width={320} height={320} viewBox="0 0 200 200" style={hideEmptyLabel?{flexShrink:0}:undefined}>
+      <circle cx={CX} cy={CY} r={R} fill="none" stroke={C.border} strokeWidth={28}/>
+    </svg>
+    // Private mode still needs the option legend on screen — just with every
+    // count pinned at zero — so the chosen format reads correctly even
+    // though no real proportions can be shown yet.
+    if (hideEmptyLabel) {
+      return(
+        <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',justifyContent:'center',gap:20}}>
+          {emptyCircle}
+          <div style={{minWidth:0}}>
+            <ChartLegend options={slide.options} counts={counts} total={total}/>
+          </div>
+        </div>
+      )
+    }
     return(
       <div style={{flex:1,minHeight:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:12}}>
-        <svg width={320} height={320} viewBox="0 0 200 200">
-          <circle cx={CX} cy={CY} r={R} fill="none" stroke={C.border} strokeWidth={28}/>
-        </svg>
-        {!hideEmptyLabel&&<EmptyState text="No responses yet"/>}
+        {emptyCircle}
+        <EmptyState text="No responses yet"/>
       </div>
     )
   }
