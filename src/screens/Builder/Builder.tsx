@@ -98,17 +98,18 @@ export function Builder({draft,setDraft,updateSlide,changeSlideType,addSlide,rem
                     onChange={patch=>updateSlide(slide.id,patch)}
                     onAddOption={()=>addOption(slide.id)}
                     onRemoveOption={oi=>removeOption(slide.id,oi)}
-                    onUpdateOption={(oi,v)=>updateOption(slide.id,oi,v)}
-                    qnaModeration={draft.qnaModeration} moderatorPin={draft.moderatorPin}
-                    onToggleQnaModeration={()=>setDraft(d=>({...d,qnaModeration:!d.qnaModeration}))}
-                    onChangeModeratorPin={v=>setDraft(d=>({...d,moderatorPin:v}))}/>
+                    onUpdateOption={(oi,v)=>updateOption(slide.id,oi,v)}/>
                 </div>
               )}
             </div>
             {editPanelOpen&&slide&&(
               <EditPanel slide={slide} onChange={patch=>updateSlide(slide.id,patch)}
                 onChangeType={type=>changeSlideType(slide.id,type)} qaTakenByOther={qaTakenByOtherActive}
-                onApplyToAll={applyResponseModeToAll} onClose={()=>setEditPanelOpen(false)}/>
+                onApplyToAll={applyResponseModeToAll} onClose={()=>setEditPanelOpen(false)}
+                qnaModeration={draft.qnaModeration} moderatorPin={draft.moderatorPin}
+                onToggleQnaModeration={()=>setDraft(d=>({...d,qnaModeration:!d.qnaModeration}))}
+                onChangeModeratorPin={v=>setDraft(d=>({...d,moderatorPin:v}))}
+                sessionCode={draft.code}/>
             )}
             <RightRail editOpen={editPanelOpen} onToggleEdit={()=>setEditPanelOpen(v=>!v)}/>
           </div>

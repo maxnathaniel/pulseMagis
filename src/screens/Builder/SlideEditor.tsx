@@ -1,6 +1,5 @@
-import { ShieldCheck, Lock, Cloud, MessageSquare } from 'lucide-react'
+import { Cloud, MessageSquare } from 'lucide-react'
 import { C, FONT_DISPLAY } from '../../theme.ts'
-import { ToggleChip } from '../../components/ui/ToggleChip.tsx'
 import { PlainSlideEditor } from './PlainSlideEditor.tsx'
 import { EditableChoiceOptions } from './EditableChoiceOptions.tsx'
 import type { Slide, SlidePatch } from '../../types.ts'
@@ -12,13 +11,9 @@ interface SlideEditorProps {
   onAddOption: () => void
   onRemoveOption: (oi: number) => void
   onUpdateOption: (oi: number, val: string) => void
-  qnaModeration: boolean
-  moderatorPin: string
-  onToggleQnaModeration: () => void
-  onChangeModeratorPin: (pin: string) => void
 }
 
-export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUpdateOption,qnaModeration,moderatorPin,onToggleQnaModeration,onChangeModeratorPin}: SlideEditorProps){
+export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUpdateOption}: SlideEditorProps){
   const hasImage=!!slide.contentImage
   const imageFirst=hasImage&&slide.layout==='left'
   // The image column always bleeds flush to every card edge it sits against
@@ -69,26 +64,8 @@ export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUp
         </div>
       )}
       {slide.type==='qa'&&(
-        <div style={{display:'flex',flexDirection:'column',gap:12}}>
-          <div style={{fontSize:13,color:C.txt3,fontWeight:600}}>
-            Audience can ask questions and upvote others during this slide.
-          </div>
-          <div style={{display:'flex',flexWrap:'wrap',gap:10}}>
-            <ToggleChip icon={qnaModeration?ShieldCheck:Lock}
-              label={qnaModeration?'Moderation on — new questions need approval':'Moderation off — questions post instantly'}
-              active={qnaModeration} onClick={onToggleQnaModeration}/>
-          </div>
-          <div style={{background:C.surfaceAlt,border:`1.5px solid ${C.border}`,borderRadius:4,padding:'14px 16px',display:'flex',flexDirection:'column',gap:8}}>
-            <div style={{display:'flex',alignItems:'center',gap:7,fontSize:12.5,color:C.txt3,fontWeight:700}}>
-              <Lock size={12}/> CO-MODERATOR PIN <span style={{fontWeight:600,color:C.txt4}}>(optional)</span>
-            </div>
-            <input value={moderatorPin} onChange={e=>onChangeModeratorPin(e.target.value.slice(0,20))}
-              placeholder="Set a PIN so co-moderators can unlock moderation…" type="password"
-              style={{width:'100%',background:C.inputBg,border:`1.5px solid ${C.border}`,borderRadius:4,padding:'9px 12px',color:C.txt1,fontSize:13.5,outline:'none'}}/>
-            <div style={{fontSize:11.5,color:C.txt4,lineHeight:1.5,fontWeight:600}}>
-              You're auto-authenticated as presenter. Share this PIN with trusted co-moderators — they join as audience, enter the PIN, and get approval powers on their device.
-            </div>
-          </div>
+        <div style={{fontSize:13,color:C.txt3,fontWeight:600}}>
+          Audience can ask questions and upvote others during this slide.
         </div>
       )}
       </>)}

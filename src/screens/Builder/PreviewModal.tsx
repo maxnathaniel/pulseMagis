@@ -32,7 +32,6 @@ export function PreviewModal({draft,startIndex,onClose}: PreviewModalProps){
   const [textInput,setTextInput]=useState('')
   const [voted,setVoted]=useState(false)
   const [qnaDraft,setQnaDraft]=useState('')
-  const [qnaModeration,setQnaModeration]=useState(!!draft.qnaModeration)
   const rawSlide=draft.slides[idx]
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export function PreviewModal({draft,startIndex,onClose}: PreviewModalProps){
   }, [idx])
 
   if (!rawSlide) return null
-  const session={title:draft.title||'Untitled presentation',qnaModeration}
+  const session={title:draft.title||'Untitled presentation',qnaModeration:!!draft.qnaModeration}
 
   // Mirrors MiniSlidePreview's placeholder text and App.tsx's blank-option
   // filtering (applied server-side before a Pulse actually goes live) — so a
@@ -79,7 +78,7 @@ export function PreviewModal({draft,startIndex,onClose}: PreviewModalProps){
               display:'flex',justifyContent:'center'}}>
               <PresenterSlideCard slide={slide} list={[]}
                 revealedSlides={revealedSlides} onReveal={id=>setRevealedSlides(prev=>new Set(prev).add(id))}
-                qnaList={[]} session={session} onModerate={()=>{}} onToggleModeration={()=>setQnaModeration(v=>!v)}
+                qnaList={[]} session={session} onModerate={()=>{}} onToggleModeration={()=>{}}
                 showJoinPanel={false} joinCode="" audienceCount={0} copied={false}
                 onCopyJoinCode={()=>{}} onCloseJoinPanel={()=>{}}/>
             </div>

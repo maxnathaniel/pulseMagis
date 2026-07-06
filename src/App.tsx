@@ -10,10 +10,11 @@ import { Builder } from './screens/Builder/Builder.tsx'
 import { Presenter } from './screens/Presenter/Presenter.tsx'
 import { Join } from './screens/Join/Join.tsx'
 import { Vote } from './screens/Vote/Vote.tsx'
+import { Moderate } from './screens/Moderate/Moderate.tsx'
 import { EmptyState } from './components/ui/EmptyState.tsx'
 import type { Draft, Session, Slide, SlideType, SlidePatch, Question, PulseSummary, ResponsesBySlide, ModerateAction, ResultsFormat } from './types.ts'
 
-type Screen = 'home' | 'build' | 'present' | 'join' | 'vote'
+type Screen = 'home' | 'build' | 'present' | 'join' | 'vote' | 'moderate'
 
 // ════════════════════════════════════════════════════════════════════════════
 //  ROOT COMPONENT
@@ -438,7 +439,7 @@ export default function App() {
     setQnaList((data||[]).map(mapQuestion))
   },[])
   useEffect(() => {
-    if (!['present','vote'].includes(screen)||!session) return
+    if (!['present','vote','moderate'].includes(screen)||!session) return
     fetchQna(session.code)
     const ch=supabase.channel(`questions-${session.code}`)
       .on('postgres_changes',{event:'*',schema:'public',table:'questions',filter:`session_code=eq.${session.code}`},
@@ -455,7 +456,7 @@ export default function App() {
   const wasLiveRef=useRef(session?.isLive)
   useEffect(() => { wasLiveRef.current=session?.isLive }, [session?.isLive])
   useEffect(() => {
-    if (screen!=='vote'||!session) return
+    if (!['vote','moderate'].includes(screen)||!session) return
     const ch=supabase.channel(`session-${session.code}`)
       .on('postgres_changes',{event:'UPDATE',schema:'public',table:'sessions',filter:`code=eq.${session.code}`},
         async payload=>{
@@ -490,7 +491,7 @@ export default function App() {
 
   // ── realtime: presence (audience announces itself while it's in the room) ─
   useEffect(() => {
-    if (screen!=='vote'||!session) return
+    if (!['vote','moderate'].includes(screen)||!session) return
     const ch=supabase.channel(`presence-${session.code}`,{config:{presence:{key:participantId}}})
     ch.subscribe(async status=>{ if (status==='SUBSCRIBED') await ch.track({joinedAt:Date.now()}) })
     return ()=>{supabase.removeChannel(ch)}
@@ -518,7 +519,7 @@ export default function App() {
     if (!session) return
     try{await navigator.clipboard.writeText(session.code);setCopied(true);setTimeout(()=>setCopied(false),1500)}catch(_){}
   }
-  const submitJoin=async(codeOverride?: string)=>{
+  const submitJoin=async(codeOverride?: string, role?: 'moderator')=>{
     const code=(typeof codeOverride==='string'?codeOverride:joinCode).trim()
     setJoinError('')
     if (code.length<6){setJoinError("Enter the 6-digit code shown on the presenter's screen.");return}
@@ -532,17 +533,26 @@ export default function App() {
       hasPresented:sd.has_presented===true,
       slides:(slides||[]).map(mapSlide)})
     setVotedSlides({});setChoiceInput(null);setTextInput('');setQnaList([])
-    setScreen('vote')
+    setScreen(role==='moderator'?'moderate':'vote')
   }
 
   // ── deep link: ?joinCode=123456 joins directly, skipping manual code entry ──
   // Deliberately not named `code` — Supabase's OAuth client (detectSessionInUrl)
   // scans the URL for a `code` query param on every load to detect an OAuth
   // callback, so a QR/link scan carrying `?code=123456` would get misread as a
-  // bogus auth code instead of reaching this handler.
+  // bogus auth code instead of reaching this handler. `role=moderator` routes
+  // straight to the moderator PIN-gate instead of the ordinary audience view.
   useEffect(() => {
-    const code=new URLSearchParams(window.location.search).get('joinCode')
-    if (code && /^\d{6}$/.test(code)) { setJoinCode(code); setAutoJoining(true); setScreen('join'); submitJoin(code) }
+    const params=new URLSearchParams(window.location.search)
+    const code=params.get('joinCode')
+    const role=params.get('role')==='moderator'?'moderator':undefined
+    if (code && /^\d{6}$/.test(code)) {
+      // Screen stays 'join' during the fetch (shows the "Joining…" loading
+      // state, and — on failure — the ordinary Join form with the error
+      // message) regardless of role; submitJoin itself picks the final
+      // 'moderate' vs 'vote' destination once the session is confirmed to exist.
+      setJoinCode(code); setAutoJoining(true); setScreen('join'); submitJoin(code, role)
+    }
   }, [])
   const submitResponse=async()=>{
     if (!session||!currentAudienceSlide) return
@@ -669,6 +679,8 @@ export default function App() {
         onSubmit={submitResponse} onLeave={resetAll}
         qnaList={qnaList} participantId={participantId} qnaDraft={qnaDraft} setQnaDraft={setQnaDraft}
         qnaSubmitting={qnaSubmitting} onSubmitQuestion={submitQuestion}/>}
+      {screen==='moderate' && session && <Moderate session={session} qnaList={qnaList}
+        onModerate={moderateQuestion} onToggleModeration={toggleModeration} onLeave={resetAll}/>}
     </div>
   )
 }

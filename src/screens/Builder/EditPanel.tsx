@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
-import { AlignLeft, AlignRight, Image as ImageIcon, X, Copy, ChevronDown, Crop, type LucideIcon } from 'lucide-react'
+import { AlignLeft, AlignRight, Image as ImageIcon, X, Copy, ChevronDown, Crop, ShieldCheck, Lock, Link2, type LucideIcon } from 'lucide-react'
 import { C, FONT_DISPLAY, RESPONSE_MODES, SLIDE_TYPES, RESULTS_FORMATS } from '../../theme.ts'
 import { readFileAsDataUrl, compressDataUrl } from '../../lib/helpers.ts'
 import { SectionLabel } from '../../components/ui/SectionLabel.tsx'
+import { ToggleChip } from '../../components/ui/ToggleChip.tsx'
 import { ImageCropModal } from './ImageCropModal.tsx'
 import type { Slide, SlidePatch, SlideType, ResponseMode, Layout } from '../../types.ts'
 
@@ -23,12 +24,18 @@ interface EditPanelProps {
   qaTakenByOther: boolean
   onApplyToAll: (mode: ResponseMode) => void
   onClose: () => void
+  qnaModeration: boolean
+  moderatorPin: string
+  onToggleQnaModeration: () => void
+  onChangeModeratorPin: (pin: string) => void
+  sessionCode: string | undefined
 }
 
-export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToAll,onClose}: EditPanelProps){
+export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToAll,onClose,qnaModeration,moderatorPin,onToggleQnaModeration,onChangeModeratorPin,sessionCode}: EditPanelProps){
   const fileRef=useRef<HTMLInputElement>(null)
   const [typeMenuOpen,setTypeMenuOpen]=useState(false)
   const [cropSrc,setCropSrc]=useState<string|null>(null)
+  const [linkCopied,setLinkCopied]=useState(false)
   // The uncropped image to save alongside the next crop confirmation — kept
   // separate from cropSrc since on "Edit crop" the two start out equal but
   // cropSrc gets replaced by the new crop while this stays the same source.
@@ -59,6 +66,11 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
     setPendingOriginal(source)
     setReCropCurrent(slide.contentImage)
     setCropSrc(source)
+  }
+  const copyModeratorLink=async()=>{
+    if (!sessionCode||!moderatorPin.trim()) return
+    const link=`${window.location.origin}/?joinCode=${sessionCode}&role=moderator`
+    try{await navigator.clipboard.writeText(link);setLinkCopied(true);setTimeout(()=>setLinkCopied(false),1500)}catch(_){}
   }
   return(
     <div style={{width:280,flexShrink:0,borderLeft:`1.5px solid ${C.border}`,
@@ -113,6 +125,36 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
           </>
         )}
       </div>
+
+      {slide.type==='qa'&&(
+        <div>
+          <SectionLabel>Q&A settings</SectionLabel>
+          <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:8}}>
+            <ToggleChip icon={qnaModeration?ShieldCheck:Lock}
+              label={qnaModeration?'Moderation on — new questions need approval':'Moderation off — questions post instantly'}
+              active={qnaModeration} onClick={onToggleQnaModeration}/>
+          </div>
+          <div style={{marginTop:10,background:C.surfaceAlt,border:`1.5px solid ${C.border}`,borderRadius:4,padding:'14px 16px',display:'flex',flexDirection:'column',gap:8}}>
+            <div style={{display:'flex',alignItems:'center',gap:7,fontSize:12.5,color:C.txt3,fontWeight:700}}>
+              <Lock size={12}/> CO-MODERATOR PIN <span style={{fontWeight:600,color:C.txt4}}>(optional)</span>
+            </div>
+            <input value={moderatorPin} onChange={e=>onChangeModeratorPin(e.target.value.slice(0,20))}
+              placeholder="Set a PIN so co-moderators can unlock moderation…" type="password"
+              style={{width:'100%',background:C.inputBg,border:`1.5px solid ${C.border}`,borderRadius:4,padding:'9px 12px',color:C.txt1,fontSize:13.5,outline:'none'}}/>
+            <div style={{fontSize:11.5,color:C.txt4,lineHeight:1.5,fontWeight:600}}>
+              Share this PIN with trusted co-moderators, along with the moderator link below — they open it on their own device to get approval powers, without ever seeing it on the projected screen.
+            </div>
+            <button onClick={copyModeratorLink} disabled={!sessionCode||!moderatorPin.trim()}
+              title={!sessionCode?'Present once to generate a shareable moderator link':!moderatorPin.trim()?'Set a PIN above to enable the moderator link':undefined}
+              style={{marginTop:2,width:'100%',padding:'9px 0',borderRadius:4,border:`1.5px solid ${C.border}`,
+                background:'transparent',color:(!sessionCode||!moderatorPin.trim())?C.txt4:C.txt3,
+                cursor:(!sessionCode||!moderatorPin.trim())?'not-allowed':'pointer',fontSize:12,fontWeight:700,
+                display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+              <Link2 size={12}/> {linkCopied?'Link copied!':'Copy moderator link'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {slide.type==='choice'&&(
         <div>
