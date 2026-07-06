@@ -147,10 +147,10 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
             <div style={{flex:1,minHeight:0,width:'100%',
               // Matches Builder's SlideEditor sizing for the same content so a
               // choice slide's response shape doesn't grow to fill the far
-              // wider presenter stage — 50% of the whole slide's width, which
+              // wider presenter stage — 70% of the whole slide's width, which
               // (since the image column is a fixed 20% of the slide when
-              // present) works out to 62.5% of this column's own width.
-              maxWidth:slide.type==='choice'?(imageCol?'62.5%':'50%'):undefined,
+              // present) works out to 87.5% of this column's own width.
+              maxWidth:slide.type==='choice'?(imageCol?'87.5%':'70%'):undefined,
               margin:slide.type==='choice'?'0 auto':undefined,
               display:'flex',flexDirection:'column'}}>
               {(() => {
@@ -171,18 +171,26 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
                 }
                 if (mode==='onclick'&&!revealedSlides.has(slide.id)) {
                   return (
-                    <button onClick={()=>onReveal(slide.id)}
-                      style={{margin:'0 auto',display:'block',padding:'12px 28px',borderRadius:5,border:'none',
-                        background:C.purple,color:'#fff',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:15,
-                        cursor:'pointer',boxShadow:`0 4px 20px ${C.purpleBg}`}}>
-                      Reveal results
-                    </button>
+                    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                      <button onClick={()=>onReveal(slide.id)}
+                        style={{padding:'12px 28px',borderRadius:5,border:'none',
+                          background:C.purple,color:'#fff',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:15,
+                          cursor:'pointer',boxShadow:`0 4px 20px ${C.purpleBg}`}}>
+                        Reveal results
+                      </button>
+                    </div>
                   )
                 }
+                // Keyed by slide id so switching to a different slide (or
+                // revealing this one) always mounts a fresh instance — the
+                // chart formats animate their entrance on mount, and without
+                // this key React would just update props on the same
+                // instance when navigating between two already-revealed
+                // slides, silently skipping the entrance animation.
                 return (<>
-                  {slide.type==='choice'   &&<ChoiceResults slide={slide} format={slide.resultsFormat} list={list}/>}
-                  {slide.type==='wordcloud'&&<WordCloudResults list={list as string[]}/>}
-                  {slide.type==='open'     &&<OpenResults list={list}/>}
+                  {slide.type==='choice'   &&<ChoiceResults key={slide.id} slide={slide} format={slide.resultsFormat} list={list}/>}
+                  {slide.type==='wordcloud'&&<WordCloudResults key={slide.id} list={list as string[]}/>}
+                  {slide.type==='open'     &&<OpenResults key={slide.id} list={list}/>}
                 </>)
               })()}
             </div>

@@ -630,6 +630,7 @@ export default function App() {
         @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pop{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+        @keyframes dotPop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
         *{box-sizing:border-box}
         input,textarea,select,button{font-family:${FONT_BODY}}
         ::selection{background:#7C3AED;color:#fff}

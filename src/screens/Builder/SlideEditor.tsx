@@ -41,10 +41,10 @@ export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUp
 
       {slide.type==='choice'&&(
         // Capped so the response shape reads as a compact, dominant element rather
-        // than stretching edge-to-edge — 50% of the whole slide's width, which
+        // than stretching edge-to-edge — 70% of the whole slide's width, which
         // (since the image column is a fixed 20% of the slide when present)
-        // works out to 62.5% of this column's own width in that case.
-        <div style={{flex:1,minHeight:0,width:'100%',maxWidth:hasImage?'62.5%':'50%',margin:'0 auto',display:'flex'}}>
+        // works out to 87.5% of this column's own width in that case.
+        <div style={{flex:1,minHeight:0,width:'100%',maxWidth:hasImage?'87.5%':'70%',margin:'0 auto',display:'flex'}}>
           <EditableChoiceOptions slide={slide} list={list}
             onUpdateOption={onUpdateOption} onRemoveOption={onRemoveOption} onAddOption={onAddOption}/>
         </div>

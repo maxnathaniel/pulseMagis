@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { C, PALETTE_BARS, FONT_DISPLAY } from '../../theme.ts'
 import { ChartLegend } from './ChartLegend.tsx'
 import { EmptyState } from '../ui/EmptyState.tsx'
@@ -13,6 +14,15 @@ interface DonutResultsProps {
 }
 
 export function DonutResults({slide,list,hideEmptyLabel}: DonutResultsProps){
+  // Starts each fresh mount with every ring segment collapsed to zero
+  // length, then grows to its real share on the next frame — so a newly
+  // presented or just-revealed slide sweeps the ring in instead of showing
+  // it already complete.
+  const [mounted,setMounted]=useState(false)
+  useEffect(() => {
+    const t=requestAnimationFrame(()=>setMounted(true))
+    return ()=>cancelAnimationFrame(t)
+  }, [])
   const counts=slide.options.map((_,i)=>list.filter(v=>v===i).length)
   const total=list.length
 
@@ -56,8 +66,9 @@ export function DonutResults({slide,list,hideEmptyLabel}: DonutResultsProps){
         <g transform={`rotate(-90 ${CX} ${CY})`}>
           {segments.map(seg=>(
             <circle key={seg.i} cx={CX} cy={CY} r={R} fill="none" stroke={seg.color}
-              strokeWidth={28} strokeDasharray={`${seg.dash} ${seg.gap}`}
-              strokeDashoffset={seg.offset} strokeLinecap="butt"/>
+              strokeWidth={28} strokeDasharray={mounted?`${seg.dash} ${seg.gap}`:`0 ${CIRCUMFERENCE}`}
+              strokeDashoffset={seg.offset} strokeLinecap="butt"
+              style={{transition:`stroke-dasharray .8s cubic-bezier(.22,1,.36,1) ${seg.i*90}ms`}}/>
           ))}
         </g>
         <text x={CX} y={CY-4} textAnchor="middle" fontFamily={FONT_DISPLAY} fontWeight={700} fontSize={28} fill={C.txt1}>{total}</text>

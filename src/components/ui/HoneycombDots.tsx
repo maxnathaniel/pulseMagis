@@ -1,5 +1,5 @@
-const DOT_SIZE=10
-const DOT_GAP=4
+const DOT_SIZE=16
+const DOT_GAP=5
 const HEX_RADIUS=4 // rings out from the center dot; 3*r*(r+1)+1 = 61 cells total
 
 type Axial={q:number; r:number}
@@ -55,7 +55,7 @@ export function HoneycombDots({count,color}: HoneycombDotsProps){
     <div style={{position:'relative',width:HEX_WIDTH,height:HEX_HEIGHT,flexShrink:0}}>
       {HEX_PIXELS.slice(0,shown).map((p,d)=>(
         <span key={d} style={{position:'absolute',left:p.x,top:p.y,width:DOT_SIZE,height:DOT_SIZE,
-          borderRadius:'50%',background:color}}/>
+          borderRadius:'50%',background:color,animation:`dotPop .4s cubic-bezier(.22,1,.36,1) ${d*15}ms both`}}/>
       ))}
     </div>
   )

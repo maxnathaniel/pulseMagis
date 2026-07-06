@@ -77,7 +77,7 @@ export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
             color:C.txt1,padding:'2px 0 12px',marginBottom:28,flexShrink:0,
             overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{question}</div>
           {validEntries.length
-            ? <div style={{flex:1,minHeight:0,width:'100%',maxWidth:hasImage?'62.5%':'50%',margin:'0 auto',display:'flex'}}>
+            ? <div style={{flex:1,minHeight:0,width:'100%',maxWidth:hasImage?'87.5%':'70%',margin:'0 auto',display:'flex'}}>
                 <EditableChoiceOptions slide={previewSlide} list={remappedList} readOnly/>
               </div>
             : <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',

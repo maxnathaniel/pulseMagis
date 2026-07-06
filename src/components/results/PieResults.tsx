@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { C, PALETTE_BARS } from '../../theme.ts'
 import { ChartLegend } from './ChartLegend.tsx'
 import { EmptyState } from '../ui/EmptyState.tsx'
@@ -12,6 +13,14 @@ interface PieResultsProps {
 }
 
 export function PieResults({slide,list,hideEmptyLabel}: PieResultsProps){
+  // Wedge paths aren't uniform shapes to scale/grow like the donut's ring,
+  // so each fresh mount instead fades wedges in one at a time — still reads
+  // as a reveal without risking a transform misaligning a wedge's geometry.
+  const [mounted,setMounted]=useState(false)
+  useEffect(() => {
+    const t=requestAnimationFrame(()=>setMounted(true))
+    return ()=>cancelAnimationFrame(t)
+  }, [])
   const counts=slide.options.map((_,i)=>list.filter(v=>v===i).length)
   const total=list.length
 
@@ -63,9 +72,12 @@ export function PieResults({slide,list,hideEmptyLabel}: PieResultsProps){
     <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',justifyContent:'center',gap:20}}>
       <svg width={320} height={320} viewBox="0 0 200 200" style={{flexShrink:0}}>
         <g transform={`rotate(-90 ${CX} ${CY})`}>
-          {wedges.map(w=>w.full
-            ? <circle key={w.i} cx={CX} cy={CY} r={R} fill={w.color}/>
-            : <path key={w.i} d={w.path} fill={w.color}/>)}
+          {wedges.map(w=>{
+            const style={opacity:mounted?1:0,transition:`opacity .5s ease ${w.i*90}ms`}
+            return w.full
+              ? <circle key={w.i} cx={CX} cy={CY} r={R} fill={w.color} style={style}/>
+              : <path key={w.i} d={w.path} fill={w.color} style={style}/>
+          })}
         </g>
       </svg>
       <div style={{minWidth:0}}>
