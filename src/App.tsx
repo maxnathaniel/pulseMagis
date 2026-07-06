@@ -535,9 +535,13 @@ export default function App() {
     setScreen('vote')
   }
 
-  // ── deep link: ?code=123456 joins directly, skipping manual code entry ────
+  // ── deep link: ?joinCode=123456 joins directly, skipping manual code entry ──
+  // Deliberately not named `code` — Supabase's OAuth client (detectSessionInUrl)
+  // scans the URL for a `code` query param on every load to detect an OAuth
+  // callback, so a QR/link scan carrying `?code=123456` would get misread as a
+  // bogus auth code instead of reaching this handler.
   useEffect(() => {
-    const code=new URLSearchParams(window.location.search).get('code')
+    const code=new URLSearchParams(window.location.search).get('joinCode')
     if (code && /^\d{6}$/.test(code)) { setJoinCode(code); setAutoJoining(true); setScreen('join'); submitJoin(code) }
   }, [])
   const submitResponse=async()=>{

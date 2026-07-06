@@ -12,7 +12,9 @@ interface ShareDialogProps {
 export function ShareDialog({code,onClose}: ShareDialogProps){
   const [copied,setCopied]=useState(false)
   const canvasRef=useRef<HTMLCanvasElement>(null)
-  const link=`${window.location.origin}/?code=${code}`
+  // Not named `code` — see JoinPanel.tsx's identical join-link construction
+  // for why that name collides with Supabase's OAuth callback handling.
+  const link=`${window.location.origin}/?joinCode=${code}`
 
   const handleCopy=()=>{
     navigator.clipboard.writeText(link)

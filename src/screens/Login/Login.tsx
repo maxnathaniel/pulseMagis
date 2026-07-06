@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Radio } from 'lucide-react'
 import { C, FONT_DISPLAY } from '../../theme.ts'
 
 interface LoginProps {
@@ -13,10 +12,9 @@ export function Login({loading,error,onSubmit}: LoginProps){
   return(
     <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'40px 24px'}}>
       <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:32}}>
-        <div style={{width:36,height:36,borderRadius:6,background:C.purple,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-          <Radio size={20} color="#fff"/>
+        <div style={{width:36,height:36,borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+          <img src="/images/apple-touch-icon.png" alt="" width={80} height={80} style={{borderRadius:6}}/>
         </div>
-        <span style={{fontFamily:FONT_DISPLAY,fontSize:19,fontWeight:700,color:C.txt1}}>PulseMagis</span>
       </div>
 
       <div style={{width:'100%',maxWidth:380,background:C.surface,borderRadius:10,border:`1.5px solid ${C.border}`,
@@ -24,9 +22,6 @@ export function Login({loading,error,onSubmit}: LoginProps){
         <h2 style={{fontFamily:FONT_DISPLAY,fontSize:24,fontWeight:700,margin:'0 0 6px',color:C.txt1,textAlign:'center'}}>
           Presenter sign-in
         </h2>
-        <p style={{color:C.txt3,fontSize:14,margin:'0 0 28px',fontWeight:600,textAlign:'center'}}>
-          Sign in with your Google account to build and run Pulses.
-        </p>
 
         {error&&<div style={{color:C.red,background:C.redBg,borderRadius:5,padding:'10px 14px',fontSize:13,
           marginBottom:18,textAlign:'center',fontWeight:700}}>{error}</div>}

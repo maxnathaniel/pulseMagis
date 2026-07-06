@@ -11,7 +11,11 @@ interface JoinPanelProps {
 }
 
 export function JoinPanel({code,audienceCount,copied,onCopy,onClose}: JoinPanelProps){
-  const joinUrl=`${window.location.origin}/?code=${code}`
+  // Not named `code` — Supabase's OAuth client scans the URL for a `code`
+  // query param on every load to detect an OAuth callback, so reusing that
+  // name here would make it swallow/misinterpret a scanned join link as a
+  // (bogus) auth code instead of letting the app's own join-code handling see it.
+  const joinUrl=`${window.location.origin}/?joinCode=${code}`
   return(
     <div style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:6,boxShadow:C.shadowHov,
       padding:'12px 27px 27px',display:'flex',flexDirection:'column',alignItems:'center',gap:15}}>
