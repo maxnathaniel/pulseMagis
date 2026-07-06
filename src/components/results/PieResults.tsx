@@ -8,9 +8,10 @@ const R=90, CX=100, CY=100
 interface PieResultsProps {
   slide: ChoiceSlide
   list: (string | number)[]
+  hideEmptyLabel?: boolean
 }
 
-export function PieResults({slide,list}: PieResultsProps){
+export function PieResults({slide,list,hideEmptyLabel}: PieResultsProps){
   const counts=slide.options.map((_,i)=>list.filter(v=>v===i).length)
   const total=list.length
 
@@ -20,7 +21,7 @@ export function PieResults({slide,list}: PieResultsProps){
         <svg width={320} height={320} viewBox="0 0 200 200">
           <circle cx={CX} cy={CY} r={R} fill={C.border}/>
         </svg>
-        <EmptyState text="No responses yet"/>
+        {!hideEmptyLabel&&<EmptyState text="No responses yet"/>}
       </div>
     )
   }
@@ -45,7 +46,7 @@ export function PieResults({slide,list}: PieResultsProps){
   })
 
   return(
-    <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',gap:32}}>
+    <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',justifyContent:'center',gap:20}}>
       <svg width={320} height={320} viewBox="0 0 200 200" style={{flexShrink:0}}>
         <g transform={`rotate(-90 ${CX} ${CY})`}>
           {wedges.map(w=>w.full
@@ -53,7 +54,7 @@ export function PieResults({slide,list}: PieResultsProps){
             : <path key={w.i} d={w.path} fill={w.color}/>)}
         </g>
       </svg>
-      <div style={{flex:1,minWidth:0}}>
+      <div style={{minWidth:0}}>
         <ChartLegend options={slide.options} counts={counts} total={total}/>
       </div>
     </div>

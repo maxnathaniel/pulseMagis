@@ -33,8 +33,8 @@ export const RESPONSE_MODES: { key: ResponseMode; label: string; description: st
 // Vibrant bars that pop on a light background
 export const PALETTE_BARS = ['#FF6B35', '#6366F1', '#10B981', '#F59E0B', '#EC4899', '#0EA5E9']
 
-export const FONT_DISPLAY = "'Fredoka', ui-rounded, ui-sans-serif, system-ui, sans-serif"
-export const FONT_BODY    = "'Nunito', ui-rounded, ui-sans-serif, system-ui, sans-serif"
+export const FONT_DISPLAY = "'Inter', ui-sans-serif, system-ui, sans-serif"
+export const FONT_BODY    = "'Inter', ui-sans-serif, system-ui, sans-serif"
 
 // Light theme colour palette
 export const C = {
@@ -75,7 +75,7 @@ export function useFonts() {
     if (document.getElementById('pm-fonts')) return
     const link = document.createElement('link')
     link.id = 'pm-fonts'; link.rel = 'stylesheet'
-    link.href = 'https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap'
+    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'
     document.head.appendChild(link)
   }, [])
 }

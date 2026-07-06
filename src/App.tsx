@@ -194,15 +194,15 @@ export default function App() {
 
   // ── start presenting ──────────────────────────────────────────────────────
   const startPresenting = async (startIndex = 0) => {
-    // startPresenting does its own authoritative delete-and-reinsert of
-    // slides below. Suppress the autosave "flush on leave" effect (fired by
-    // the screen change to 'present' at the end of this function) so it
-    // doesn't fire a redundant/racy upsert of its own, AND wait for any
-    // already-in-flight autosave (debounce timer that fired, or a previous
-    // flush) to fully finish — clearTimeout can't stop a call that already
-    // started, and an interleaved write here is what was corrupting slide
-    // `position` ordering (presenter's own view stayed correct since it's
-    // built from local state, but audience joins re-fetch from the DB,
+    // startPresenting reconciles slides below (upsert + delete-only-removed,
+    // same pattern as persistDraft). Suppress the autosave "flush on leave"
+    // effect (fired by the screen change to 'present' at the end of this
+    // function) so it doesn't fire a redundant/racy upsert of its own, AND
+    // wait for any already-in-flight autosave (debounce timer that fired, or
+    // a previous flush) to fully finish — clearTimeout can't stop a call that
+    // already started, and an interleaved write here is what was corrupting
+    // slide `position` ordering (presenter's own view stayed correct since
+    // it's built from local state, but audience joins re-fetch from the DB,
     // ordered by `position`, so they'd see whatever the race left behind).
     suppressAutosaveFlush.current=true
     if (persistInFlight.current) await persistInFlight.current
@@ -227,11 +227,6 @@ export default function App() {
       pinHash=null
     }
 
-    // Checked and blocking, same reasoning as the slides insert below: the
-    // isUpdate path deletes the Pulse's existing slides right after this, so
-    // silently logging-and-continuing past a failed sessions write (as this
-    // used to do) still runs that delete even though the session itself
-    // never actually got marked live/updated — wiping slides for no benefit.
     if (isUpdate) {
       const {error:sessUpdErr}=await supabase.from('sessions').update({
         title, current_slide_index:startIndex, qna_enabled:qnaEnabled,
@@ -240,12 +235,6 @@ export default function App() {
       if (sessUpdErr) {
         console.error(sessUpdErr)
         window.alert(`Couldn't start presenting — the session failed to update (${sessUpdErr.message}). Your Pulse has NOT started; please fix the issue and try again before making further changes.`)
-        return
-      }
-      const {error:delErr}=await supabase.from('slides').delete().eq('session_code',code)
-      if (delErr) {
-        console.error(delErr)
-        window.alert(`Couldn't start presenting — clearing the old slides failed (${delErr.message}). Please fix the issue and try again before making further changes.`)
         return
       }
     } else {
@@ -260,25 +249,37 @@ export default function App() {
       }
     }
 
-    // Checked and blocking (unlike the other writes above, which only log):
-    // this insert follows a delete of the Pulse's existing slides on the
-    // isUpdate path, so silently swallowing a failure here — as a schema
-    // mismatch (e.g. a column added without a PostgREST schema-cache
-    // reload) previously did — leaves the Pulse's slides deleted with
-    // nothing reinserted, while the code below still proceeds to show a
-    // "live" presenter screen as if it worked. Surface it and abort instead.
-    const {error:slidesInsertError}=await supabase.from('slides').insert(draft.slides.map((s,idx) => ({
+    // Upsert (not delete-then-insert): preserves existing slide rows in
+    // place so responses/questions tied to still-present slides survive a
+    // re-present — re-presenting the same Pulse is meant to resume it, not
+    // silently reset every vote to zero (there's already a dedicated "Reset
+    // results" button in the Results tab for anyone who explicitly wants
+    // that). Only slides actually removed from the deck get deleted below,
+    // which correctly cascades away just that slide's own responses. Upsert
+    // also can't hit a duplicate-key error the way a blind insert could if a
+    // previous attempt's slides were never fully cleaned up.
+    const slideRows=draft.slides.map((s,idx) => ({
       id:s.id, session_code:code, type:s.type, question:s.question,
       options:s.type==='choice'?s.options.filter(o=>o.trim()):null,
       option_images:s.type==='choice'?(s.optionImages||null):null, position:idx,
       layout:s.layout||'right', content_image:s.contentImage||null, response_mode:s.responseMode||'instant',
       content:s.type==='plain'?(s.content||null):null, vertical_align:s.type==='plain'?(s.verticalAlign||'middle'):'middle',
       results_format:s.type==='choice'?(s.resultsFormat||'bar'):'bar',
-    })))
-    if (slidesInsertError) {
-      console.error(slidesInsertError)
-      window.alert(`Couldn't start presenting — the slides failed to save (${slidesInsertError.message}). Your Pulse has NOT started; please fix the issue and try again before making further changes.`)
+    }))
+    const {error:slidesUpsertError}=await supabase.from('slides').upsert(slideRows)
+    if (slidesUpsertError) {
+      console.error(slidesUpsertError)
+      window.alert(`Couldn't start presenting — the slides failed to save (${slidesUpsertError.message}). Your Pulse has NOT started; please fix the issue and try again before making further changes.`)
       return
+    }
+    if (isUpdate) {
+      const currentIds=draft.slides.map(s=>s.id)
+      const {data:existingSlides}=await supabase.from('slides').select('id').eq('session_code',code)
+      const removedIds=(existingSlides||[]).map(r=>r.id).filter(id=>!currentIds.includes(id))
+      if (removedIds.length) {
+        const {error:deleteError}=await supabase.from('slides').delete().in('id',removedIds)
+        if (deleteError) console.error(deleteError)
+      }
     }
     setSession({ code, title,
       slides:draft.slides.map(s=>s.type==='choice' ? {...s,options:s.options.filter(o=>o.trim())} : s),

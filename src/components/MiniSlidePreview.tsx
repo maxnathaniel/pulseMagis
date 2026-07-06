@@ -25,7 +25,7 @@ interface MiniSlidePreviewProps {
 }
 
 // Renders a scaled-down but genuine representation of what the slide will
-// actually look like once presented — the real question/title centered,
+// actually look like once presented — the real question/title left-aligned,
 // plus real option bars for choice slides — not a generic type-icon
 // summary.
 export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
@@ -73,7 +73,7 @@ export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
           padding:'48px 56px',boxSizing:'border-box',
           transform:`translate(-50%,-50%) scale(calc(100cqw / ${CHOICE_CANVAS_W}px))`,transformOrigin:'center center',
           display:'flex',flexDirection:'column'} as CSSProperties}>
-          <div style={{width:'100%',textAlign:'center',fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:700,
+          <div style={{width:'100%',textAlign:'left',fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:700,
             color:C.txt1,padding:'2px 0 12px',marginBottom:28,flexShrink:0,
             overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{question}</div>
           {validEntries.length
@@ -110,8 +110,8 @@ export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
     // so the preview shows exactly that, no type icon.
     body=(
       <div style={{flex:1,minWidth:0,minHeight:0,overflow:'hidden',display:'flex',flexDirection:'column',
-        alignItems:'center',justifyContent:'center'}}>
-        <div style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:12,color:C.txt1,textAlign:'center',
+        alignItems:'flex-start',justifyContent:'center'}}>
+        <div style={{width:'100%',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:12,color:C.txt1,textAlign:'left',
           overflow:'hidden',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',lineHeight:1.35} as CSSProperties}>
           {question}
         </div>

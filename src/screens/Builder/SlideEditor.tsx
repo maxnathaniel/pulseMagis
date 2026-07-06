@@ -31,7 +31,7 @@ export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUp
         placeholder={slide.type==='qa'?'Ask us anything…':'Type your question…'}
         style={{width:'100%',background:'transparent',border:'none',borderBottom:`2px solid transparent`,
           color:C.txt1,fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:700,padding:'2px 0 12px',
-          outline:'none',marginBottom:28,flexShrink:0,textAlign:'center'}}/>
+          outline:'none',marginBottom:28,flexShrink:0,textAlign:'left'}}/>
 
       {slide.type==='choice'&&(
         // Capped so the response shape reads as a compact, dominant element rather

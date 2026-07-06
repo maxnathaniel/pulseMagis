@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seed:responses": "node scripts/seed-responses.mjs",
+    "seed:dots": "node scripts/seed-dotmatrix-responses.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",

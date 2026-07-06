@@ -102,14 +102,16 @@ export function ResultsView({draft}: {draft: Draft}){
                 const typeMeta = SLIDE_TYPES.find(t => t.key===slide.type)
                 return (
                   <div key={slide.id}>
-                    <div style={{fontSize:11.5,color:C.txt4,fontWeight:700,letterSpacing:1,marginBottom:6,textTransform:'uppercase'}}>
-                      {typeMeta?.label}
-                    </div>
-                    <h3 style={{fontFamily:FONT_DISPLAY,fontSize:20,fontWeight:700,color:C.txt1,margin:'0 0 6px'}}>
-                      {slide.question.trim()||'Untitled question'}
-                    </h3>
-                    <div style={{fontSize:12.5,color:C.txt3,fontWeight:600,marginBottom:16}}>
-                      {list.length} response{list.length!==1?'s':''}
+                    <div style={{textAlign:'center'}}>
+                      <div style={{fontSize:11.5,color:C.txt4,fontWeight:700,letterSpacing:1,marginBottom:6,textTransform:'uppercase'}}>
+                        {typeMeta?.label}
+                      </div>
+                      <h3 style={{fontFamily:FONT_DISPLAY,fontSize:20,fontWeight:700,color:C.txt1,margin:'0 0 6px'}}>
+                        {slide.question.trim()||'Untitled question'}
+                      </h3>
+                      <div style={{fontSize:12.5,color:C.txt3,fontWeight:600,marginBottom:16}}>
+                        {list.length} response{list.length!==1?'s':''}
+                      </div>
                     </div>
                     {slide.type==='choice'   && <ChoiceResults slide={slide} format={slide.resultsFormat} list={list}/>}
                     {slide.type==='wordcloud'&& <WordCloudResults list={list as string[]}/>}

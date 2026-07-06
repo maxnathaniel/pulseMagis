@@ -1,8 +1,8 @@
 import { C } from '../../theme.ts'
 import { EmptyState } from '../ui/EmptyState.tsx'
 
-export function OpenResults({list}: {list: (string | number)[]}){
-  if (!list.length) return <EmptyState text="Waiting for the first response…"/>
+export function OpenResults({list,hideEmptyLabel}: {list: (string | number)[]; hideEmptyLabel?: boolean}){
+  if (!list.length) return hideEmptyLabel ? null : <EmptyState text="Waiting for the first response…"/>
   return(
     <div style={{display:'flex',flexDirection:'column',gap:8,maxHeight:260,overflowY:'auto'}}>
       {[...list].reverse().map((r,i)=>(

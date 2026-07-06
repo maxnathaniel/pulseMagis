@@ -9,9 +9,10 @@ const CIRCUMFERENCE=2*Math.PI*R
 interface DonutResultsProps {
   slide: ChoiceSlide
   list: (string | number)[]
+  hideEmptyLabel?: boolean
 }
 
-export function DonutResults({slide,list}: DonutResultsProps){
+export function DonutResults({slide,list,hideEmptyLabel}: DonutResultsProps){
   const counts=slide.options.map((_,i)=>list.filter(v=>v===i).length)
   const total=list.length
 
@@ -21,7 +22,7 @@ export function DonutResults({slide,list}: DonutResultsProps){
         <svg width={320} height={320} viewBox="0 0 200 200">
           <circle cx={CX} cy={CY} r={R} fill="none" stroke={C.border} strokeWidth={28}/>
         </svg>
-        <EmptyState text="No responses yet"/>
+        {!hideEmptyLabel&&<EmptyState text="No responses yet"/>}
       </div>
     )
   }
@@ -36,7 +37,7 @@ export function DonutResults({slide,list}: DonutResultsProps){
   })
 
   return(
-    <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',gap:32}}>
+    <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',justifyContent:'center',gap:20}}>
       <svg width={320} height={320} viewBox="0 0 200 200" style={{flexShrink:0}}>
         <g transform={`rotate(-90 ${CX} ${CY})`}>
           {segments.map(seg=>(
@@ -48,7 +49,7 @@ export function DonutResults({slide,list}: DonutResultsProps){
         <text x={CX} y={CY-4} textAnchor="middle" fontFamily={FONT_DISPLAY} fontWeight={700} fontSize={28} fill={C.txt1}>{total}</text>
         <text x={CX} y={CY+18} textAnchor="middle" fontWeight={700} fontSize={12} fill={C.txt3}>response{total!==1?'s':''}</text>
       </svg>
-      <div style={{flex:1,minWidth:0}}>
+      <div style={{minWidth:0}}>
         <ChartLegend options={slide.options} counts={counts} total={total}/>
       </div>
     </div>

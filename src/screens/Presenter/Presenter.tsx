@@ -55,8 +55,8 @@ export function Presenter({session,slideIndex,responses,goToSlide,copyCode,copie
   }, [slideIndex, session.slides.length])
 
   return(
-    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',minHeight:0}}>
-      <PresenterSlideCard slide={slide} slideIndex={slideIndex} totalSlides={session.slides.length} list={list}
+    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',minHeight:0,background:'#000'}}>
+      <PresenterSlideCard slide={slide} list={list}
         revealedSlides={revealedSlides} onReveal={id=>setRevealedSlides(prev=>new Set(prev).add(id))}
         qnaList={qnaList} session={session} onModerate={onModerate} onToggleModeration={onToggleModeration}
         showJoinPanel={showJoinPanel} joinCode={session.code} audienceCount={audienceCount} copied={copied}

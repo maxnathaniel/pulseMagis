@@ -29,7 +29,19 @@
       "Bash(npx --yes tsc --noEmit --strict test_never.ts)",
       "Bash(node_modules/.bin/tsc --noEmit --strict /tmp/test_never.ts)",
       "Bash(\"c:\\\\Users\\\\User\\\\coding\\\\pulsemagis\\\\node_modules\\\\.bin\\\\tsc\" --noEmit --strict test_never.ts)",
-      "Bash(rm -f /tmp/test_never.ts /tmp/test_never2.ts)"
+      "Bash(rm -f /tmp/test_never.ts /tmp/test_never2.ts)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5175/debug.html --max-time 3)",
+      "Bash(which chromium-cli *)",
+      "Read(//c/Users/User/.claude/**)",
+      "Read(//c//**)",
+      "Bash(chromium-cli --session pulsedebug)",
+      "Bash(node -e \"require.resolve\\('playwright'\\)\")",
+      "Bash(npm ls *)",
+      "Bash(where.exe npx *)",
+      "Bash(npx --yes playwright --version)",
+      "Bash(npx playwright *)",
+      "PowerShell($conn = Get-NetTCPConnection -LocalPort 5175 -ErrorAction SilentlyContinue; if \\($conn\\) { $conn | Select-Object -First 1 -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force; \"Killed PID $_\" } } else { \"no listener found\" })",
+      "Bash(git check-ignore *)"
     ],
     "additionalDirectories": [
       "\\tmp"

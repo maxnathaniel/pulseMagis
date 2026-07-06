@@ -14,12 +14,12 @@ export function JoinPanel({code,audienceCount,copied,onCopy,onClose}: JoinPanelP
   const joinUrl=`${window.location.origin}/?code=${code}`
   return(
     <div style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:6,boxShadow:C.shadowHov,
-      padding:27,display:'flex',flexDirection:'column',alignItems:'center',gap:15,position:'relative'}}>
+      padding:'12px 27px 27px',display:'flex',flexDirection:'column',alignItems:'center',gap:15}}>
       <button onClick={onClose} title="Hide join panel"
-        style={{position:'absolute',top:9,right:9,background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:8,lineHeight:0}}>
+        style={{alignSelf:'flex-end',background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:8,lineHeight:0}}>
         <X size={21}/>
       </button>
-      <div style={{background:'#fff',padding:14,borderRadius:5,border:`1.5px solid ${C.border}`}}>
+      <div style={{background:'#fff',padding:14,borderRadius:5,border:`1.5px solid ${C.border}`,marginTop:-15}}>
         <QRCodeSVG value={joinUrl} size={210} fgColor={C.txt1} bgColor="#fff"/>
       </div>
       <div style={{fontSize:16,color:C.txt4,fontWeight:700,letterSpacing:.5}}>{window.location.host}</div>

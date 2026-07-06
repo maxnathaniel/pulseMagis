@@ -1,7 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react'
 import { C, PALETTE_BARS, FONT_DISPLAY } from '../../theme.ts'
-
-const DOTS_MAX_PER_OPTION=60
+import { HoneycombDots, DOTS_MAX_PER_OPTION } from '../../components/ui/HoneycombDots.tsx'
 
 interface EditableDotsOptionsProps {
   slide: { options: string[] }
@@ -22,8 +21,7 @@ export function EditableDotsOptions({slide,list,readOnly,onUpdateOption,onRemove
       {slide.options.map((opt,i)=>{
         const c=counts[i], pct=total?Math.round((c/total)*100):0
         const color=PALETTE_BARS[i%PALETTE_BARS.length]
-        const shown=Math.min(c,DOTS_MAX_PER_OPTION)
-        const overflow=c-shown
+        const overflow=c-DOTS_MAX_PER_OPTION
         return(
           <div key={i}>
             {!readOnly&&(
@@ -37,12 +35,10 @@ export function EditableDotsOptions({slide,list,readOnly,onUpdateOption,onRemove
                   style={{background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:2,flexShrink:0}}><Trash2 size={13}/></button>}
               </div>
             )}
-            <div style={{display:'flex',flexWrap:'wrap',gap:4,maxWidth:260}}>
-              {Array.from({length:shown}).map((_,d)=>(
-                <span key={d} style={{width:10,height:10,borderRadius:'50%',background:color,flexShrink:0}}/>
-              ))}
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <HoneycombDots count={c} color={color}/>
               {overflow>0&&(
-                <span style={{fontSize:11,fontWeight:700,color:C.txt3,alignSelf:'center',marginLeft:4}}>+{overflow}</span>
+                <span style={{fontSize:11,fontWeight:700,color:C.txt3}}>+{overflow}</span>
               )}
             </div>
           </div>

@@ -1,8 +1,8 @@
 import { PALETTE_BARS, FONT_DISPLAY } from '../../theme.ts'
 import { EmptyState } from '../ui/EmptyState.tsx'
 
-export function WordCloudResults({list}: {list: string[]}){
-  if (!list.length) return <EmptyState text="Waiting for the first word to land…"/>
+export function WordCloudResults({list,hideEmptyLabel}: {list: string[]; hideEmptyLabel?: boolean}){
+  if (!list.length) return hideEmptyLabel ? null : <EmptyState text="Waiting for the first word to land…"/>
   const freq: Record<string, number> = {}
   list.forEach(w=>{const k=w.toLowerCase();freq[k]=(freq[k]||0)+1})
   const entries=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,40)
