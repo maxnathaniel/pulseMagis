@@ -129,11 +129,11 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
               </h2>
             </div>
             <div style={{width:'100%',flex:1,minHeight:0,display:'flex',flexDirection:'column'}}>
-              {/* PresenterSlideCard always renders the presented/projected
-                slide — in both the live session and the Builder's preview
-                mockup — so moderation controls never belong here; they're
-                host-only and have no surface in this component. */}
-              <ModerationPanel session={session as Session} qnaList={qnaList} onModerate={onModerate} onToggleModeration={onToggleModeration} audienceView/>
+              {/* showChrome is true only for the real live session (Presenter.tsx) —
+                that's the presenter's own control screen, so full moderation controls
+                belong here. The Builder's inert preview mockup (PreviewModal.tsx, no
+                showChrome) has no real session to moderate, so it stays audience-view. */}
+              <ModerationPanel session={session as Session} qnaList={qnaList} onModerate={onModerate} onToggleModeration={onToggleModeration} audienceView={!showChrome}/>
             </div>
           </div>
         ):slide.type==='plain'?(
