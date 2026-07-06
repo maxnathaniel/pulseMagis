@@ -60,7 +60,9 @@
       "Bash(git add *)",
       "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('.claude/settings.json','utf8'\\)\\); console.log\\('valid JSON'\\)\")",
       "Bash(netstat -ano)",
-      "Bash(NODE_PATH=/c/Users/User/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules node -e ' *)"
+      "Bash(NODE_PATH=/c/Users/User/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules node -e ' *)",
+      "Read(//c/Users/User/.cache/**)",
+      "Read(//c/Users/User/AppData/Local/ms-playwright/**)"
     ],
     "additionalDirectories": [
       "\\tmp"

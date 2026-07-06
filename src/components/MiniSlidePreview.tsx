@@ -10,14 +10,16 @@ import type { SlidePreviewData } from '../types.ts'
 const PLAIN_CANVAS_W = 800
 const PLAIN_CANVAS_H = 450
 
-// Choice slides use a taller reference canvas than the plain one above —
-// the Create tab's real chart (EditableDonutOptions/EditablePieOptions) is
-// 320px tall, which the plain canvas's 450px height (minus its own padding)
-// isn't tall enough to fit without clipping. Kept at the same 16:9 ratio as
-// the thumbnail box itself so scaling by width (the cqw trick below) also
-// fits the height exactly, with no clipping or leftover empty space.
-const CHOICE_CANVAS_W = 960
-const CHOICE_CANVAS_H = 540
+// Choice slides scale off a fixed reference WIDTH only (see the choice
+// branch below) — unlike the plain canvas above, there's no matching fixed
+// reference height. An image column can eat ~25% of this box's width,
+// making the remaining area a different shape than the thumbnail box
+// itself; deriving the canvas's height from the container's own live
+// aspect ratio (cqh/cqw) instead of a hardcoded number means the canvas
+// always exactly fills the container in both dimensions, whatever shape
+// it ends up being — so there's never leftover space to misplace, and the
+// chart's flex area always gets the container's real available height.
+const CHOICE_CANVAS_W = 1280
 
 interface MiniSlidePreviewProps {
   slide: SlidePreviewData | null | undefined
@@ -67,14 +69,19 @@ export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
     // its readOnly mode) rendered at full size in a fixed reference canvas,
     // then shrunk via transform:scale — same technique as the plain-slide
     // branch below, so this can't independently drift from the real thing.
-    // Anchored top-left (not center, unlike the plain branch) since the
-    // question must stay flush with the slide's top-left corner regardless
-    // of any aspect-ratio mismatch between this canvas and its container.
+    // Anchored top-left (title flush, matching the real editor) with the
+    // canvas's height derived from the container's own aspect ratio (see
+    // CHOICE_CANVAS_W's comment) rather than a fixed number or scale(min(...))
+    // — that guarantees the canvas always exactly fills the container in
+    // both dimensions, so there's no leftover gap for top-left anchoring to
+    // dump below the content (which is what pinned the chart to the top
+    // whenever an image column narrowed the available width).
     body=(
       <div style={{flex:1,minWidth:0,minHeight:0,overflow:'hidden',position:'relative',containerType:'size'} as CSSProperties}>
-        <div style={{position:'absolute',top:0,left:0,width:CHOICE_CANVAS_W,height:CHOICE_CANVAS_H,
+        <div style={{position:'absolute',top:0,left:0,width:CHOICE_CANVAS_W,
+          height:`calc(${CHOICE_CANVAS_W}px * (100cqh / 100cqw))`,
           padding:'48px 56px',boxSizing:'border-box',
-          transform:`scale(min(calc(100cqw / ${CHOICE_CANVAS_W}px), calc(100cqh / ${CHOICE_CANVAS_H}px)))`,transformOrigin:'top left',
+          transform:`scale(calc(100cqw / ${CHOICE_CANVAS_W}px))`,transformOrigin:'top left',
           display:'flex',flexDirection:'column'} as CSSProperties}>
           <div style={{width:'100%',textAlign:'left',fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:700,
             color:C.txt1,padding:'2px 0 12px',marginBottom:28,flexShrink:0,

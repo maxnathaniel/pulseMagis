@@ -26,23 +26,24 @@ export function EditableBarOptions({slide,list,readOnly,onUpdateOption,onRemoveO
         const c=counts[oi], pct=total?Math.round((c/total)*100):0
         return(
           <div key={oi} style={{flex:1,minWidth:0,height:'100%',display:'flex',flexDirection:'column',alignItems:'center',gap:8}}>
-            {!readOnly&&(
-              <div style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'center',gap:8,flexShrink:0}}>
-                <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,color:C.txt2}}>{c} · {pct}%</span>
-                {slide.options.length>2&&<button onClick={()=>onRemoveOption?.(oi)} title="Remove option"
-                  style={{background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:2,flexShrink:0}}><Trash2 size={13}/></button>}
-              </div>
-            )}
+            {/* Kept mounted (not removed) in readOnly mode so the bar-track
+              below still gets the same squeezed-space height as the real
+              editor — only its visibility is toggled, not its layout. */}
+            <div style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'center',gap:8,flexShrink:0,
+              visibility:readOnly?'hidden':'visible'}}>
+              <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,color:C.txt2}}>{c} · {pct}%</span>
+              {slide.options.length>2&&<button onClick={()=>onRemoveOption?.(oi)} title="Remove option"
+                style={{background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:2,flexShrink:0}}><Trash2 size={13}/></button>}
+            </div>
             <div style={{flex:1,width:'100%',borderRadius:4,background:`${color}16`,display:'flex',alignItems:'flex-end'}}>
               <div style={{width:'100%',height:mounted?`${(c/max)*100}%`:'0%',background:`${color}30`,borderRadius:4,
                 border:c>0?`2px solid ${color}45`:'none',boxSizing:'border-box',
                 transition:`height .6s cubic-bezier(.22,1,.36,1) ${oi*70}ms`}}/>
             </div>
-            {!readOnly&&(
-              <input value={opt} onChange={e=>onUpdateOption?.(oi,e.target.value)} placeholder={`Option ${oi+1}`}
-                style={{width:'100%',flexShrink:0,background:'transparent',border:'none',outline:'none',color:C.txt1,textAlign:'center',
-                  fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:15}}/>
-            )}
+            <input value={opt} onChange={e=>onUpdateOption?.(oi,e.target.value)} placeholder={`Option ${oi+1}`}
+              readOnly={readOnly} tabIndex={readOnly?-1:undefined}
+              style={{width:'100%',flexShrink:0,background:'transparent',border:'none',outline:'none',color:C.txt1,textAlign:'center',
+                fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:15,visibility:readOnly?'hidden':'visible'}}/>
           </div>
         )
       })}
