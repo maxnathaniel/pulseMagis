@@ -36,6 +36,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
   const [typeMenuOpen,setTypeMenuOpen]=useState(false)
   const [cropSrc,setCropSrc]=useState<string|null>(null)
   const [linkCopied,setLinkCopied]=useState(false)
+  const [appliedToAll,setAppliedToAll]=useState(false)
   // The uncropped image to save alongside the next crop confirmation — kept
   // separate from cropSrc since on "Edit crop" the two start out equal but
   // cropSrc gets replaced by the new crop while this stays the same source.
@@ -270,11 +271,11 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
             )
           })}
         </div>
-        <button onClick={()=>onApplyToAll(slide.responseMode||'instant')}
+        <button onClick={()=>{ onApplyToAll(slide.responseMode||'instant'); setAppliedToAll(true); setTimeout(()=>setAppliedToAll(false),1500) }}
           style={{marginTop:10,width:'100%',padding:'9px 0',borderRadius:4,border:`1.5px solid ${C.border}`,
             background:'transparent',color:C.txt3,cursor:'pointer',fontSize:12,fontWeight:700,
             display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
-          <Copy size={12}/> Apply to all slides
+          <Copy size={12}/> {appliedToAll?'Applied!':'Apply to all slides'}
         </button>
       </div>
     </div>
