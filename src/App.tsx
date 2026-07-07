@@ -40,6 +40,7 @@ export default function App() {
     title: 'Untitled presentation', qnaModeration: true, moderatorPin: '',
     slides: [createSlide('choice')],
   })
+  const [builderActiveId, setBuilderActiveId] = useState<string | undefined>(undefined)
   const [session,     setSession]   = useState<Session | null>(null)
   const [slideIndex,  setSlideIndex]= useState(0)
   const [responses,   setResponses] = useState<ResponsesBySlide>({})
@@ -288,7 +289,9 @@ export default function App() {
   }
 
   // ── resume an existing Pulse into the Builder ───────────────────────────
-  const resumePulse = async (code: string) => {
+  // activeId lets a caller (e.g. endPresentation) land the Builder back on a
+  // specific slide instead of always defaulting to the first one.
+  const resumePulse = async (code: string, activeId?: string) => {
     const {data:sd,error}=await supabase.from('sessions').select('*').eq('code',code).single()
     if (error||!sd) { console.error(error); return }
     const {data:slideRows}=await supabase.from('slides').select('*').eq('session_code',code).order('position')
@@ -296,6 +299,7 @@ export default function App() {
       code:sd.code, title:sd.title, qnaModeration:sd.qna_moderation, moderatorPin:'',
       slides:(slideRows||[]).map(mapSlideForBuilder),
     })
+    setBuilderActiveId(activeId)
     setScreen('build')
     setPulseUrl(code, 'build')
   }
@@ -608,6 +612,9 @@ export default function App() {
   // then return the presenter to the Builder for this Pulse (not all the way home) ─
   const endPresentation=async()=>{
     const code=session?.code
+    // Captured before session is wiped below, so the Builder can reopen on
+    // whichever slide was on screen when presenting ended, not always slide 1.
+    const activeId=session?.slides[slideIndex]?.id
     if (session) {
       // Wait for any in-flight goToSlide write first, so it can't land
       // after (and overwrite) this reset — see goToSlide's own comment.
@@ -618,7 +625,7 @@ export default function App() {
     }
     setSession(null); setSlideIndex(0); setResponses({}); setQnaList([])
     setIsModerator(false); setAudienceCount(0)
-    if (code) await resumePulse(code)
+    if (code) await resumePulse(code, activeId)
     else resetAll()
   }
 
@@ -656,7 +663,7 @@ export default function App() {
               {screen==='home'    && <Home pulses={pulses} pulsesLoading={pulsesLoading} userEmail={user?.email}
                 onCreateNew={createNewPulse} onJoin={()=>setScreen('join')} onResume={resumePulse}
                 onDeletePulse={deletePulse} onRenamePulse={renamePulse} onLogout={logout}/>}
-              {screen==='build'   && <Builder draft={draft} setDraft={setDraft} updateSlide={updateSlide}
+              {screen==='build'   && <Builder draft={draft} initialActiveId={builderActiveId} setDraft={setDraft} updateSlide={updateSlide}
                 changeSlideType={changeSlideType}
                 addSlide={addSlide} removeSlide={removeSlide} reorderSlide={reorderSlide} addOption={addOption}
                 removeOption={removeOption} updateOption={updateOption}

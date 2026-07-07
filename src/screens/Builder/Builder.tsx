@@ -12,6 +12,7 @@ import type { Draft, SlideType, SlidePatch, ResponseMode, ResponsesBySlide } fro
 
 interface BuilderProps {
   draft: Draft
+  initialActiveId?: string
   setDraft: Dispatch<SetStateAction<Draft>>
   updateSlide: (id: string, patch: SlidePatch) => void
   changeSlideType: (id: string, newType: SlideType) => void
@@ -26,11 +27,14 @@ interface BuilderProps {
   onPresent: (startIndex: number) => void
 }
 
-export function Builder({draft,setDraft,updateSlide,changeSlideType,addSlide,removeSlide,reorderSlide,addOption,removeOption,updateOption,applyResponseModeToAll,onBack,onPresent}: BuilderProps){
+export function Builder({draft,initialActiveId,setDraft,updateSlide,changeSlideType,addSlide,removeSlide,reorderSlide,addOption,removeOption,updateOption,applyResponseModeToAll,onBack,onPresent}: BuilderProps){
   // Tracked by slide id, not array index — reordering (drag-and-drop) changes
   // which slide sits at a given index, so an index-based "active slide" would
-  // silently start pointing at the wrong slide after a drag.
-  const [activeId,setActiveId]=useState(draft.slides[0]?.id)
+  // silently start pointing at the wrong slide after a drag. Seeded from
+  // initialActiveId (e.g. wherever presenting was ended) when the caller
+  // provides one, falling back to the first slide otherwise — the "stale id"
+  // case (a slide removed elsewhere) is already handled by the effect below.
+  const [activeId,setActiveId]=useState(initialActiveId||draft.slides[0]?.id)
   const [previewOpen,setPreviewOpen]=useState(false)
   const [editPanelOpen,setEditPanelOpen]=useState(true)
   const [view,setView]=useState<BuilderView>('create')
