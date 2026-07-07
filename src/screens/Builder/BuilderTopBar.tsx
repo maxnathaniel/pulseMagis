@@ -25,11 +25,12 @@ interface BuilderTopBarProps {
   onBack: () => void
   onPreview: () => void
   onPresent: () => void
+  presentLoading?: boolean
   view: BuilderView
   onViewChange: (view: BuilderView) => void
 }
 
-export function BuilderTopBar({title,onTitleChange,onBack,onPreview,onPresent,view,onViewChange}: BuilderTopBarProps){
+export function BuilderTopBar({title,onTitleChange,onBack,onPreview,onPresent,presentLoading,view,onViewChange}: BuilderTopBarProps){
   return(
     <div style={{borderBottom:`1.5px solid ${C.border}`,padding:'14px 24px',display:'grid',
       gridTemplateColumns:'1fr auto 1fr',alignItems:'center',gap:16,background:C.surface}}>
@@ -54,13 +55,14 @@ export function BuilderTopBar({title,onTitleChange,onBack,onPreview,onPresent,vi
           fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,cursor:'pointer'}}>
           <Eye size={16}/> Preview
         </button>
-        <button onClick={onPresent} disabled={view==='results'} title={view==='results'?'Switch to Create to start presenting':undefined}
+        <button onClick={onPresent} disabled={view==='results'||presentLoading}
+          title={view==='results'?'Switch to Create to start presenting':undefined}
           style={{display:'flex',alignItems:'center',gap:7,
           padding:'10px 20px',borderRadius:4,border:'none',
           background:view==='results'?C.disabledBtn:C.purple,color:view==='results'?C.txtDis:'#fff',
-          fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,cursor:view==='results'?'not-allowed':'pointer',
+          fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,cursor:view==='results'?'not-allowed':presentLoading?'wait':'pointer',
           boxShadow:view==='results'?'none':`0 4px 16px ${C.purpleBg}`,transition:'all .2s ease'}}>
-          <Play size={16}/> Start Presentation
+          <Play size={16}/> {presentLoading?'Starting…':'Start Presentation'}
         </button>
       </div>
     </div>

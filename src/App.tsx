@@ -3,7 +3,7 @@ import type { User } from '@supabase/supabase-js'
 import type { JSONContent } from '@tiptap/core'
 import { supabase } from './lib/supabase.ts'
 import { C, FONT_BODY, useFonts, EMPTY_RICH_DOC } from './theme.ts'
-import { uid, genCode, hashPin, mapSlide, mapSlideForBuilder, mapQuestion } from './lib/helpers.ts'
+import { uid, genCode, hashPin, mapSlide, mapSlideForBuilder, toBuilderSlide, mapQuestion } from './lib/helpers.ts'
 import { Home } from './screens/Home/Home.tsx'
 import { Login } from './screens/Login/Login.tsx'
 import { Builder } from './screens/Builder/Builder.tsx'
@@ -37,10 +37,12 @@ export default function App() {
 
   const [screen, setScreen]         = useState<Screen>('home')
   const [draft, setDraft]           = useState<Draft>({
-    title: 'Untitled presentation', qnaModeration: true, moderatorPin: '',
+    title: 'Untitled presentation', qnaModeration: true, moderatorPin: '', pinHash: null,
     slides: [createSlide('choice')],
   })
   const [builderActiveId, setBuilderActiveId] = useState<string | undefined>(undefined)
+  const [startingPresent, setStartingPresent]=useState(false)
+  const [endingPresentation, setEndingPresentation]=useState(false)
   const [session,     setSession]   = useState<Session | null>(null)
   const [slideIndex,  setSlideIndex]= useState(0)
   const [responses,   setResponses] = useState<ResponsesBySlide>({})
@@ -192,6 +194,7 @@ export default function App() {
 
   // ── start presenting ──────────────────────────────────────────────────────
   const startPresenting = async (startIndex = 0) => {
+    setStartingPresent(true)
     // startPresenting reconciles slides below (upsert + delete-only-removed,
     // same pattern as persistDraft). Suppress the autosave "flush on leave"
     // effect (fired by the screen change to 'present' at the end of this
@@ -213,39 +216,14 @@ export default function App() {
     const code=isUpdate ? draft.code! : genCode()
     const title=draft.title.trim()||'Untitled presentation'
 
-    let pinHash: string | null
-    if (draft.moderatorPin.trim()) {
-      pinHash=await hashPin(draft.moderatorPin.trim())
-    } else if (isUpdate) {
-      // pin_hash is one-way (SHA-256) — a blank PIN field on resume does not
-      // mean "remove the PIN", so preserve whatever's already stored.
-      const {data:existing}=await supabase.from('sessions').select('pin_hash').eq('code',code).single()
-      pinHash=existing?.pin_hash ?? null
-    } else {
-      pinHash=null
-    }
-
-    if (isUpdate) {
-      const {error:sessUpdErr}=await supabase.from('sessions').update({
-        title, current_slide_index:startIndex, qna_enabled:qnaEnabled,
-        qna_moderation:draft.qnaModeration, pin_hash:pinHash, is_live:true, has_presented:true,
-      }).eq('code',code)
-      if (sessUpdErr) {
-        console.error(sessUpdErr)
-        window.alert(`Couldn't start presenting — the session failed to update (${sessUpdErr.message}). Your Pulse has NOT started; please fix the issue and try again before making further changes.`)
-        return
-      }
-    } else {
-      const {error:sessInsertError}=await supabase.from('sessions').insert({
-        code, title, owner_id:user!.id, current_slide_index:startIndex, qna_enabled:qnaEnabled,
-        qna_moderation:draft.qnaModeration, pin_hash:pinHash, is_live:true, has_presented:true,
-      })
-      if (sessInsertError) {
-        console.error(sessInsertError)
-        window.alert(`Couldn't start presenting — the session failed to save (${sessInsertError.message}).`)
-        return
-      }
-    }
+    // pin_hash is one-way (SHA-256) — a blank PIN field on resume does not
+    // mean "remove the PIN", so preserve whatever's already stored, which
+    // draft.pinHash already carries (populated wherever a Draft is built —
+    // no need to round-trip to the DB to read back a value we're not
+    // changing).
+    const pinHash: string | null = draft.moderatorPin.trim()
+      ? await hashPin(draft.moderatorPin.trim())
+      : (isUpdate ? draft.pinHash : null)
 
     // Upsert (not delete-then-insert): preserves existing slide rows in
     // place so responses/questions tied to still-present slides survive a
@@ -264,19 +242,58 @@ export default function App() {
       content:s.type==='plain'?(s.content||null):null, vertical_align:s.type==='plain'?(s.verticalAlign||'middle'):'middle',
       results_format:s.type==='choice'?(s.resultsFormat||'bar'):'bar',
     }))
-    const {error:slidesUpsertError}=await supabase.from('slides').upsert(slideRows)
-    if (slidesUpsertError) {
-      console.error(slidesUpsertError)
-      window.alert(`Couldn't start presenting — the slides failed to save (${slidesUpsertError.message}). Your Pulse has NOT started; please fix the issue and try again before making further changes.`)
-      return
-    }
+
     if (isUpdate) {
+      // The session row already exists, so the update, the slides upsert,
+      // and the existing-slide-ids lookup (for the removed-slides diff
+      // below) have no dependency on each other — run them concurrently
+      // instead of as a sequential chain of round trips.
+      const [sessRes, slidesRes, existingRes] = await Promise.all([
+        supabase.from('sessions').update({
+          title, current_slide_index:startIndex, qna_enabled:qnaEnabled,
+          qna_moderation:draft.qnaModeration, pin_hash:pinHash, is_live:true, has_presented:true,
+        }).eq('code',code),
+        supabase.from('slides').upsert(slideRows),
+        supabase.from('slides').select('id').eq('session_code',code),
+      ])
+      if (sessRes.error) {
+        console.error(sessRes.error)
+        window.alert(`Couldn't start presenting — the session failed to update (${sessRes.error.message}). Your Pulse has NOT started; please fix the issue and try again before making further changes.`)
+        setStartingPresent(false)
+        return
+      }
+      if (slidesRes.error) {
+        console.error(slidesRes.error)
+        window.alert(`Couldn't start presenting — the slides failed to save (${slidesRes.error.message}). Your Pulse has NOT started; please fix the issue and try again before making further changes.`)
+        setStartingPresent(false)
+        return
+      }
       const currentIds=draft.slides.map(s=>s.id)
-      const {data:existingSlides}=await supabase.from('slides').select('id').eq('session_code',code)
-      const removedIds=(existingSlides||[]).map(r=>r.id).filter(id=>!currentIds.includes(id))
+      const removedIds=(existingRes.data||[]).map(r=>r.id).filter(id=>!currentIds.includes(id))
       if (removedIds.length) {
         const {error:deleteError}=await supabase.from('slides').delete().in('id',removedIds)
         if (deleteError) console.error(deleteError)
+      }
+    } else {
+      // A brand-new session row must exist before slides can reference it
+      // (slides.session_code has a FK to sessions(code)), so this path stays
+      // sequential.
+      const {error:sessInsertError}=await supabase.from('sessions').insert({
+        code, title, owner_id:user!.id, current_slide_index:startIndex, qna_enabled:qnaEnabled,
+        qna_moderation:draft.qnaModeration, pin_hash:pinHash, is_live:true, has_presented:true,
+      })
+      if (sessInsertError) {
+        console.error(sessInsertError)
+        window.alert(`Couldn't start presenting — the session failed to save (${sessInsertError.message}).`)
+        setStartingPresent(false)
+        return
+      }
+      const {error:slidesUpsertError}=await supabase.from('slides').upsert(slideRows)
+      if (slidesUpsertError) {
+        console.error(slidesUpsertError)
+        window.alert(`Couldn't start presenting — the slides failed to save (${slidesUpsertError.message}). Your Pulse has NOT started; please fix the issue and try again before making further changes.`)
+        setStartingPresent(false)
+        return
       }
     }
     setSession({ code, title,
@@ -286,17 +303,33 @@ export default function App() {
     setSlideIndex(startIndex); setResponses({}); setQnaList([])
     setIsModerator(true); setScreen('present')
     setPulseUrl(code, 'present')
+    setStartingPresent(false)
   }
+
+  // ── build a Builder Draft directly from an in-memory Session ────────────
+  // Used by endPresentation instead of resumePulse's DB re-fetch: nothing
+  // can have changed `sessions`/`slides` server-side while presenting (slide
+  // edits are a Builder-only action, and the only session field changes
+  // during a presentation are ones the app itself just wrote), so the
+  // in-memory session is already a faithful mirror of what a re-fetch would
+  // return.
+  const sessionToDraft = (s: Session): Draft => ({
+    code: s.code, title: s.title, qnaModeration: s.qnaModeration,
+    moderatorPin: '', pinHash: s.pinHash,
+    slides: s.slides.map(toBuilderSlide),
+  })
 
   // ── resume an existing Pulse into the Builder ───────────────────────────
   // activeId lets a caller (e.g. endPresentation) land the Builder back on a
   // specific slide instead of always defaulting to the first one.
   const resumePulse = async (code: string, activeId?: string) => {
-    const {data:sd,error}=await supabase.from('sessions').select('*').eq('code',code).single()
+    const [{data:sd,error}, {data:slideRows}] = await Promise.all([
+      supabase.from('sessions').select('*').eq('code',code).single(),
+      supabase.from('slides').select('*').eq('session_code',code).order('position'),
+    ])
     if (error||!sd) { console.error(error); return }
-    const {data:slideRows}=await supabase.from('slides').select('*').eq('session_code',code).order('position')
     setDraft({
-      code:sd.code, title:sd.title, qnaModeration:sd.qna_moderation, moderatorPin:'',
+      code:sd.code, title:sd.title, qnaModeration:sd.qna_moderation, moderatorPin:'', pinHash:sd.pin_hash,
       slides:(slideRows||[]).map(mapSlideForBuilder),
     })
     setBuilderActiveId(activeId)
@@ -306,9 +339,11 @@ export default function App() {
 
   // ── resume presenting an existing Pulse directly (e.g. after a reload) ──
   const resumePresenting = async (code: string) => {
-    const {data:sd,error}=await supabase.from('sessions').select('*').eq('code',code).single()
+    const [{data:sd,error}, {data:slideRows}] = await Promise.all([
+      supabase.from('sessions').select('*').eq('code',code).single(),
+      supabase.from('slides').select('*').eq('session_code',code).order('position'),
+    ])
     if (error||!sd) { console.error(error); return }
-    const {data:slideRows}=await supabase.from('slides').select('*').eq('session_code',code).order('position')
     setSession({code:sd.code, title:sd.title, currentSlideIndex:sd.current_slide_index,
       qnaEnabled:sd.qna_enabled, qnaModeration:sd.qna_moderation, pinHash:sd.pin_hash, isLive:sd.is_live!==false,
       hasPresented:sd.has_presented===true,
@@ -340,7 +375,7 @@ export default function App() {
       qna_enabled:false, qna_moderation:true, pin_hash:null,
     })
     if (error) { console.error(error); return }
-    setDraft({code, title:'Untitled presentation', qnaModeration:true, moderatorPin:'', slides:[createSlide('choice')]})
+    setDraft({code, title:'Untitled presentation', qnaModeration:true, moderatorPin:'', pinHash:null, slides:[createSlide('choice')]})
     setScreen('build')
     setPulseUrl(code, 'build')
   }
@@ -357,17 +392,19 @@ export default function App() {
     const code=d.code
     const title=d.title.trim()||'Untitled presentation'
     const draftQnaEnabled=d.slides.some(s=>s.type==='qa')
+    // pin_hash is one-way, so a blank PIN field means "preserve the existing
+    // hash", which d.pinHash already carries — no need to read it back from
+    // the DB. When a PIN *is* set, write the freshly computed hash back into
+    // draft state too, so a later autosave (within the same Builder session)
+    // that clears the PIN field falls back to this latest hash rather than a
+    // stale one captured when the Builder first opened.
     let pinHash: string | null
     if (d.moderatorPin.trim()) {
       pinHash=await hashPin(d.moderatorPin.trim())
+      setDraft(cur => cur.pinHash===pinHash ? cur : {...cur, pinHash})
     } else {
-      const {data:existing}=await supabase.from('sessions').select('pin_hash').eq('code',code).single()
-      pinHash=existing?.pin_hash ?? null
+      pinHash=d.pinHash
     }
-    const {error:sessionError}=await supabase.from('sessions').update({
-      title, qna_enabled:draftQnaEnabled, qna_moderation:d.qnaModeration, pin_hash:pinHash,
-    }).eq('code',code)
-    if (sessionError) console.error(sessionError)
 
     const slideRows=d.slides.map((s,idx) => ({
       id:s.id, session_code:code, type:s.type, question:s.question,
@@ -377,12 +414,22 @@ export default function App() {
       content:s.type==='plain'?(s.content||null):null, vertical_align:s.type==='plain'?(s.verticalAlign||'middle'):'middle',
       results_format:s.type==='choice'?(s.resultsFormat||'bar'):'bar',
     }))
-    const {error:upsertError}=await supabase.from('slides').upsert(slideRows)
-    if (upsertError) console.error(upsertError)
+
+    // The session row already exists here (guarded by `!d.code` above), so
+    // these three calls have no dependency on each other and can run
+    // concurrently instead of as a sequential chain.
+    const [sessionRes, upsertRes, existingRes] = await Promise.all([
+      supabase.from('sessions').update({
+        title, qna_enabled:draftQnaEnabled, qna_moderation:d.qnaModeration, pin_hash:pinHash,
+      }).eq('code',code),
+      supabase.from('slides').upsert(slideRows),
+      supabase.from('slides').select('id').eq('session_code',code),
+    ])
+    if (sessionRes.error) console.error(sessionRes.error)
+    if (upsertRes.error) console.error(upsertRes.error)
 
     const currentIds=d.slides.map(s=>s.id)
-    const {data:existingSlides}=await supabase.from('slides').select('id').eq('session_code',code)
-    const removedIds=(existingSlides||[]).map(r=>r.id).filter(id=>!currentIds.includes(id))
+    const removedIds=(existingRes.data||[]).map(r=>r.id).filter(id=>!currentIds.includes(id))
     if (removedIds.length) {
       const {error:deleteError}=await supabase.from('slides').delete().in('id',removedIds)
       if (deleteError) console.error(deleteError)
@@ -611,10 +658,15 @@ export default function App() {
   // ── end presentation: flip is_live so connected audience clients are notified,
   // then return the presenter to the Builder for this Pulse (not all the way home) ─
   const endPresentation=async()=>{
+    setEndingPresentation(true)
     const code=session?.code
     // Captured before session is wiped below, so the Builder can reopen on
     // whichever slide was on screen when presenting ended, not always slide 1.
     const activeId=session?.slides[slideIndex]?.id
+    // Built from the in-memory session before it's wiped below, so exiting
+    // doesn't need to re-fetch sessions+slides from the DB (see
+    // sessionToDraft's comment) — this is what makes exiting fast.
+    const nextDraft=session ? sessionToDraft(session) : null
     if (session) {
       // Wait for any in-flight goToSlide write first, so it can't land
       // after (and overwrite) this reset — see goToSlide's own comment.
@@ -625,8 +677,15 @@ export default function App() {
     }
     setSession(null); setSlideIndex(0); setResponses({}); setQnaList([])
     setIsModerator(false); setAudienceCount(0)
-    if (code) await resumePulse(code, activeId)
-    else resetAll()
+    if (nextDraft) {
+      setDraft(nextDraft)
+      setBuilderActiveId(activeId)
+      setScreen('build')
+      setPulseUrl(code!, 'build')
+    } else {
+      resetAll()
+    }
+    setEndingPresentation(false)
   }
 
   // ── deep link: ?pulse=<code>&mode=build|present reopens that Pulse on reload
@@ -668,10 +727,10 @@ export default function App() {
                 addSlide={addSlide} removeSlide={removeSlide} reorderSlide={reorderSlide} addOption={addOption}
                 removeOption={removeOption} updateOption={updateOption}
                 applyResponseModeToAll={applyResponseModeToAll}
-                onBack={resetAll} onPresent={startPresenting}/>}
+                onBack={resetAll} onPresent={startPresenting} presentLoading={startingPresent}/>}
               {screen==='present' && session && <Presenter session={session} slideIndex={slideIndex}
                 responses={responses} goToSlide={goToSlide} copyCode={copyCode} copied={copied}
-                onExit={endPresentation} qnaList={qnaList}
+                onExit={endPresentation} exiting={endingPresentation} qnaList={qnaList}
                 onModerate={moderateQuestion} onToggleModeration={toggleModeration} audienceCount={audienceCount}/>}
             </>
       }

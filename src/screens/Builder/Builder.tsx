@@ -25,9 +25,10 @@ interface BuilderProps {
   applyResponseModeToAll: (mode: ResponseMode) => void
   onBack: () => void
   onPresent: (startIndex: number) => void
+  presentLoading?: boolean
 }
 
-export function Builder({draft,initialActiveId,setDraft,updateSlide,changeSlideType,addSlide,removeSlide,reorderSlide,addOption,removeOption,updateOption,applyResponseModeToAll,onBack,onPresent}: BuilderProps){
+export function Builder({draft,initialActiveId,setDraft,updateSlide,changeSlideType,addSlide,removeSlide,reorderSlide,addOption,removeOption,updateOption,applyResponseModeToAll,onBack,onPresent,presentLoading}: BuilderProps){
   // Tracked by slide id, not array index — reordering (drag-and-drop) changes
   // which slide sits at a given index, so an index-based "active slide" would
   // silently start pointing at the wrong slide after a drag. Seeded from
@@ -79,6 +80,7 @@ export function Builder({draft,initialActiveId,setDraft,updateSlide,changeSlideT
     <div style={{flex:1,display:'flex',flexDirection:'column',minHeight:0}}>
       <BuilderTopBar title={draft.title} onTitleChange={t=>setDraft(d=>({...d,title:t}))}
         onBack={onBack} onPreview={()=>setPreviewOpen(true)} onPresent={()=>onPresent(Math.max(activeIndex,0))}
+        presentLoading={presentLoading}
         view={view} onViewChange={setView}/>
       {view==='results'
         ? <ResultsView draft={draft}/>

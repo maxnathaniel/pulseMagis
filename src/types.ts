@@ -73,6 +73,7 @@ export interface Draft {
   title: string
   qnaModeration: boolean
   moderatorPin: string
+  pinHash: string | null
   slides: Slide[]
 }
 

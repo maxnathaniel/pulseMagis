@@ -10,13 +10,14 @@ interface PresenterProps {
   copyCode: () => void
   copied: boolean
   onExit: () => void
+  exiting?: boolean
   qnaList: Question[]
   onModerate: (qId: string, action: ModerateAction) => void
   onToggleModeration: () => void
   audienceCount: number
 }
 
-export function Presenter({session,slideIndex,responses,goToSlide,copyCode,copied,onExit,qnaList,onModerate,onToggleModeration,audienceCount}: PresenterProps){
+export function Presenter({session,slideIndex,responses,goToSlide,copyCode,copied,onExit,exiting,qnaList,onModerate,onToggleModeration,audienceCount}: PresenterProps){
   const [showJoinPanel,setShowJoinPanel]=useState(true)
   const [revealedSlides,setRevealedSlides]=useState<Set<string>>(() => new Set())
   const [isFullscreen,setIsFullscreen]=useState(false)
@@ -34,6 +35,7 @@ export function Presenter({session,slideIndex,responses,goToSlide,copyCode,copie
     else document.documentElement.requestFullscreen()
   }
   const handleExit=() => {
+    if (exiting) return
     if (document.fullscreenElement) document.exitFullscreen()
     onExit()
   }
@@ -61,7 +63,7 @@ export function Presenter({session,slideIndex,responses,goToSlide,copyCode,copie
         qnaList={qnaList} session={session} onModerate={onModerate} onToggleModeration={onToggleModeration}
         showJoinPanel={showJoinPanel} joinCode={session.code} audienceCount={audienceCount} copied={copied}
         onCopyJoinCode={copyCode} onCloseJoinPanel={()=>setShowJoinPanel(false)}
-        showChrome onExit={handleExit} isFullscreen={isFullscreen} onToggleFullscreen={toggleFullscreen}
+        showChrome onExit={handleExit} exiting={exiting} isFullscreen={isFullscreen} onToggleFullscreen={toggleFullscreen}
         onShowJoinPanel={()=>setShowJoinPanel(true)}
         onPrev={()=>goToSlide(slideIndex-1)} prevDisabled={slideIndex===0}
         onNext={()=>goToSlide(slideIndex+1)} nextDisabled={slideIndex===session.slides.length-1}/>

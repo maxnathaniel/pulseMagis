@@ -34,6 +34,7 @@ interface PresenterSlideCardProps {
   // Builder preview, which has no live session, fullscreen, or navigation.
   showChrome?: boolean
   onExit?: () => void
+  exiting?: boolean
   isFullscreen?: boolean
   onToggleFullscreen?: () => void
   onShowJoinPanel?: () => void
@@ -45,7 +46,7 @@ interface PresenterSlideCardProps {
 
 export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,session,onModerate,onToggleModeration,
   showJoinPanel,joinCode,audienceCount,copied,onCopyJoinCode,onCloseJoinPanel,
-  showChrome,onExit,isFullscreen,onToggleFullscreen,onShowJoinPanel,onPrev,prevDisabled,onNext,nextDisabled}: PresenterSlideCardProps){
+  showChrome,onExit,exiting,isFullscreen,onToggleFullscreen,onShowJoinPanel,onPrev,prevDisabled,onNext,nextDisabled}: PresenterSlideCardProps){
   const [hovTopLeft,setHovTopLeft]=useState(false)
   const [hovBottomLeft,setHovBottomLeft]=useState(false)
   // The panel column stays permanently mounted and is animated via a
@@ -87,7 +88,8 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
           <div onMouseEnter={()=>setHovTopLeft(true)} onMouseLeave={()=>setHovTopLeft(false)}
             style={{position:'absolute',top:0,left:0,width:140,height:100,zIndex:5,padding:16,display:'flex',alignItems:'flex-start'}}>
             <div style={{display:'flex',gap:8,opacity:hovTopLeft?1:0,pointerEvents:hovTopLeft?'auto':'none',transition:'opacity .15s ease'}}>
-              <button onClick={onExit} title="End presentation" style={iconBtnStyle}><X size={16}/></button>
+              <button onClick={onExit} disabled={exiting} title="End presentation"
+                style={{...iconBtnStyle,cursor:exiting?'wait':iconBtnStyle.cursor}}><X size={16}/></button>
               <button onClick={onToggleFullscreen} title={isFullscreen?'Exit full screen':'Full screen'} style={iconBtnStyle}>
                 {isFullscreen?<Minimize2 size={16}/>:<Maximize2 size={16}/>}
               </button>

@@ -83,30 +83,24 @@ export const mapSlide = (s: SlideRow): Slide => {
   }
   return { ...base, type: s.type }
 }
-// Companion to mapSlide, used only when resuming a Pulse into the Builder's
-// editable draft.slides shape (see createSlide in App.jsx). Unlike mapSlide,
-// this pads/truncates optionImages to match options.length — startPresenting
-// filters empty option strings before insert but does not correspondingly
-// filter optionImages, so the two arrays can already be misaligned in the DB.
-export const mapSlideForBuilder = (s: SlideRow): Slide => {
-  const base = {
-    id: s.id, question: s.question,
-    layout: (s.layout || 'right') as Layout,
-    contentImage: s.content_image || null,
-    contentImageOriginal: s.content_image_original || null,
-    responseMode: (s.response_mode || 'instant') as ResponseMode,
-  }
-  if (s.type === 'plain') {
-    return { ...base, type: 'plain', content: s.content || null, verticalAlign: (s.vertical_align || 'middle') as VerticalAlign }
-  }
-  if (s.type !== 'choice') {
-    return { ...base, type: s.type }
-  }
-  const options = s.options && s.options.length ? s.options : ['', '']
-  const rawImages = s.option_images || []
-  const optionImages = options.map((_, i) => rawImages[i] ?? null)
-  return { ...base, type: 'choice', options, optionImages, resultsFormat: (s.results_format || 'bar') as ResultsFormat }
+// Companion to mapSlide, used when resuming a Pulse into the Builder's
+// editable draft.slides shape (see createSlide in App.jsx) — from either a
+// freshly-fetched DB row (mapSlideForBuilder) or an already-in-memory Slide
+// (e.g. a live Session's slides, reused directly on presenter-exit instead of
+// re-fetching). Unlike mapSlide, this pads/truncates optionImages to match
+// options.length — startPresenting filters empty option strings before
+// insert but does not correspondingly filter optionImages, so the two arrays
+// can already be misaligned — and strips `position`, which Draft slides
+// don't carry.
+export function toBuilderSlide(s: Slide): Slide {
+  const { position: _position, ...rest } = s
+  if (rest.type !== 'choice') return rest
+  const options = rest.options.length ? rest.options : ['', '']
+  const optionImages = options.map((_, i) => rest.optionImages[i] ?? null)
+  return { ...rest, options, optionImages }
 }
+
+export const mapSlideForBuilder = (s: SlideRow): Slide => toBuilderSlide(mapSlide(s))
 
 export const mapQuestion = (q: QuestionRow): Question => ({
   id: q.id, text: q.text, votes: q.votes, voterIds: q.voter_ids || [],
