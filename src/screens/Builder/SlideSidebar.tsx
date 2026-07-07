@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus } from 'lucide-react'
 import { C } from '../../theme.ts'
 import { SlideThumbnail } from './SlideThumbnail.tsx'
@@ -21,6 +21,27 @@ export function SlideSidebar({slides,activeIndex,onSelect,onReorder,onRemove,onA
   const [dragIndex,setDragIndex]=useState<number | null>(null)
   const [overIndex,setOverIndex]=useState<number | null>(null)
   const hasQa=slides.some(s=>s.type==='qa')
+
+  useEffect(() => {
+    // Global Up/Down slide nav (PowerPoint/Slides-style) — skipped while
+    // typing so it doesn't hijack cursor movement in the question/option
+    // text fields or the caret in a contentEditable rich-text area.
+    function onKeyDown(e: KeyboardEvent){
+      if (e.key!=='ArrowUp' && e.key!=='ArrowDown') return
+      const el=document.activeElement
+      const typing=el instanceof HTMLElement &&
+        (el.tagName==='INPUT' || el.tagName==='TEXTAREA' || el.isContentEditable)
+      if (typing) return
+      e.preventDefault()
+      const delta=e.key==='ArrowUp' ? -1 : 1
+      const nextIndex=activeIndex+delta
+      if (nextIndex<0 || nextIndex>=slides.length) return
+      onSelect(slides[nextIndex].id)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [activeIndex, slides, onSelect])
+
   return(
     <div style={{width:240,flexShrink:0,borderRight:`1.5px solid ${C.border}`,padding:16,
       display:'flex',flexDirection:'column',gap:10,overflowY:'auto'}}>

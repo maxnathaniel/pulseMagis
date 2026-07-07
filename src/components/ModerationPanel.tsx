@@ -1,4 +1,4 @@
-import { ShieldCheck, Lock, Check, X, ThumbsUp, Trash2 } from 'lucide-react'
+import { ShieldCheck, Lock, Check, X, Trash2 } from 'lucide-react'
 import { C } from '../theme.ts'
 import { RoundBtn } from './ui/RoundBtn.tsx'
 import { SectionLabel } from './ui/SectionLabel.tsx'
@@ -55,9 +55,6 @@ export function ModerationPanel({session,qnaList,onModerate,onToggleModeration,a
           <div style={{display:'flex',flexDirection:'column',gap:8,marginTop:10}}>
             {visible.map(q=>(
               <div key={q.id} style={{background:C.surface,border:`1.5px solid ${q.answered?C.borderLight:C.border}`,borderRadius:4,padding:'12px 14px',display:'flex',alignItems:'center',gap:12,opacity:q.answered?.5:1,boxShadow:C.shadow}}>
-                <div style={{display:'flex',flexDirection:'column',alignItems:'center',color:C.amber,fontSize:12,fontWeight:800,minWidth:28}}>
-                  <ThumbsUp size={13}/>{q.votes}
-                </div>
                 <div style={{flex:1,fontSize:14,fontWeight:700,color:C.txt1,textDecoration:q.answered?'line-through':'none'}}>{q.text}</div>
                 {!audienceView&&<>
                   <RoundBtn onClick={()=>onModerate(q.id,'answered')} color={q.answered?C.txt4:C.teal} title={q.answered?'Mark unanswered':'Mark answered'}><Check size={14}/></RoundBtn>
