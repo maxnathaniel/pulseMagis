@@ -1,19 +1,15 @@
 import { C, PALETTE_BARS, FONT_DISPLAY } from '../../theme.ts'
-import { EmptyState } from '../ui/EmptyState.tsx'
 import { HoneycombDots, DOTS_MAX_PER_OPTION } from '../ui/HoneycombDots.tsx'
 import type { ChoiceSlide } from '../../types.ts'
 
 interface DotsResultsProps {
   slide: ChoiceSlide
   list: (string | number)[]
-  hideEmptyLabel?: boolean
 }
 
-export function DotsResults({slide,list,hideEmptyLabel}: DotsResultsProps){
+export function DotsResults({slide,list}: DotsResultsProps){
   const counts=slide.options.map((_,i)=>list.filter(v=>v===i).length)
   const total=list.length
-
-  if (!total&&!hideEmptyLabel) return <EmptyState text="No responses yet"/>
 
   return(
     <div style={{flex:1,minHeight:0,overflowY:'auto',display:'flex',flexDirection:'column',gap:12,justifyContent:'center'}}>
@@ -30,7 +26,7 @@ export function DotsResults({slide,list,hideEmptyLabel}: DotsResultsProps){
               )}
             </div>
             <div style={{display:'flex',flexDirection:'column',gap:4,minWidth:0}}>
-              <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,color:C.txt1}}>{opt}</span>
+              <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:20,color:C.txt1}}>{opt}</span>
               <span style={{fontSize:12,fontWeight:700,color:C.txt3}}>{c} · {pct}%</span>
             </div>
           </div>

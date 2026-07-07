@@ -38,7 +38,7 @@ export function BarResults({slide,list}: BarResultsProps){
                 <img src={img} alt={opt} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
               </div>
             )}
-            <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:16,color:C.txt1,textAlign:'center'}}>{opt}</span>
+            <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:22,color:C.txt1,textAlign:'center'}}>{opt}</span>
           </div>
         )
       })}

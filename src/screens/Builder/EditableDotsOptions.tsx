@@ -29,7 +29,7 @@ export function EditableDotsOptions({slide,list,readOnly,onUpdateOption,onRemove
                 <span style={{width:10,height:10,borderRadius:'50%',background:color,flexShrink:0}}/>
                 <input value={opt} onChange={e=>onUpdateOption?.(i,e.target.value)} placeholder={`Option ${i+1}`}
                   style={{flex:1,minWidth:0,background:'transparent',border:'none',outline:'none',color:C.txt1,
-                    fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,borderBottom:`1.5px solid ${C.border}`,padding:'2px 0'}}/>
+                    fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:20,borderBottom:`1.5px solid ${C.border}`,padding:'2px 0'}}/>
                 {slide.options.length>2&&<button onClick={()=>onRemoveOption?.(i)} title="Remove option"
                   style={{background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:2,flexShrink:0}}><Trash2 size={13}/></button>}
               </div>

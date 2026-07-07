@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { C, PALETTE_BARS } from '../../theme.ts'
 import { ChartLegend } from './ChartLegend.tsx'
-import { EmptyState } from '../ui/EmptyState.tsx'
 import type { ChoiceSlide } from '../../types.ts'
 
 const R=90, CX=100, CY=100
@@ -9,10 +8,9 @@ const R=90, CX=100, CY=100
 interface PieResultsProps {
   slide: ChoiceSlide
   list: (string | number)[]
-  hideEmptyLabel?: boolean
 }
 
-export function PieResults({slide,list,hideEmptyLabel}: PieResultsProps){
+export function PieResults({slide,list}: PieResultsProps){
   // Wedge paths aren't uniform shapes to scale/grow like the donut's ring,
   // so each fresh mount instead fades wedges in one at a time — still reads
   // as a reveal without risking a transform misaligning a wedge's geometry.
@@ -25,26 +23,18 @@ export function PieResults({slide,list,hideEmptyLabel}: PieResultsProps){
   const total=list.length
 
   if (!total) {
-    const emptyCircle=<svg width={320} height={320} viewBox="0 0 200 200" style={hideEmptyLabel?{flexShrink:0}:undefined}>
-      <circle cx={CX} cy={CY} r={R} fill={C.border}/>
-    </svg>
-    // Private mode still needs the option legend on screen — just with every
-    // count pinned at zero — so the chosen format reads correctly even
-    // though no real proportions can be shown yet.
-    if (hideEmptyLabel) {
-      return(
-        <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',justifyContent:'center',gap:20}}>
-          {emptyCircle}
-          <div style={{minWidth:0}}>
-            <ChartLegend options={slide.options} counts={counts} total={total}/>
-          </div>
-        </div>
-      )
-    }
+    // Zero responses still needs the option legend on screen — just with
+    // every count pinned at zero — so the chosen format reads correctly
+    // whether that's because the poll is genuinely empty or because
+    // responses are hidden (private mode always forces an empty list here).
     return(
-      <div style={{flex:1,minHeight:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:12}}>
-        {emptyCircle}
-        <EmptyState text="No responses yet"/>
+      <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',justifyContent:'center',gap:20}}>
+        <svg width={320} height={320} viewBox="0 0 200 200" style={{flexShrink:0}}>
+          <circle cx={CX} cy={CY} r={R} fill={C.border}/>
+        </svg>
+        <div style={{minWidth:0}}>
+          <ChartLegend options={slide.options} counts={counts} total={total}/>
+        </div>
       </div>
     )
   }

@@ -167,7 +167,7 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
                 // votes come in, regardless of the real `list` prop.
                 if (mode==='private') {
                   return (<>
-                    {slide.type==='choice'   &&<ChoiceResults slide={slide} format={slide.resultsFormat} list={[]} hideEmptyLabel/>}
+                    {slide.type==='choice'   &&<ChoiceResults slide={slide} format={slide.resultsFormat} list={[]}/>}
                     {slide.type==='wordcloud'&&<WordCloudResults list={[]} hideEmptyLabel/>}
                     {slide.type==='open'     &&<OpenResults list={[]} hideEmptyLabel/>}
                   </>)

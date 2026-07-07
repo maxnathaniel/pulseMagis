@@ -48,15 +48,21 @@ interface HoneycombDotsProps {
 
 // Renders `count` dots (clamped to DOTS_MAX_PER_OPTION) hex-packed outward
 // from a center point, so the cluster traces a honeycomb hexagon silhouette
-// as it grows. Only filled dots are drawn — no placeholders for empty cells.
+// as it grows. At zero, a single dot in the option's own color still takes
+// the center cell instead of leaving the whole cluster blank — same idea as
+// the circle/ring Pie and Donut fall back to when empty, just tinted to
+// match this option rather than a neutral grey.
 export function HoneycombDots({count,color}: HoneycombDotsProps){
   const shown=Math.min(count,DOTS_MAX_PER_OPTION)
   return(
     <div style={{position:'relative',width:HEX_WIDTH,height:HEX_HEIGHT,flexShrink:0}}>
-      {HEX_PIXELS.slice(0,shown).map((p,d)=>(
+      {shown ? HEX_PIXELS.slice(0,shown).map((p,d)=>(
         <span key={d} style={{position:'absolute',left:p.x,top:p.y,width:DOT_SIZE,height:DOT_SIZE,
           borderRadius:'50%',background:color,animation:`dotPop .4s cubic-bezier(.22,1,.36,1) ${d*15}ms both`}}/>
-      ))}
+      )) : (
+        <span style={{position:'absolute',left:HEX_PIXELS[0].x,top:HEX_PIXELS[0].y,width:DOT_SIZE,height:DOT_SIZE,
+          borderRadius:'50%',background:color}}/>
+      )}
     </div>
   )
 }

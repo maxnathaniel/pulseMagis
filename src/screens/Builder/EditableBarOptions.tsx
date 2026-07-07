@@ -43,7 +43,7 @@ export function EditableBarOptions({slide,list,readOnly,onUpdateOption,onRemoveO
             <input value={opt} onChange={e=>onUpdateOption?.(oi,e.target.value)} placeholder={`Option ${oi+1}`}
               readOnly={readOnly} tabIndex={readOnly?-1:undefined}
               style={{width:'100%',flexShrink:0,background:'transparent',border:'none',outline:'none',color:C.txt1,textAlign:'center',
-                fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:15,visibility:readOnly?'hidden':'visible'}}/>
+                fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:21,visibility:readOnly?'hidden':'visible'}}/>
           </div>
         )
       })}
