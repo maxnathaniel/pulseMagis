@@ -52,7 +52,7 @@ export function Home({pulses,pulsesLoading,onCreateNew,onJoin,onResume,onDeleteP
             <div style={{position:'relative'}}>
               <button onClick={()=>setNewPulseOpen(o=>!o)}
                 style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,
-                  padding:'11px 18px',borderRadius:5,border:'none',background:C.purple,color:'#fff',cursor:'pointer',
+                  padding:'11px 18px',borderRadius:9999,border:'none',background:C.purple,color:'#fff',cursor:'pointer',
                   fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14.5,boxShadow:`0 4px 16px ${C.purpleBg}`}}>
                 <Plus size={16}/> New Pulse <ChevronDown size={14} style={{marginLeft:2}}/>
               </button>

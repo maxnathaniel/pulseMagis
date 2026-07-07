@@ -19,7 +19,7 @@ interface ToolbarBtnProps {
 function ToolbarBtn({active, disabled, onClick, title, children}: ToolbarBtnProps) {
   return (
     <button type="button" onClick={onClick} title={title} disabled={disabled}
-      style={{width:28,height:28,display:'flex',alignItems:'center',justifyContent:'center',borderRadius:4,
+      style={{width:28,height:28,display:'flex',alignItems:'center',justifyContent:'center',borderRadius:9999,
         border:'none',background:active?C.purpleBg:'transparent',
         color:disabled?C.txtDis:(active?C.purple:C.txt3),
         cursor:disabled?'default':'pointer',flexShrink:0}}
@@ -102,7 +102,7 @@ export function RichTextToolbar({editor, verticalAlign, onVerticalAlignChange}: 
       {/* block style */}
       <div style={{position:'relative'}}>
         <button type="button" onClick={()=>setBlockOpen(o=>!o)}
-          style={{display:'flex',alignItems:'center',gap:4,height:28,padding:'0 8px',borderRadius:4,
+          style={{display:'flex',alignItems:'center',gap:4,height:28,padding:'0 8px',borderRadius:9999,
             border:'none',background:blockOpen?C.surfaceHov:'transparent',color:C.txt2,
             fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:12.5,cursor:'pointer'}}>
           {activeBlock.label}<ChevronDown size={12}/>
@@ -207,7 +207,7 @@ export function RichTextToolbar({editor, verticalAlign, onVerticalAlignChange}: 
                 style={{flex:1,background:C.inputBg,border:`1.5px solid ${C.border}`,borderRadius:4,
                   padding:'6px 8px',color:C.txt1,fontSize:13,outline:'none'}}/>
               <button onClick={confirmLink}
-                style={{padding:'6px 12px',borderRadius:4,border:'none',background:C.purple,color:'#fff',
+                style={{padding:'6px 12px',borderRadius:9999,border:'none',background:C.purple,color:'#fff',
                   fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:12.5,cursor:'pointer'}}>Add</button>
             </div>
           </>

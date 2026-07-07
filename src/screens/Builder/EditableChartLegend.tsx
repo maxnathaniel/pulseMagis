@@ -25,7 +25,7 @@ export function EditableChartLegend({options,counts,total,onUpdateOption,onRemov
         </div>
       ))}
       {options.length<6&&(
-        <button onClick={onAddOption} style={{marginTop:4,padding:'8px 0',borderRadius:4,border:`2px dashed ${C.border}`,
+        <button onClick={onAddOption} style={{marginTop:4,padding:'8px 0',borderRadius:9999,border:`2px dashed ${C.border}`,
           background:'transparent',color:C.txt3,display:'flex',alignItems:'center',justifyContent:'center',
           gap:6,cursor:'pointer',fontSize:12.5,fontWeight:700}}>
           <Plus size={12}/> Add option

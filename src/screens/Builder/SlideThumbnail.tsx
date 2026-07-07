@@ -36,7 +36,7 @@ export function SlideThumbnail({slide,index,total,active,dropIndicator,onSelect,
         {hov&&(
           <>
             <button onClick={e=>{e.stopPropagation();setMenuOpen(o=>!o)}}
-              style={{width:22,height:22,borderRadius:4,border:`1.5px solid ${C.border}`,background:C.surfaceAlt,
+              style={{width:22,height:22,borderRadius:9999,border:`1.5px solid ${C.border}`,background:C.surfaceAlt,
                 color:C.txt2,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
               <MoreVertical size={13}/>
             </button>

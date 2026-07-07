@@ -39,7 +39,7 @@ export const FONT_BODY    = "'Inter', ui-sans-serif, system-ui, sans-serif"
 
 // Light theme colour palette
 export const C = {
-  pageBg:      'linear-gradient(135deg,#F0E8FF 0%,#FFF4EE 50%,#E8F0FF 100%)',
+  pageBg:      '#F1F2F4',
   surface:     '#FFFFFF',
   surfaceAlt:  '#F8F4FF',
   surfaceHov:  '#F2ECFE',
@@ -62,8 +62,8 @@ export const C = {
   tealBorder:  'rgba(5,150,105,0.35)',
   red:         '#E11D48',
   redBg:       'rgba(225,29,72,0.10)',
-  purple:      '#7C3AED',
-  purpleBg:    'rgba(124,58,237,0.10)',
+  purple:      '#5769E7',
+  purpleBg:    'rgba(87,105,231,0.10)',
   disabledBtn: 'rgba(110,60,200,0.08)',
   shadow:      '0 2px 16px rgba(110,60,200,0.10)',
   shadowHov:   '0 4px 24px rgba(110,60,200,0.16)',

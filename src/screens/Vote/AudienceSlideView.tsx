@@ -57,7 +57,7 @@ export function AudienceSlideView({session,slide,voted,choiceInput,setChoiceInpu
                   const img=(slide.optionImages||[])[i],color=PALETTE_BARS[i%PALETTE_BARS.length],selected=choiceInput===i
                   return(
                     <button key={i} onClick={()=>setChoiceInput(i)}
-                      style={{flex:'1 1 110px',maxWidth:145,padding:'14px 8px',borderRadius:5,
+                      style={{flex:'1 1 110px',maxWidth:145,padding:'14px 8px',borderRadius:9999,
                         border:`2px solid ${selected?color:C.border}`,
                         background:selected?`${color}12`:C.surface,color:C.txt1,cursor:'pointer',textAlign:'center',
                         boxShadow:selected?`0 4px 16px ${color}30`:C.shadow,
@@ -77,7 +77,7 @@ export function AudienceSlideView({session,slide,voted,choiceInput,setChoiceInpu
                   const color=PALETTE_BARS[i%PALETTE_BARS.length],selected=choiceInput===i
                   return(
                     <button key={i} onClick={()=>setChoiceInput(i)}
-                      style={{textAlign:'left',padding:'14px 16px',borderRadius:4,
+                      style={{textAlign:'left',padding:'14px 16px',borderRadius:9999,
                         border:`2px solid ${selected?color:C.border}`,
                         background:selected?`${color}10`:C.surface,
                         color:selected?color:C.txt1,fontSize:15,fontWeight:700,cursor:'pointer',
@@ -102,7 +102,7 @@ export function AudienceSlideView({session,slide,voted,choiceInput,setChoiceInpu
             const disabled=submitting||(slide.type==='choice'?choiceInput===null:!textInput.trim())
             return(
               <button onClick={onSubmit} disabled={disabled}
-                style={{marginTop:20,padding:'14px',borderRadius:5,border:'none',
+                style={{marginTop:20,padding:'14px',borderRadius:9999,border:'none',
                   background:disabled?C.disabledBtn:C.purple,color:disabled?C.txtDis:'#fff',
                   fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:16,cursor:disabled?'not-allowed':'pointer',
                   boxShadow:disabled?'none':`0 4px 20px ${C.purpleBg}`,transition:'all .2s ease'}}>

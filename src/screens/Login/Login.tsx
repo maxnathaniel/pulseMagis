@@ -29,7 +29,7 @@ export function Login({loading,error,onSubmit}: LoginProps){
         <button onClick={()=>onSubmit()} disabled={loading}
           onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
           style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'13px 20px',
-            borderRadius:5,border:`1.5px solid ${hov?C.borderStrong:C.border}`,background:hov?C.surfaceHov:C.surface,
+            borderRadius:9999,border:`1.5px solid ${hov?C.borderStrong:C.border}`,background:hov?C.surfaceHov:C.surface,
             color:C.txt1,fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:15,cursor:loading?'wait':'pointer',
             boxShadow:hov?C.shadowHov:C.shadow,transition:'all .15s ease'}}>
           <svg width="18" height="18" viewBox="0 0 18 18">

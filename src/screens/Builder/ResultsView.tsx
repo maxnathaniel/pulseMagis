@@ -88,7 +88,7 @@ export function ResultsView({draft}: {draft: Draft}){
         {hasResultSlides&&(
           <div style={{display:'flex',justifyContent:'flex-end',marginBottom:12}}>
             <button onClick={()=>setConfirmReset(true)} disabled={resetting||!totalResponses}
-              style={{display:'flex',alignItems:'center',gap:7,padding:'8px 14px',borderRadius:4,
+              style={{display:'flex',alignItems:'center',gap:7,padding:'8px 14px',borderRadius:9999,
                 border:`2px solid ${C.border}`,background:C.surface,
                 color:totalResponses?C.txt2:C.txtDis,fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,
                 cursor:totalResponses?'pointer':'not-allowed'}}>
@@ -104,7 +104,7 @@ export function ResultsView({draft}: {draft: Draft}){
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}}>
                   <div style={{fontSize:11.5,color:C.txt4,fontWeight:700,letterSpacing:1,textTransform:'uppercase'}}>Q&amp;A</div>
                   <button onClick={()=>setConfirmClearQna(true)} disabled={clearingQna||!questions.length}
-                    style={{display:'flex',alignItems:'center',gap:7,padding:'8px 14px',borderRadius:4,
+                    style={{display:'flex',alignItems:'center',gap:7,padding:'8px 14px',borderRadius:9999,
                       border:`2px solid ${C.border}`,background:C.surface,
                       color:questions.length?C.txt2:C.txtDis,fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,
                       cursor:questions.length?'pointer':'not-allowed'}}>

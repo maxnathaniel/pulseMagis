@@ -178,7 +178,7 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
                   return (
                     <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center'}}>
                       <button onClick={()=>onReveal(slide.id)}
-                        style={{padding:'12px 28px',borderRadius:5,border:'none',
+                        style={{padding:'12px 28px',borderRadius:9999,border:'none',
                           background:C.purple,color:'#fff',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:15,
                           cursor:'pointer',boxShadow:`0 4px 20px ${C.purpleBg}`}}>
                         Reveal results

@@ -93,7 +93,7 @@ export function Moderate({session,qnaList,onModerate,onToggleModeration,onLeave}
             style={{width:290,textAlign:'center',fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:700,letterSpacing:7,background:C.surface,border:`2px solid ${C.border}`,borderRadius:5,color:C.txt1,padding:'14px 10px',outline:'none',boxShadow:C.shadow}}/>
           {error&&<div style={{color:C.red,fontSize:13,marginTop:14,maxWidth:260,textAlign:'center',fontWeight:700}}>{error}</div>}
           <button onClick={submitPin} disabled={checking||!pinInput.trim()}
-            style={{marginTop:24,padding:'13px 40px',borderRadius:5,border:'none',background:C.teal,color:'#fff',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:16,cursor:checking?'wait':'pointer',boxShadow:`0 4px 16px ${C.tealBg}`}}>
+            style={{marginTop:24,padding:'13px 40px',borderRadius:9999,border:'none',background:C.teal,color:'#fff',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:16,cursor:checking?'wait':'pointer',boxShadow:`0 4px 16px ${C.tealBg}`}}>
             {checking?'Checking…':'Unlock'}
           </button>
         </div>

@@ -58,7 +58,7 @@ export function PulseTile({code,firstSlide,list,title,dateLabel,onClick,onDelete
       {hov&&!renaming&&(
         <div style={{position:'absolute',bottom:10,right:10}}>
           <button onClick={e=>{e.stopPropagation();setMenuOpen(o=>!o)}}
-            style={{width:26,height:26,borderRadius:4,border:`1.5px solid ${C.border}`,background:C.surfaceAlt,
+            style={{width:26,height:26,borderRadius:9999,border:`1.5px solid ${C.border}`,background:C.surfaceAlt,
               color:C.txt2,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:C.shadow}}>
             <MoreVertical size={14}/>
           </button>

@@ -23,7 +23,7 @@ export function AudienceQna({qnaList,participantId,qnaDraft,setQnaDraft,qnaSubmi
           placeholder="Ask a question…"
           style={{flex:1,padding:'12px 14px',borderRadius:4,border:`2px solid ${C.border}`,background:C.surface,color:C.txt1,fontSize:14,fontWeight:700,outline:'none',boxShadow:C.shadow}}/>
         <button onClick={onSubmitQuestion} disabled={qnaSubmitting||!qnaDraft.trim()}
-          style={{padding:'0 20px',borderRadius:4,border:'none',background:qnaDraft.trim()?C.amber:C.disabledBtn,color:qnaDraft.trim()?'#fff':C.txtDis,fontWeight:700,fontSize:14,cursor:qnaDraft.trim()?'pointer':'not-allowed'}}>
+          style={{padding:'0 20px',borderRadius:9999,border:'none',background:qnaDraft.trim()?C.amber:C.disabledBtn,color:qnaDraft.trim()?'#fff':C.txtDis,fontWeight:700,fontSize:14,cursor:qnaDraft.trim()?'pointer':'not-allowed'}}>
           Ask
         </button>
       </div>

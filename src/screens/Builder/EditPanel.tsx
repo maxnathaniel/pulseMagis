@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { AlignLeft, AlignRight, Image as ImageIcon, X, Copy, ChevronDown, Crop, ShieldCheck, Lock, Link2, type LucideIcon } from 'lucide-react'
+import { AlignLeft, AlignRight, X, ChevronDown, Crop, ShieldCheck, Lock, Link2, type LucideIcon } from 'lucide-react'
 import { C, FONT_DISPLAY, RESPONSE_MODES, SLIDE_TYPES, RESULTS_FORMATS } from '../../theme.ts'
 import { readFileAsDataUrl, compressDataUrl } from '../../lib/helpers.ts'
 import { SectionLabel } from '../../components/ui/SectionLabel.tsx'
@@ -86,8 +86,8 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
       <div style={{position:'relative'}}>
         <SectionLabel>Question type</SectionLabel>
         <button onClick={()=>setTypeMenuOpen(o=>!o)}
-          style={{marginTop:8,width:'100%',padding:'10px 12px',borderRadius:6,
-            border:`1.5px solid ${C.border}`,background:C.surfaceAlt,cursor:'pointer',
+          style={{marginTop:8,width:'100%',padding:'10px 12px',borderRadius:9999,
+            border:`1.5px solid ${C.border}`,background:C.surface,cursor:'pointer',
             display:'flex',alignItems:'center',gap:9}}>
           <currentType.icon size={15} color={C.purple}/>
           <span style={{flex:1,textAlign:'left',fontFamily:FONT_DISPLAY,fontWeight:700,
@@ -135,7 +135,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
               label={qnaModeration?'Moderation on — new questions need approval':'Moderation off — questions post instantly'}
               active={qnaModeration} onClick={onToggleQnaModeration}/>
           </div>
-          <div style={{marginTop:10,background:C.surfaceAlt,border:`1.5px solid ${C.border}`,borderRadius:4,padding:'14px 16px',display:'flex',flexDirection:'column',gap:8}}>
+          <div style={{marginTop:10,background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:4,padding:'14px 16px',display:'flex',flexDirection:'column',gap:8}}>
             <div style={{display:'flex',alignItems:'center',gap:7,fontSize:12.5,color:C.txt3,fontWeight:700}}>
               <Lock size={12}/> CO-MODERATOR PIN <span style={{fontWeight:600,color:C.txt4}}>(optional)</span>
             </div>
@@ -147,7 +147,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
             </div>
             <button onClick={copyModeratorLink} disabled={!sessionCode||!moderatorPin.trim()}
               title={!sessionCode?'Present once to generate a shareable moderator link':!moderatorPin.trim()?'Set a PIN above to enable the moderator link':undefined}
-              style={{marginTop:2,width:'100%',padding:'9px 0',borderRadius:4,border:`1.5px solid ${C.border}`,
+              style={{marginTop:2,width:'100%',padding:'9px 0',borderRadius:9999,border:`1.5px solid ${C.border}`,
                 background:'transparent',color:(!sessionCode||!moderatorPin.trim())?C.txt4:C.txt3,
                 cursor:(!sessionCode||!moderatorPin.trim())?'not-allowed':'pointer',fontSize:12,fontWeight:700,
                 display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
@@ -160,7 +160,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
       {slide.type==='choice'&&(
         <div>
           <SectionLabel>Results format</SectionLabel>
-          <div style={{display:'flex',marginTop:8,borderRadius:4,overflow:'hidden',border:`2px solid ${C.border}`}}>
+          <div style={{display:'flex',marginTop:8,borderRadius:9999,overflow:'hidden',border:`2px solid ${C.border}`}}>
             {RESULTS_FORMATS.map(({key,label,icon:Icon},i)=>{
               const active=(slide.resultsFormat||'bar')===key
               const isLast=i===RESULTS_FORMATS.length-1
@@ -202,7 +202,15 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
       </div>
 
       <div>
-        <SectionLabel>Content image</SectionLabel>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <SectionLabel>Content image</SectionLabel>
+          {!slide.contentImage&&(
+            <button onClick={()=>fileRef.current?.click()}
+              style={{background:'none',border:'none',color:C.purple,cursor:'pointer',fontSize:12.5,fontWeight:700,padding:0}}>
+              Upload image
+            </button>
+          )}
+        </div>
         <input ref={fileRef} type="file" accept="image/*" style={{display:'none'}}
           onChange={e=>handleUpload(e.target.files?.[0])}/>
         {slide.contentImage?(
@@ -230,14 +238,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
               </button>
             </div>
           </div>
-        ):(
-          <button onClick={()=>fileRef.current?.click()} style={{marginTop:8,width:'100%',
-            padding:'28px 12px',borderRadius:5,border:`2px dashed ${C.border}`,background:'transparent',
-            color:C.txt3,display:'flex',flexDirection:'column',alignItems:'center',gap:8,
-            cursor:'pointer',fontSize:12.5,fontWeight:700}}>
-            <ImageIcon size={20} color={C.txt4}/> Click to upload
-          </button>
-        )}
+        ):null}
       </div>
 
       {cropSrc&&(
@@ -250,33 +251,29 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
       )}
 
       <div>
-        <SectionLabel>Show responses</SectionLabel>
-        <div style={{display:'flex',flexDirection:'column',gap:8,marginTop:8}}>
-          {RESPONSE_MODES.map(({key,label,description})=>{
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <SectionLabel>Show responses</SectionLabel>
+          <button onClick={()=>{ onApplyToAll(slide.responseMode||'instant'); setAppliedToAll(true); setTimeout(()=>setAppliedToAll(false),1500) }}
+            style={{background:'none',border:'none',color:C.purple,cursor:'pointer',fontSize:12.5,fontWeight:700,padding:0}}>
+            {appliedToAll?'Applied!':'Apply to all'}
+          </button>
+        </div>
+        <div style={{display:'flex',marginTop:8,borderRadius:4,overflow:'hidden',border:`2px solid ${C.border}`}}>
+          {RESPONSE_MODES.map(({key,label,description},i)=>{
             const active=(slide.responseMode||'instant')===key
+            const isLast=i===RESPONSE_MODES.length-1
             return(
-              <label key={key}
-                style={{textAlign:'left',padding:'10px 12px',borderRadius:4,
-                  border:`2px solid ${active?C.purple:C.border}`,
-                  background:active?C.purpleBg:C.surface,cursor:'pointer',
-                  display:'flex',alignItems:'flex-start',gap:9}}>
-                <input type="radio" name="responseMode" checked={active}
-                  onChange={()=>onChange({responseMode:key})}
-                  style={{marginTop:3,flexShrink:0,accentColor:C.purple,cursor:'pointer'}}/>
-                <div>
-                  <div style={{fontSize:13,fontWeight:700,color:active?C.purple:C.txt1}}>{label}</div>
-                  <div style={{fontSize:11,color:C.txt4,fontWeight:600,marginTop:2}}>{description}</div>
-                </div>
-              </label>
+              <button key={key} onClick={()=>onChange({responseMode:key})} title={description}
+                style={{flex:1,padding:'10px 6px',border:'none',
+                  borderRight:isLast?'none':`2px solid ${C.border}`,
+                  background:active?C.purpleBg:C.surface,color:active?C.purple:C.txt3,
+                  cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',
+                  fontSize:12,fontWeight:700}}>
+                {label}
+              </button>
             )
           })}
         </div>
-        <button onClick={()=>{ onApplyToAll(slide.responseMode||'instant'); setAppliedToAll(true); setTimeout(()=>setAppliedToAll(false),1500) }}
-          style={{marginTop:10,width:'100%',padding:'9px 0',borderRadius:4,border:`1.5px solid ${C.border}`,
-            background:'transparent',color:C.txt3,cursor:'pointer',fontSize:12,fontWeight:700,
-            display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
-          <Copy size={12}/> {appliedToAll?'Applied!':'Apply to all slides'}
-        </button>
       </div>
     </div>
   )

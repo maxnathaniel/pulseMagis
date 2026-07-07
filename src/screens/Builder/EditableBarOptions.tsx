@@ -48,7 +48,7 @@ export function EditableBarOptions({slide,list,readOnly,onUpdateOption,onRemoveO
         )
       })}
       {!readOnly&&slide.options.length<6&&(
-        <button onClick={onAddOption} style={{flex:1,minWidth:0,height:'100%',borderRadius:4,border:`2px dashed ${C.border}`,
+        <button onClick={onAddOption} style={{flex:1,minWidth:0,height:'100%',borderRadius:9999,border:`2px dashed ${C.border}`,
           background:'transparent',color:C.txt3,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
           gap:7,cursor:'pointer',fontSize:14,fontWeight:700}}>
           <Plus size={14}/> Add option

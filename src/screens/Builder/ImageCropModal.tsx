@@ -109,7 +109,7 @@ export function ImageCropModal({imageSrc,currentImageSrc,onCancel,onConfirm}: Im
           return(
             <button key={key} onClick={()=>applyPreset(key,aspect)}
               style={{flex:1,padding:'10px 0',
-                borderRadius:isFirst?'4px 0 0 4px':isLast?'0 4px 4px 0':0,
+                borderRadius:isFirst?'9999px 0 0 9999px':isLast?'0 9999px 9999px 0':0,
                 border:`2px solid ${active?C.purple:C.border}`,
                 marginLeft:isFirst?0:-2,position:'relative',zIndex:active?1:0,
                 background:active?C.purpleBg:C.surface,color:active?C.purple:C.txt3,
@@ -122,12 +122,12 @@ export function ImageCropModal({imageSrc,currentImageSrc,onCancel,onConfirm}: Im
 
       <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:20}}>
         <button onClick={onCancel}
-          style={{padding:'10px 20px',borderRadius:5,border:`1.5px solid ${C.border}`,background:'transparent',
+          style={{padding:'10px 20px',borderRadius:9999,border:`1.5px solid ${C.border}`,background:'transparent',
             color:C.txt3,cursor:'pointer',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14}}>
           Cancel
         </button>
         <button onClick={handleConfirm}
-          style={{padding:'10px 20px',borderRadius:5,border:'none',background:C.purple,color:'#fff',
+          style={{padding:'10px 20px',borderRadius:9999,border:'none',background:C.purple,color:'#fff',
             cursor:'pointer',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,boxShadow:`0 4px 20px ${C.purpleBg}`}}>
           Apply crop
         </button>

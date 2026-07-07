@@ -58,7 +58,7 @@ export function ShareDialog({code,onClose}: ShareDialogProps){
             {link}
           </div>
           <button onClick={handleCopy} title="Copy link"
-            style={{flexShrink:0,width:40,height:40,borderRadius:5,border:'none',
+            style={{flexShrink:0,width:40,height:40,borderRadius:9999,border:'none',
               background:copied?C.teal:C.purple,color:'#fff',cursor:'pointer',
               display:'flex',alignItems:'center',justifyContent:'center'}}>
             {copied?<Check size={17}/>:<Copy size={17}/>}
@@ -70,7 +70,7 @@ export function ShareDialog({code,onClose}: ShareDialogProps){
         </div>
 
         <button onClick={handleDownload}
-          style={{display:'flex',alignItems:'center',gap:8,padding:'10px 20px',borderRadius:5,
+          style={{display:'flex',alignItems:'center',gap:8,padding:'10px 20px',borderRadius:9999,
             border:`2px solid ${C.border}`,background:C.surface,color:C.txt2,
             fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13.5,cursor:'pointer'}}>
           <Download size={15}/> Download QR code

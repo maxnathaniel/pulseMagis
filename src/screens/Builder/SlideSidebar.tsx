@@ -64,7 +64,7 @@ export function SlideSidebar({slides,activeIndex,onSelect,onReorder,onRemove,onA
         )
       })}
       <div style={{position:'relative',marginTop:4}}>
-        <button onClick={()=>setPickerOpen(o=>!o)} style={{width:'100%',padding:'12px',borderRadius:4,
+        <button onClick={()=>setPickerOpen(o=>!o)} style={{width:'100%',padding:'12px',borderRadius:9999,
           border:`2px dashed ${C.border}`,background:'transparent',color:C.txt3,
           display:'flex',alignItems:'center',justifyContent:'center',gap:7,cursor:'pointer',
           fontSize:13.5,fontWeight:700}}>
