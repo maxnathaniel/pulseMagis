@@ -17,7 +17,7 @@ export function EditableDotsOptions({slide,list,readOnly,onUpdateOption,onRemove
 
   return(
     <div style={{flex:1,minHeight:0,overflowY:'auto',display:'flex',flexDirection:'column',gap:12,
-      justifyContent:'center'}}>
+      justifyContent:'safe center'}}>
       {slide.options.map((opt,i)=>{
         const c=counts[i], pct=total?Math.round((c/total)*100):0
         const color=PALETTE_BARS[i%PALETTE_BARS.length]
