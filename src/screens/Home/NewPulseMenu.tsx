@@ -38,8 +38,8 @@ export function NewPulseMenu({open,onClose,onPick}: NewPulseMenuProps){
                 <Icon size={16} color={C.purple}/>
               </div>
               <div>
-                <div style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,color:C.txt1}}>{t.label}</div>
-                <div style={{fontSize:12,color:C.txt3,fontWeight:600}}>{t.subtitle}</div>
+                <div style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:14,color:C.txt1}}>{t.label}</div>
+                <div style={{fontSize:12,color:C.txt3,fontWeight:400}}>{t.subtitle}</div>
               </div>
             </button>
           )

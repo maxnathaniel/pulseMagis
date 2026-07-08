@@ -17,7 +17,7 @@ function NavItem({icon:Icon,label,active,onClick,accent}: NavItemProps){
     <button onClick={onClick} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
       style={{width:'100%',display:'flex',alignItems:'center',gap:10,padding:'10px 12px',borderRadius:5,
         border:'none',background:on?(accent?`${accent}18`:C.surfaceHov):'transparent',
-        color:on?(accent||C.purple):C.txt2,cursor:'pointer',fontFamily:FONT_DISPLAY,fontWeight:700,
+        color:on?(accent||C.purple):C.txt2,cursor:'pointer',fontFamily:FONT_DISPLAY,fontWeight:500,
         fontSize:14,textAlign:'left',transition:'all .15s ease'}}>
       <Icon size={17}/>{label}
     </button>

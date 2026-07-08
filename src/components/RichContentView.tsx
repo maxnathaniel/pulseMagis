@@ -10,13 +10,13 @@ import { C, FONT_BODY, EMPTY_RICH_DOC } from '../theme.ts'
 // carry React inline `style` props, so this is the one deliberate exception
 // to this codebase's otherwise-universal inline-style convention.
 const RICH_TEXT_CSS = `
-.pm-rich h1{font-size:2em;font-weight:700;margin:.4em 0;line-height:1.2}
-.pm-rich h2{font-size:1.5em;font-weight:700;margin:.4em 0;line-height:1.25}
-.pm-rich h3{font-size:1.17em;font-weight:700;margin:.4em 0;line-height:1.3}
+.pm-rich h1{font-size:2em;font-weight:500;margin:.4em 0;line-height:1.2}
+.pm-rich h2{font-size:1.5em;font-weight:500;margin:.4em 0;line-height:1.25}
+.pm-rich h3{font-size:1.17em;font-weight:500;margin:.4em 0;line-height:1.3}
 .pm-rich p{margin:.4em 0}
 .pm-rich ul,.pm-rich ol{padding-left:1.3em;margin:.4em 0}
 .pm-rich a{color:${C.purple};text-decoration:underline}
-.pm-rich strong{font-weight:700}
+.pm-rich strong{font-weight:500}
 .pm-rich em{font-style:italic}
 .pm-rich u{text-decoration:underline}
 .pm-rich s{text-decoration:line-through}

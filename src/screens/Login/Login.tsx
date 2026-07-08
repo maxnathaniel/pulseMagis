@@ -19,18 +19,18 @@ export function Login({loading,error,onSubmit}: LoginProps){
 
       <div style={{width:'100%',maxWidth:380,background:C.surface,borderRadius:10,border:`1.5px solid ${C.border}`,
         boxShadow:C.shadowHov,padding:'36px 32px'}}>
-        <h2 style={{fontFamily:FONT_DISPLAY,fontSize:24,fontWeight:700,margin:'0 0 6px',color:C.txt1,textAlign:'center'}}>
+        <h2 style={{fontFamily:FONT_DISPLAY,fontSize:24,fontWeight:500,margin:'0 0 6px',color:C.txt1,textAlign:'center'}}>
           Presenter sign-in
         </h2>
 
         {error&&<div style={{color:C.red,background:C.redBg,borderRadius:5,padding:'10px 14px',fontSize:13,
-          marginBottom:18,textAlign:'center',fontWeight:700}}>{error}</div>}
+          marginBottom:18,textAlign:'center',fontWeight:500}}>{error}</div>}
 
         <button onClick={()=>onSubmit()} disabled={loading}
           onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
           style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'13px 20px',
             borderRadius:9999,border:`1.5px solid ${hov?C.borderStrong:C.border}`,background:hov?C.surfaceHov:C.surface,
-            color:C.txt1,fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:15,cursor:loading?'wait':'pointer',
+            color:C.txt1,fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:15,cursor:loading?'wait':'pointer',
             boxShadow:hov?C.shadowHov:C.shadow,transition:'all .15s ease'}}>
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.56 2.7-3.86 2.7-6.62z"/>
@@ -41,7 +41,7 @@ export function Login({loading,error,onSubmit}: LoginProps){
           {loading?'Please wait…':'Sign in with Google'}
         </button>
 
-        <p style={{color:C.txt4,fontSize:12,marginTop:22,marginBottom:0,textAlign:'center',fontWeight:600,lineHeight:1.5}}>
+        <p style={{color:C.txt4,fontSize:12,marginTop:22,marginBottom:0,textAlign:'center',fontWeight:400,lineHeight:1.5}}>
           Access is restricted to approved presenter accounts.<br/>Audience members don't need to sign in.
         </p>
       </div>

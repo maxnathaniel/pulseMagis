@@ -61,7 +61,7 @@ export function PreviewModal({draft,startIndex,onClose}: PreviewModalProps){
   return(
     <Modal onClose={onClose} maxWidth={920}>
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
-        <div style={{fontSize:12,color:C.txt4,fontWeight:700,letterSpacing:1}}>PREVIEW · {idx+1} / {draft.slides.length}</div>
+        <div style={{fontSize:12,color:C.txt4,fontWeight:500,letterSpacing:1}}>PREVIEW · {idx+1} / {draft.slides.length}</div>
         <button onClick={onClose} style={{background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:6}}>
           <X size={18}/>
         </button>
@@ -69,7 +69,7 @@ export function PreviewModal({draft,startIndex,onClose}: PreviewModalProps){
 
       <div style={{display:'flex',gap:28,flexWrap:'wrap',justifyContent:'center',alignItems:'flex-start'}}>
         <div style={{flex:'1 1 420px',minWidth:280,maxWidth:560}}>
-          <div style={{display:'flex',alignItems:'center',gap:6,justifyContent:'center',marginBottom:12,color:C.txt3,fontWeight:700,fontSize:12,letterSpacing:1}}>
+          <div style={{display:'flex',alignItems:'center',gap:6,justifyContent:'center',marginBottom:12,color:C.txt3,fontWeight:500,fontSize:12,letterSpacing:1}}>
             <Monitor size={14}/> DESKTOP · PRESENTER SCREEN
           </div>
           <div style={{width:'100%',aspectRatio:'16/9',overflow:'hidden',position:'relative',containerType:'inline-size'} as CSSProperties}>
@@ -78,7 +78,7 @@ export function PreviewModal({draft,startIndex,onClose}: PreviewModalProps){
               display:'flex',justifyContent:'center'}}>
               <PresenterSlideCard slide={slide} list={[]}
                 revealedSlides={revealedSlides} onReveal={id=>setRevealedSlides(prev=>new Set(prev).add(id))}
-                qnaList={[]} session={session} onModerate={()=>{}} onToggleModeration={()=>{}}
+                qnaList={[]} onModerate={()=>{}}
                 showJoinPanel={false} joinCode="" audienceCount={0} copied={false}
                 onCopyJoinCode={()=>{}} onCloseJoinPanel={()=>{}}/>
             </div>
@@ -86,7 +86,7 @@ export function PreviewModal({draft,startIndex,onClose}: PreviewModalProps){
         </div>
 
         <div style={{flex:'0 0 auto'}}>
-          <div style={{display:'flex',alignItems:'center',gap:6,justifyContent:'center',marginBottom:12,color:C.txt3,fontWeight:700,fontSize:12,letterSpacing:1}}>
+          <div style={{display:'flex',alignItems:'center',gap:6,justifyContent:'center',marginBottom:12,color:C.txt3,fontWeight:500,fontSize:12,letterSpacing:1}}>
             <Smartphone size={14}/> MOBILE · AUDIENCE VIEW
           </div>
           <div style={{width:340,aspectRatio:'9/19.5',padding:'20px 16px',borderRadius:28,border:`8px solid ${C.txt1}`,background:C.surfaceAlt,boxShadow:C.shadowHov,display:'flex',flexDirection:'column'}}>

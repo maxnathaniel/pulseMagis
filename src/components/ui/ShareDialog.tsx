@@ -43,17 +43,17 @@ export function ShareDialog({code,onClose}: ShareDialogProps){
           <Share2 size={20} color={C.purple}/>
         </div>
         <div>
-          <div style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:18,color:C.txt1,marginBottom:4}}>
+          <div style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:18,color:C.txt1,marginBottom:4}}>
             Share with Participants
           </div>
-          <div style={{color:C.txt3,fontSize:13.5,fontWeight:600}}>
+          <div style={{color:C.txt3,fontSize:13.5,fontWeight:400}}>
             Anyone with this link or QR code can join and respond.
           </div>
         </div>
 
         <div style={{width:'100%',display:'flex',alignItems:'center',gap:8}}>
           <div style={{flex:1,padding:'11px 12px',borderRadius:5,border:`1.5px solid ${C.border}`,
-            background:C.surfaceAlt,color:C.txt2,fontSize:13,fontWeight:600,textAlign:'left',
+            background:C.surfaceAlt,color:C.txt2,fontSize:13,fontWeight:400,textAlign:'left',
             overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
             {link}
           </div>
@@ -72,7 +72,7 @@ export function ShareDialog({code,onClose}: ShareDialogProps){
         <button onClick={handleDownload}
           style={{display:'flex',alignItems:'center',gap:8,padding:'10px 20px',borderRadius:9999,
             border:`2px solid ${C.border}`,background:C.surface,color:C.txt2,
-            fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13.5,cursor:'pointer'}}>
+            fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:13.5,cursor:'pointer'}}>
           <Download size={15}/> Download QR code
         </button>
       </div>

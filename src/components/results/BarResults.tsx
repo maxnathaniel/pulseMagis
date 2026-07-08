@@ -27,7 +27,7 @@ export function BarResults({slide,list}: BarResultsProps){
         const isLeading=c>0&&c===max
         return(
           <div key={i} style={{flex:1,minWidth:0,height:'100%',display:'flex',flexDirection:'column',alignItems:'center',gap:8}}>
-            <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,color:C.txt2,flexShrink:0}}>{c} · {pct}%</span>
+            <span style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:14,color:C.txt2,flexShrink:0}}>{c} · {pct}%</span>
             <div style={{flex:1,width:'100%',borderRadius:4,background:`${color}16`,display:'flex',alignItems:'flex-end'}}>
               <div style={{width:'100%',height:mounted?`${(c/max)*100}%`:'0%',background:`${color}30`,borderRadius:4,
                 border:c>0?`2px solid ${isLeading?color:`${color}45`}`:'none',boxSizing:'border-box',
@@ -38,7 +38,7 @@ export function BarResults({slide,list}: BarResultsProps){
                 <img src={img} alt={opt} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
               </div>
             )}
-            <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:22,color:C.txt1,textAlign:'center'}}>{opt}</span>
+            <span style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:22,color:C.txt1,textAlign:'center'}}>{opt}</span>
           </div>
         )
       })}

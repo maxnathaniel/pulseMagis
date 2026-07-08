@@ -31,7 +31,7 @@ export function SlideThumbnail({slide,index,total,active,dropIndicator,onSelect,
       style={{display:'flex',alignItems:'stretch',gap:6,width:'100%',cursor:'grab'}}>
 
       <div style={{width:22,flexShrink:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'space-between'}}>
-        <div style={{fontSize:10.5,fontWeight:700,color:active?C.purple:C.txt4}}>{index+1}</div>
+        <div style={{fontSize:10.5,fontWeight:500,color:active?C.purple:C.txt4}}>{index+1}</div>
         <div style={{position:'relative',display:'flex',justifyContent:'center'}}>
         {hov&&(
           <>
@@ -58,7 +58,7 @@ export function SlideThumbnail({slide,index,total,active,dropIndicator,onSelect,
                       onMouseEnter={e=>{ if (!disabled) e.currentTarget.style.background=C.surfaceHov }}
                       onMouseLeave={e=>{ e.currentTarget.style.background=isCurrent?C.surfaceHov:'transparent' }}>
                       <Icon size={13} color={isCurrent?C.purple:C.txt2}/>
-                      <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:12.5,
+                      <span style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:12.5,
                         color:isCurrent?C.purple:C.txt1}}>
                         {t.label}{disabled&&!isCurrent?' (added)':''}
                       </span>
@@ -70,7 +70,7 @@ export function SlideThumbnail({slide,index,total,active,dropIndicator,onSelect,
                   style={{width:'100%',textAlign:'left',display:'flex',alignItems:'center',gap:7,
                     padding:'7px 9px',borderRadius:4,border:'none',background:'transparent',
                     color:total<=1?C.txtDis:C.red,cursor:total<=1?'not-allowed':'pointer',
-                    fontSize:12.5,fontWeight:700}}>
+                    fontSize:12.5,fontWeight:500}}>
                   <Trash2 size={12}/> Delete
                 </button>
               </div>

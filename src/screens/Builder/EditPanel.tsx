@@ -77,7 +77,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
     <div style={{width:280,flexShrink:0,borderLeft:`1.5px solid ${C.border}`,
       padding:20,overflowY:'auto',display:'flex',flexDirection:'column',gap:24}}>
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-        <div style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:16,color:C.txt1}}>Edit slide</div>
+        <div style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:16,color:C.txt1}}>Edit slide</div>
         <button onClick={onClose} style={{background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:4}}>
           <X size={16}/>
         </button>
@@ -90,7 +90,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
             border:`1.5px solid ${C.border}`,background:C.surface,cursor:'pointer',
             display:'flex',alignItems:'center',gap:9}}>
           <currentType.icon size={15} color={C.purple}/>
-          <span style={{flex:1,textAlign:'left',fontFamily:FONT_DISPLAY,fontWeight:700,
+          <span style={{flex:1,textAlign:'left',fontFamily:FONT_DISPLAY,fontWeight:500,
             fontSize:13,color:C.txt1}}>{currentType.label}</span>
           <ChevronDown size={15} color={C.txt3}/>
         </button>
@@ -115,7 +115,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
                     onMouseEnter={e=>{ if (!disabled) e.currentTarget.style.background=C.surfaceHov }}
                     onMouseLeave={e=>{ e.currentTarget.style.background=isCurrent?C.surfaceHov:'transparent' }}>
                     <Icon size={14} color={isCurrent?C.purple:C.txt2}/>
-                    <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,
+                    <span style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:13,
                       color:isCurrent?C.purple:C.txt1}}>
                       {t.label}{disabled&&!isCurrent?' (added)':''}
                     </span>
@@ -136,20 +136,20 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
               active={qnaModeration} onClick={onToggleQnaModeration}/>
           </div>
           <div style={{marginTop:10,background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:4,padding:'14px 16px',display:'flex',flexDirection:'column',gap:8}}>
-            <div style={{display:'flex',alignItems:'center',gap:7,fontSize:12.5,color:C.txt3,fontWeight:700}}>
-              <Lock size={12}/> CO-MODERATOR PIN <span style={{fontWeight:600,color:C.txt4}}>(optional)</span>
+            <div style={{display:'flex',alignItems:'center',gap:7,fontSize:12.5,color:C.txt3,fontWeight:500}}>
+              <Lock size={12}/> CO-MODERATOR PIN <span style={{fontWeight:400,color:C.txt4}}>(optional)</span>
             </div>
             <input value={moderatorPin} onChange={e=>onChangeModeratorPin(e.target.value.slice(0,20))}
-              placeholder="Set a PIN so co-moderators can unlock moderation…" type="password"
+              placeholder="Set a PIN" type="password"
               style={{width:'100%',background:C.inputBg,border:`1.5px solid ${C.border}`,borderRadius:4,padding:'9px 12px',color:C.txt1,fontSize:13.5,outline:'none'}}/>
-            <div style={{fontSize:11.5,color:C.txt4,lineHeight:1.5,fontWeight:600}}>
+            <div style={{fontSize:11.5,color:C.txt4,lineHeight:1.5,fontWeight:400}}>
               Share this PIN with trusted co-moderators, along with the moderator link below — they open it on their own device to get approval powers, without ever seeing it on the projected screen.
             </div>
             <button onClick={copyModeratorLink} disabled={!sessionCode||!moderatorPin.trim()}
               title={!sessionCode?'Present once to generate a shareable moderator link':!moderatorPin.trim()?'Set a PIN above to enable the moderator link':undefined}
               style={{marginTop:2,width:'100%',padding:'9px 0',borderRadius:9999,border:`1.5px solid ${C.border}`,
                 background:'transparent',color:(!sessionCode||!moderatorPin.trim())?C.txt4:C.txt3,
-                cursor:(!sessionCode||!moderatorPin.trim())?'not-allowed':'pointer',fontSize:12,fontWeight:700,
+                cursor:(!sessionCode||!moderatorPin.trim())?'not-allowed':'pointer',fontSize:12,fontWeight:500,
                 display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
               <Link2 size={12}/> {linkCopied?'Link copied!':'Copy moderator link'}
             </button>
@@ -194,7 +194,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
                   background:active?C.purpleBg:C.surface,color:active?C.purple:C.txt3,
                   cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:5}}>
                 <Icon size={16}/>
-                <span style={{fontSize:11,fontWeight:700}}>{label}</span>
+                <span style={{fontSize:11,fontWeight:500}}>{label}</span>
               </button>
             )
           })}
@@ -206,7 +206,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
           <SectionLabel>Content image</SectionLabel>
           {!slide.contentImage&&(
             <button onClick={()=>fileRef.current?.click()}
-              style={{background:'none',border:'none',color:C.purple,cursor:'pointer',fontSize:12.5,fontWeight:700,padding:0}}>
+              style={{background:'none',border:'none',color:C.purple,cursor:'pointer',fontSize:12.5,fontWeight:500,padding:0}}>
               Upload image
             </button>
           )}
@@ -228,12 +228,12 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
             </div>
             <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:4}}>
               <button onClick={openEditCrop}
-                style={{background:'none',border:'none',color:C.purple,cursor:'pointer',fontSize:12.5,fontWeight:700,
+                style={{background:'none',border:'none',color:C.purple,cursor:'pointer',fontSize:12.5,fontWeight:500,
                   display:'flex',alignItems:'center',gap:5,padding:0}}>
                 <Crop size={12}/> Edit crop
               </button>
               <button onClick={()=>fileRef.current?.click()}
-                style={{background:'none',border:'none',color:C.txt3,cursor:'pointer',fontSize:12.5,fontWeight:700,padding:0}}>
+                style={{background:'none',border:'none',color:C.txt3,cursor:'pointer',fontSize:12.5,fontWeight:500,padding:0}}>
                 Replace image
               </button>
             </div>
@@ -254,7 +254,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
           <SectionLabel>Show responses</SectionLabel>
           <button onClick={()=>{ onApplyToAll(slide.responseMode||'instant'); setAppliedToAll(true); setTimeout(()=>setAppliedToAll(false),1500) }}
-            style={{background:'none',border:'none',color:C.purple,cursor:'pointer',fontSize:12.5,fontWeight:700,padding:0}}>
+            style={{background:'none',border:'none',color:C.purple,cursor:'pointer',fontSize:12.5,fontWeight:500,padding:0}}>
             {appliedToAll?'Applied!':'Apply to all'}
           </button>
         </div>
@@ -268,7 +268,7 @@ export function EditPanel({slide,onChange,onChangeType,qaTakenByOther,onApplyToA
                   borderRight:isLast?'none':`2px solid ${C.border}`,
                   background:active?C.purpleBg:C.surface,color:active?C.purple:C.txt3,
                   cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',
-                  fontSize:12,fontWeight:700}}>
+                  fontSize:12,fontWeight:500}}>
                 {label}
               </button>
             )

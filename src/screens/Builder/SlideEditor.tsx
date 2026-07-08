@@ -33,7 +33,7 @@ export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUp
       <input value={slide.question} onChange={e=>onChange({question:e.target.value})}
         placeholder={slide.type==='qa'?'Ask us anything…':'Type your question…'}
         style={{width:'100%',background:'transparent',border:'none',borderBottom:`2px solid transparent`,
-          color:C.txt1,fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:700,padding:'2px 0 12px',
+          color:C.txt1,fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:500,padding:'2px 0 12px',
           outline:'none',marginBottom:28,flexShrink:0,textAlign:'left'}}/>
 
       {slide.type==='choice'&&(
@@ -54,17 +54,17 @@ export function SlideEditor({slide,list,onChange,onAddOption,onRemoveOption,onUp
       {slide.type==='wordcloud'&&(
         <div style={{border:`2px dashed ${C.border}`,borderRadius:5,padding:'52px 24px',textAlign:'center'}}>
           <Cloud size={30} color={C.txt4}/>
-          <div style={{marginTop:12,fontSize:14.5,color:C.txt3,fontWeight:700}}>Audience responses appear here as a live word cloud</div>
+          <div style={{marginTop:12,fontSize:14.5,color:C.txt3,fontWeight:500}}>Audience responses appear here as a live word cloud</div>
         </div>
       )}
       {slide.type==='open'&&(
         <div style={{border:`2px dashed ${C.border}`,borderRadius:5,padding:'52px 24px',textAlign:'center'}}>
           <MessageSquare size={30} color={C.txt4}/>
-          <div style={{marginTop:12,fontSize:14.5,color:C.txt3,fontWeight:700}}>Audience free-text responses appear here live</div>
+          <div style={{marginTop:12,fontSize:14.5,color:C.txt3,fontWeight:500}}>Audience free-text responses appear here live</div>
         </div>
       )}
       {slide.type==='qa'&&(
-        <div style={{fontSize:13,color:C.txt3,fontWeight:600}}>
+        <div style={{fontSize:13,color:C.txt3,fontWeight:400}}>
           Audience can ask questions and upvote others during this slide.
         </div>
       )}

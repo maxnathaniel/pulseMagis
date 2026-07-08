@@ -731,7 +731,7 @@ export default function App() {
               {screen==='present' && session && <Presenter session={session} slideIndex={slideIndex}
                 responses={responses} goToSlide={goToSlide} copyCode={copyCode} copied={copied}
                 onExit={endPresentation} exiting={endingPresentation} qnaList={qnaList}
-                onModerate={moderateQuestion} onToggleModeration={toggleModeration} audienceCount={audienceCount}/>}
+                onModerate={moderateQuestion} audienceCount={audienceCount}/>}
             </>
       }
       {screen==='join'    && (autoJoining

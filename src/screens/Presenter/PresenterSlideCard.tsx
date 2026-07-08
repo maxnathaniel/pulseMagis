@@ -1,14 +1,14 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { ChevronLeft, ChevronRight, Users, QrCode, X, Maximize2, Minimize2 } from 'lucide-react'
 import { C, FONT_DISPLAY, VERTICAL_ALIGN_CSS } from '../../theme.ts'
-import { ModerationPanel } from '../../components/ModerationPanel.tsx'
+import { QaSpotlight } from '../../components/QaSpotlight.tsx'
 import { JoinPanel } from '../../components/JoinPanel.tsx'
 import { NavBtn } from '../../components/ui/NavBtn.tsx'
 import { ChoiceResults } from '../../components/results/ChoiceResults.tsx'
 import { WordCloudResults } from '../../components/results/WordCloudResults.tsx'
 import { OpenResults } from '../../components/results/OpenResults.tsx'
 import { RichContentView } from '../../components/RichContentView.tsx'
-import type { Slide, Session, Question, ModerateAction } from '../../types.ts'
+import type { Slide, Question, ModerateAction } from '../../types.ts'
 
 const iconBtnStyle: CSSProperties = {
   width:38,height:38,borderRadius:'50%',border:'none',background:C.surface,color:C.txt2,
@@ -21,9 +21,7 @@ interface PresenterSlideCardProps {
   revealedSlides: Set<string>
   onReveal: (id: string) => void
   qnaList: Question[]
-  session: Session | { title: string; qnaModeration: boolean }
   onModerate: (qId: string, action: ModerateAction) => void
-  onToggleModeration: () => void
   showJoinPanel: boolean
   joinCode: string
   audienceCount: number
@@ -44,7 +42,7 @@ interface PresenterSlideCardProps {
   nextDisabled?: boolean
 }
 
-export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,session,onModerate,onToggleModeration,
+export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,onModerate,
   showJoinPanel,joinCode,audienceCount,copied,onCopyJoinCode,onCloseJoinPanel,
   showChrome,onExit,exiting,isFullscreen,onToggleFullscreen,onShowJoinPanel,onPrev,prevDisabled,onNext,nextDisabled}: PresenterSlideCardProps){
   const [hovTopLeft,setHovTopLeft]=useState(false)
@@ -97,10 +95,10 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
           </div>
 
           <div style={{position:'absolute',top:16,right:16,zIndex:5,display:'flex',alignItems:'center',gap:10}}>
-            <div style={{display:'flex',alignItems:'center',gap:6,fontSize:12,color:C.red,fontWeight:800,letterSpacing:.5}}>
+            <div style={{display:'flex',alignItems:'center',gap:6,fontSize:12,color:C.red,fontWeight:600,letterSpacing:.5}}>
               <span style={{width:8,height:8,borderRadius:'50%',background:C.red,display:'inline-block',animation:'pulseDot 1.5s infinite'}}/> LIVE
             </div>
-            <div title="People currently in the room" style={{display:'flex',alignItems:'center',gap:5,fontSize:13,color:C.txt2,fontWeight:700}}><Users size={15}/>{audienceCount}</div>
+            <div title="People currently in the room" style={{display:'flex',alignItems:'center',gap:5,fontSize:13,color:C.txt2,fontWeight:500}}><Users size={15}/>{audienceCount}</div>
             {!showJoinPanel&&(
               <button onClick={onShowJoinPanel} title="Show join panel" style={iconBtnStyle}>
                 <QrCode size={14}/>
@@ -126,7 +124,7 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
         {slide.type==='qa'?(
           <div style={{flex:1,minHeight:0,width:'100%',display:'flex',flexDirection:'column'}}>
             <div style={{width:'100%',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'flex-start',gap:8,marginBottom:16}}>
-              <h2 style={{fontFamily:FONT_DISPLAY,fontSize:'clamp(22px,3.5vw,30px)',fontWeight:700,textAlign:'left',margin:0,color:C.txt1}}>
+              <h2 style={{fontFamily:FONT_DISPLAY,fontSize:'clamp(22px,3.5vw,30px)',fontWeight:500,textAlign:'left',margin:0,color:C.txt1}}>
                 {slide.question||'Ask a question'}
               </h2>
             </div>
@@ -136,7 +134,7 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
                 mockup — so moderation controls never belong here; they're
                 host-only and live in the Builder's Edit panel plus the
                 dedicated moderator-link screen instead. */}
-              <ModerationPanel session={session as Session} qnaList={qnaList} onModerate={onModerate} onToggleModeration={onToggleModeration} audienceView/>
+              <QaSpotlight qnaList={qnaList} onModerate={onModerate}/>
             </div>
           </div>
         ):slide.type==='plain'?(
@@ -148,7 +146,7 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
           </>
         ):(
           <>
-            <h2 style={{width:'100%',fontFamily:FONT_DISPLAY,fontSize:'clamp(24px,4vw,36px)',fontWeight:700,textAlign:'left',margin:'0 0 30px',color:C.txt1,flexShrink:0}}>{slide.question}</h2>
+            <h2 style={{width:'100%',fontFamily:FONT_DISPLAY,fontSize:'clamp(24px,4vw,36px)',fontWeight:500,textAlign:'left',margin:'0 0 30px',color:C.txt1,flexShrink:0}}>{slide.question}</h2>
             <div style={{flex:1,minHeight:0,width:'100%',
               // Matches Builder's SlideEditor sizing for the same content so a
               // choice slide's response shape doesn't grow to fill the far
@@ -179,7 +177,7 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
                     <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center'}}>
                       <button onClick={()=>onReveal(slide.id)}
                         style={{padding:'12px 28px',borderRadius:9999,border:'none',
-                          background:C.purple,color:'#fff',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:15,
+                          background:C.purple,color:'#fff',fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:15,
                           cursor:'pointer',boxShadow:`0 4px 20px ${C.purpleBg}`}}>
                         Reveal results
                       </button>
@@ -217,7 +215,7 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,s
           <JoinPanel code={joinCode} audienceCount={audienceCount} copied={copied}
             onCopy={onCopyJoinCode} onClose={onCloseJoinPanel}/>
           {(slide.type==='choice'||slide.type==='wordcloud'||slide.type==='open')&&(
-            <div style={{marginTop:18,textAlign:'center',fontFamily:FONT_DISPLAY,fontSize:22,fontWeight:700,color:C.txt2}}>
+            <div style={{marginTop:18,textAlign:'center',fontFamily:FONT_DISPLAY,fontSize:22,fontWeight:500,color:C.txt2}}>
               {list.length} response{list.length!==1?'s':''}
             </div>
           )}

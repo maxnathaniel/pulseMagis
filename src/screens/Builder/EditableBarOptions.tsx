@@ -31,7 +31,7 @@ export function EditableBarOptions({slide,list,readOnly,onUpdateOption,onRemoveO
               editor — only its visibility is toggled, not its layout. */}
             <div style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'center',gap:8,flexShrink:0,
               visibility:readOnly?'hidden':'visible'}}>
-              <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,color:C.txt2}}>{c} · {pct}%</span>
+              <span style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:13,color:C.txt2}}>{c} · {pct}%</span>
               {slide.options.length>2&&<button onClick={()=>onRemoveOption?.(oi)} title="Remove option"
                 style={{background:'none',border:'none',color:C.txt4,cursor:'pointer',padding:2,flexShrink:0}}><Trash2 size={13}/></button>}
             </div>
@@ -43,14 +43,14 @@ export function EditableBarOptions({slide,list,readOnly,onUpdateOption,onRemoveO
             <input value={opt} onChange={e=>onUpdateOption?.(oi,e.target.value)} placeholder={`Option ${oi+1}`}
               readOnly={readOnly} tabIndex={readOnly?-1:undefined}
               style={{width:'100%',flexShrink:0,background:'transparent',border:'none',outline:'none',color:C.txt1,textAlign:'center',
-                fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:21,visibility:readOnly?'hidden':'visible'}}/>
+                fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:21,visibility:readOnly?'hidden':'visible'}}/>
           </div>
         )
       })}
       {!readOnly&&slide.options.length<6&&(
         <button onClick={onAddOption} style={{flex:1,minWidth:0,height:'100%',borderRadius:9999,border:`2px dashed ${C.border}`,
           background:'transparent',color:C.txt3,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
-          gap:7,cursor:'pointer',fontSize:14,fontWeight:700}}>
+          gap:7,cursor:'pointer',fontSize:14,fontWeight:500}}>
           <Plus size={14}/> Add option
         </button>
       )}

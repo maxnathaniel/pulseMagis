@@ -29,7 +29,7 @@ export function AddSlideMenu({open,onClose,onPick,hasQa}: AddSlideMenuProps){
               onMouseEnter={e=>{ if (!disabled) e.currentTarget.style.background=C.surfaceHov }}
               onMouseLeave={e=>{ e.currentTarget.style.background='transparent' }}>
               <Icon size={15} color={C.purple}/>
-              <span style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,color:C.txt1}}>
+              <span style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:13,color:C.txt1}}>
                 {t.label}{disabled?' (added)':''}
               </span>
             </button>

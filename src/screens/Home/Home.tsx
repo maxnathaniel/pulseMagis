@@ -40,20 +40,20 @@ export function Home({pulses,pulsesLoading,onCreateNew,onJoin,onResume,onDeleteP
           display:'flex',alignItems:'center',justifyContent:'flex-end',padding:'0 32px'}}>
           <div title={userEmail||''} style={{width:38,height:38,borderRadius:'50%',background:C.purple,
             color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',
-            fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,flexShrink:0}}>
+            fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:14,flexShrink:0}}>
             {getInitials(userEmail)}
           </div>
         </div>
         <div style={{flex:1,overflowY:'auto',padding:'32px 40px'}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
-            <h1 style={{fontFamily:FONT_DISPLAY,fontSize:26,fontWeight:700,margin:0,color:C.txt1}}>
+            <h1 style={{fontFamily:FONT_DISPLAY,fontSize:26,fontWeight:500,margin:0,color:C.txt1}}>
               Your Pulses
             </h1>
             <div style={{position:'relative'}}>
               <button onClick={()=>setNewPulseOpen(o=>!o)}
                 style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,
                   padding:'11px 18px',borderRadius:9999,border:'none',background:C.purple,color:'#fff',cursor:'pointer',
-                  fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14.5,boxShadow:`0 4px 16px ${C.purpleBg}`}}>
+                  fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:14.5,boxShadow:`0 4px 16px ${C.purpleBg}`}}>
                 <Plus size={16}/> New Pulse <ChevronDown size={14} style={{marginLeft:2}}/>
               </button>
               <NewPulseMenu open={newPulseOpen} onClose={()=>setNewPulseOpen(false)}

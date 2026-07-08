@@ -48,11 +48,11 @@ export function PulseTile({code,firstSlide,list,title,dateLabel,onClick,onDelete
                 if (e.key==='Enter') commitRename()
                 if (e.key==='Escape') { setDraftTitle(title); setRenaming(false) }
               }}
-              style={{width:'100%',fontFamily:FONT_DISPLAY,fontWeight:600,fontSize:15,color:C.txt1,
+              style={{width:'100%',fontFamily:FONT_DISPLAY,fontWeight:400,fontSize:15,color:C.txt1,
                 background:C.surface,border:`1.5px solid ${C.purple}`,borderRadius:4,padding:'2px 6px',outline:'none'}}/>
-          : <div style={{fontFamily:FONT_DISPLAY,fontWeight:600,fontSize:15,color:C.txt1,
+          : <div style={{fontFamily:FONT_DISPLAY,fontWeight:400,fontSize:15,color:C.txt1,
               overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{title}</div>}
-        <div style={{color:C.txt4,fontSize:12,marginTop:4,fontWeight:600}}>{dateLabel}</div>
+        <div style={{color:C.txt4,fontSize:12,marginTop:4,fontWeight:400}}>{dateLabel}</div>
       </div>
 
       {hov&&!renaming&&(
@@ -69,19 +69,19 @@ export function PulseTile({code,firstSlide,list,title,dateLabel,onClick,onDelete
               <button onClick={()=>{ setMenuOpen(false); setDraftTitle(title); setRenaming(true) }}
                 style={{width:'100%',textAlign:'left',display:'flex',alignItems:'center',gap:10,
                   padding:'11px 14px',borderRadius:5,border:'none',background:'transparent',
-                  color:C.txt2,cursor:'pointer',fontSize:14,fontWeight:700}}>
+                  color:C.txt2,cursor:'pointer',fontSize:14,fontWeight:500}}>
                 <Pencil size={15}/> Rename
               </button>
               <button onClick={()=>{ setMenuOpen(false); setSharing(true) }}
                 style={{width:'100%',textAlign:'left',display:'flex',alignItems:'center',gap:10,
                   padding:'11px 14px',borderRadius:5,border:'none',background:'transparent',
-                  color:C.txt2,cursor:'pointer',fontSize:14,fontWeight:700}}>
+                  color:C.txt2,cursor:'pointer',fontSize:14,fontWeight:500}}>
                 <Share2 size={15}/> Share with Participants
               </button>
               <button onClick={()=>{ setMenuOpen(false); onDelete() }}
                 style={{width:'100%',textAlign:'left',display:'flex',alignItems:'center',gap:10,
                   padding:'11px 14px',borderRadius:5,border:'none',background:'transparent',
-                  color:C.red,cursor:'pointer',fontSize:14,fontWeight:700}}>
+                  color:C.red,cursor:'pointer',fontSize:14,fontWeight:500}}>
                 <Trash2 size={15}/> Delete
               </button>
             </div>

@@ -107,3 +107,10 @@ export const mapQuestion = (q: QuestionRow): Question => ({
   status: q.status, authorId: q.author_id, answered: q.answered,
   createdAt: new Date(q.created_at).getTime(),
 })
+
+// Shared ordering for approved questions: unanswered first (by votes desc),
+// answered pushed to the end — used by both the moderator's full list and
+// the presenter's single-question spotlight, which must never disagree on order.
+export const sortVisibleQuestions = (qnaList: Question[]): Question[] =>
+  qnaList.filter(q => q.status === 'visible')
+    .sort((a, b) => a.answered === b.answered ? b.votes - a.votes : a.answered ? 1 : -1)

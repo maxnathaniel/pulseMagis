@@ -104,7 +104,7 @@ export function RichTextToolbar({editor, verticalAlign, onVerticalAlignChange}: 
         <button type="button" onClick={()=>setBlockOpen(o=>!o)}
           style={{display:'flex',alignItems:'center',gap:4,height:28,padding:'0 8px',borderRadius:9999,
             border:'none',background:blockOpen?C.surfaceHov:'transparent',color:C.txt2,
-            fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:12.5,cursor:'pointer'}}>
+            fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:12.5,cursor:'pointer'}}>
           {activeBlock.label}<ChevronDown size={12}/>
         </button>
         {blockOpen&&(
@@ -117,7 +117,7 @@ export function RichTextToolbar({editor, verticalAlign, onVerticalAlignChange}: 
                   style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,
                     textAlign:'left',padding:'7px 9px',borderRadius:4,border:'none',
                     background:opt.key===activeBlock.key?C.surfaceHov:'transparent',
-                    color:C.txt1,fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,cursor:'pointer'}}
+                    color:C.txt1,fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:13,cursor:'pointer'}}
                   onMouseEnter={e=>e.currentTarget.style.background=C.surfaceHov}
                   onMouseLeave={e=>e.currentTarget.style.background=opt.key===activeBlock.key?C.surfaceHov:'transparent'}>
                   {opt.label}{opt.key===activeBlock.key&&<Check size={13} color={C.purple}/>}
@@ -208,7 +208,7 @@ export function RichTextToolbar({editor, verticalAlign, onVerticalAlignChange}: 
                   padding:'6px 8px',color:C.txt1,fontSize:13,outline:'none'}}/>
               <button onClick={confirmLink}
                 style={{padding:'6px 12px',borderRadius:9999,border:'none',background:C.purple,color:'#fff',
-                  fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:12.5,cursor:'pointer'}}>Add</button>
+                  fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:12.5,cursor:'pointer'}}>Add</button>
             </div>
           </>
         )}

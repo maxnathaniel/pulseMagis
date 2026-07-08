@@ -33,7 +33,7 @@ interface MiniSlidePreviewProps {
 export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
   if (!slide) return (
     <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <span style={{fontSize:12,color:C.txt4,fontWeight:600}}>No slides yet</span>
+      <span style={{fontSize:12,color:C.txt4,fontWeight:400}}>No slides yet</span>
     </div>
   )
 
@@ -83,7 +83,7 @@ export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
           padding:'48px 56px',boxSizing:'border-box',
           transform:`scale(calc(100cqw / ${CHOICE_CANVAS_W}px))`,transformOrigin:'top left',
           display:'flex',flexDirection:'column'} as CSSProperties}>
-          <div style={{width:'100%',textAlign:'left',fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:700,
+          <div style={{width:'100%',textAlign:'left',fontFamily:FONT_DISPLAY,fontSize:34,fontWeight:500,
             color:C.txt1,padding:'2px 0 12px',marginBottom:28,flexShrink:0,
             overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{question}</div>
           {validEntries.length
@@ -91,7 +91,7 @@ export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
                 <EditableChoiceOptions slide={previewSlide} list={remappedList} readOnly/>
               </div>
             : <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',
-                fontFamily:FONT_DISPLAY,fontSize:18,color:C.txt4,fontWeight:600}}>No options yet</div>}
+                fontFamily:FONT_DISPLAY,fontSize:18,color:C.txt4,fontWeight:400}}>No options yet</div>}
         </div>
       </div>
     )
@@ -121,7 +121,7 @@ export function MiniSlidePreview({slide,list}: MiniSlidePreviewProps){
     body=(
       <div style={{flex:1,minWidth:0,minHeight:0,overflow:'hidden',display:'flex',flexDirection:'column',
         alignItems:'flex-start',justifyContent:'flex-start'}}>
-        <div style={{width:'100%',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:12,color:C.txt1,textAlign:'left',
+        <div style={{width:'100%',fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:12,color:C.txt1,textAlign:'left',
           overflow:'hidden',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',lineHeight:1.35} as CSSProperties}>
           {question}
         </div>

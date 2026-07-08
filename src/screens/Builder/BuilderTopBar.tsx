@@ -13,7 +13,7 @@ function ViewTab({label,active,onClick}: ViewTabProps){
   return(
     <button onClick={onClick} style={{flex:1,padding:'7px 18px',border:'none',background:'transparent',
       color:active?C.purple:C.txt2,
-      fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13.5,cursor:'pointer',transition:'color .15s ease'}}>
+      fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:13.5,cursor:'pointer',transition:'color .15s ease'}}>
       {label}
     </button>
   )
@@ -41,7 +41,7 @@ export function BuilderTopBar({title,onTitleChange,onBack,onPreview,onPresent,pr
         </button>
         <input value={title} onChange={e=>onTitleChange(e.target.value)} placeholder="Presentation title…"
           style={{flex:1,minWidth:80,background:'transparent',border:'none',color:C.txt1,
-            fontFamily:FONT_DISPLAY,fontSize:20,fontWeight:700,padding:'4px 2px',outline:'none'}}/>
+            fontFamily:FONT_DISPLAY,fontSize:20,fontWeight:500,padding:'4px 2px',outline:'none'}}/>
       </div>
 
       <div style={{position:'relative',display:'flex',width:170,flexShrink:0,borderBottom:`1.5px solid ${C.border}`}}>
@@ -54,7 +54,7 @@ export function BuilderTopBar({title,onTitleChange,onBack,onPreview,onPresent,pr
       <div style={{display:'flex',alignItems:'center',gap:10,justifySelf:'end'}}>
         <button onClick={onPreview} style={{display:'flex',alignItems:'center',gap:7,padding:'10px 18px',
           borderRadius:9999,border:`2px solid ${C.border}`,background:C.surface,color:C.txt2,
-          fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,cursor:'pointer'}}>
+          fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:14,cursor:'pointer'}}>
           <Eye size={16}/> Preview
         </button>
         <button onClick={onPresent} disabled={view==='results'||presentLoading}
@@ -62,7 +62,7 @@ export function BuilderTopBar({title,onTitleChange,onBack,onPreview,onPresent,pr
           style={{display:'flex',alignItems:'center',gap:7,
           padding:'10px 20px',borderRadius:9999,border:'none',
           background:view==='results'?C.disabledBtn:C.purple,color:view==='results'?C.txtDis:'#fff',
-          fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,cursor:view==='results'?'not-allowed':presentLoading?'wait':'pointer',
+          fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:14,cursor:view==='results'?'not-allowed':presentLoading?'wait':'pointer',
           boxShadow:view==='results'?'none':`0 4px 16px ${C.purpleBg}`,transition:'all .2s ease'}}>
           <Play size={16}/> {presentLoading?'Starting…':'Start Presentation'}
         </button>

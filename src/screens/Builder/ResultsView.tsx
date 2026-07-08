@@ -90,7 +90,7 @@ export function ResultsView({draft}: {draft: Draft}){
             <button onClick={()=>setConfirmReset(true)} disabled={resetting||!totalResponses}
               style={{display:'flex',alignItems:'center',gap:7,padding:'8px 14px',borderRadius:9999,
                 border:`2px solid ${C.border}`,background:C.surface,
-                color:totalResponses?C.txt2:C.txtDis,fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,
+                color:totalResponses?C.txt2:C.txtDis,fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:13,
                 cursor:totalResponses?'pointer':'not-allowed'}}>
               <RotateCcw size={14}/> {resetting?'Resetting…':'Reset results'}
             </button>
@@ -102,16 +102,16 @@ export function ResultsView({draft}: {draft: Draft}){
             if (slide.type==='qa') return (
               <div key={slide.id}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}}>
-                  <div style={{fontSize:11.5,color:C.txt4,fontWeight:700,letterSpacing:1,textTransform:'uppercase'}}>Q&amp;A</div>
+                  <div style={{fontSize:11.5,color:C.txt4,fontWeight:500,letterSpacing:1,textTransform:'uppercase'}}>Q&amp;A</div>
                   <button onClick={()=>setConfirmClearQna(true)} disabled={clearingQna||!questions.length}
                     style={{display:'flex',alignItems:'center',gap:7,padding:'8px 14px',borderRadius:9999,
                       border:`2px solid ${C.border}`,background:C.surface,
-                      color:questions.length?C.txt2:C.txtDis,fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:13,
+                      color:questions.length?C.txt2:C.txtDis,fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:13,
                       cursor:questions.length?'pointer':'not-allowed'}}>
                     <RotateCcw size={14}/> {clearingQna?'Clearing…':'Clear questions'}
                   </button>
                 </div>
-                <div style={{fontSize:12.5,color:C.txt3,fontWeight:600,marginBottom:16}}>
+                <div style={{fontSize:12.5,color:C.txt3,fontWeight:400,marginBottom:16}}>
                   {questions.length} question{questions.length!==1?'s':''}
                 </div>
                 {questions.length===0
@@ -121,8 +121,8 @@ export function ResultsView({draft}: {draft: Draft}){
                         <div key={q.id} style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:4,
                           padding:'12px 14px',display:'flex',justifyContent:'space-between',gap:12,
                           opacity:q.answered?0.6:1}}>
-                          <div style={{fontSize:14,fontWeight:600,color:C.txt1,textDecoration:q.answered?'line-through':'none'}}>{q.text}</div>
-                          <div style={{fontSize:12.5,color:C.txt3,fontWeight:700,flexShrink:0}}>{q.votes} vote{q.votes!==1?'s':''}</div>
+                          <div style={{fontSize:14,fontWeight:400,color:C.txt1,textDecoration:q.answered?'line-through':'none'}}>{q.text}</div>
+                          <div style={{fontSize:12.5,color:C.txt3,fontWeight:500,flexShrink:0}}>{q.votes} vote{q.votes!==1?'s':''}</div>
                         </div>
                       ))}
                     </div>}
@@ -134,13 +134,13 @@ export function ResultsView({draft}: {draft: Draft}){
             return (
               <div key={slide.id}>
                 <div style={{textAlign:'center'}}>
-                  <div style={{fontSize:11.5,color:C.txt4,fontWeight:700,letterSpacing:1,marginBottom:6,textTransform:'uppercase'}}>
+                  <div style={{fontSize:11.5,color:C.txt4,fontWeight:500,letterSpacing:1,marginBottom:6,textTransform:'uppercase'}}>
                     {typeMeta?.label}
                   </div>
-                  <h3 style={{fontFamily:FONT_DISPLAY,fontSize:20,fontWeight:700,color:C.txt1,margin:'0 0 6px'}}>
+                  <h3 style={{fontFamily:FONT_DISPLAY,fontSize:20,fontWeight:500,color:C.txt1,margin:'0 0 6px'}}>
                     {slide.question.trim()||'Untitled question'}
                   </h3>
-                  <div style={{fontSize:12.5,color:C.txt3,fontWeight:600,marginBottom:16}}>
+                  <div style={{fontSize:12.5,color:C.txt3,fontWeight:400,marginBottom:16}}>
                     {list.length} response{list.length!==1?'s':''}
                   </div>
                 </div>

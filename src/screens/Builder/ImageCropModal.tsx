@@ -92,7 +92,7 @@ export function ImageCropModal({imageSrc,currentImageSrc,onCancel,onConfirm}: Im
 
   return (
     <Modal onClose={onCancel} maxWidth={640}>
-      <div style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:18,color:C.txt1,marginBottom:16}}>Crop image</div>
+      <div style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:18,color:C.txt1,marginBottom:16}}>Crop image</div>
 
       <div style={{display:'flex',justifyContent:'center',background:C.surfaceAlt,borderRadius:6,padding:12}}>
         <ReactCrop crop={crop} onChange={(_,percentCrop)=>setCrop(percentCrop)} onComplete={c=>setCompletedCrop(c)}
@@ -113,7 +113,7 @@ export function ImageCropModal({imageSrc,currentImageSrc,onCancel,onConfirm}: Im
                 border:`2px solid ${active?C.purple:C.border}`,
                 marginLeft:isFirst?0:-2,position:'relative',zIndex:active?1:0,
                 background:active?C.purpleBg:C.surface,color:active?C.purple:C.txt3,
-                cursor:'pointer',fontFamily:FONT_DISPLAY,fontSize:13,fontWeight:700}}>
+                cursor:'pointer',fontFamily:FONT_DISPLAY,fontSize:13,fontWeight:500}}>
               {label}
             </button>
           )
@@ -123,12 +123,12 @@ export function ImageCropModal({imageSrc,currentImageSrc,onCancel,onConfirm}: Im
       <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:20}}>
         <button onClick={onCancel}
           style={{padding:'10px 20px',borderRadius:9999,border:`1.5px solid ${C.border}`,background:'transparent',
-            color:C.txt3,cursor:'pointer',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14}}>
+            color:C.txt3,cursor:'pointer',fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:14}}>
           Cancel
         </button>
         <button onClick={handleConfirm}
           style={{padding:'10px 20px',borderRadius:9999,border:'none',background:C.purple,color:'#fff',
-            cursor:'pointer',fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:14,boxShadow:`0 4px 20px ${C.purpleBg}`}}>
+            cursor:'pointer',fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:14,boxShadow:`0 4px 20px ${C.purpleBg}`}}>
           Apply crop
         </button>
       </div>

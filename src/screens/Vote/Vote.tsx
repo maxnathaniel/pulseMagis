@@ -57,8 +57,8 @@ export function Vote({session,slide,voted,choiceInput,setChoiceInput,textInput,s
             display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16}}>
             <Clock size={26} color={C.txt4}/>
           </div>
-          <div style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:20,color:C.txt1}}>This Pulse hasn't started yet</div>
-          <div style={{color:C.txt3,fontSize:14,marginTop:6,fontWeight:600}}>Hang tight — this page will update automatically once the presenter starts.</div>
+          <div style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:20,color:C.txt1}}>This Pulse hasn't started yet</div>
+          <div style={{color:C.txt3,fontSize:14,marginTop:6,fontWeight:400}}>Hang tight — this page will update automatically once the presenter starts.</div>
         </div>
       </div>
     )
@@ -73,8 +73,8 @@ export function Vote({session,slide,voted,choiceInput,setChoiceInput,textInput,s
             display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16}}>
             <Radio size={26} color={C.txt4}/>
           </div>
-          <div style={{fontFamily:FONT_DISPLAY,fontWeight:700,fontSize:20,color:C.txt1}}>This Pulse has ended</div>
-          <div style={{color:C.txt3,fontSize:14,marginTop:6,fontWeight:600}}>The presenter has ended this presentation. Thanks for participating!</div>
+          <div style={{fontFamily:FONT_DISPLAY,fontWeight:500,fontSize:20,color:C.txt1}}>This Pulse has ended</div>
+          <div style={{color:C.txt3,fontSize:14,marginTop:6,fontWeight:400}}>The presenter has ended this presentation. Thanks for participating!</div>
         </div>
       </div>
     )
