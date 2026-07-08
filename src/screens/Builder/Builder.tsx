@@ -100,7 +100,13 @@ export function Builder({draft,initialActiveId,setDraft,updateSlide,changeSlideT
                 <div style={{background:C.surface,borderRadius:4,boxShadow:C.shadow,
                   width:'min(100cqw, calc(100cqh * 16 / 9))',height:'min(100cqh, calc(100cqw * 9 / 16))',
                   overflowY:'auto',display:'flex',flexDirection:'column'} as CSSProperties}>
-                  <SlideEditor slide={slide} list={responsesBySlide[slide.id]||[]}
+                  {/* Private/on-click slides keep their real vote counts out of the
+                    Create tab too — not just the presenter screen — so switching
+                    back here to tweak a slide mid-session (while a laptop/projector
+                    is still visible to the room) can't accidentally leak results
+                    the presenter hasn't chosen to reveal yet. */}
+                  <SlideEditor slide={slide}
+                    list={slide.responseMode==='instant' ? (responsesBySlide[slide.id]||[]) : []}
                     onChange={patch=>updateSlide(slide.id,patch)}
                     onAddOption={()=>addOption(slide.id)}
                     onRemoveOption={oi=>removeOption(slide.id,oi)}

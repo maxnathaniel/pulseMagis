@@ -52,7 +52,7 @@ export function SlideSidebar({slides,activeIndex,onSelect,onReorder,onRemove,onA
             active={i===activeIndex} dropIndicator={dragIndex!==null&&dragIndex!==i&&overIndex===i}
             onSelect={()=>onSelect(slide.id)} onRemove={()=>onRemove(slide.id)}
             onChangeType={type=>onChangeType(slide.id,{type})} qaTakenByOther={qaTakenByOther}
-            list={responsesBySlide[slide.id]||[]}
+            list={slide.responseMode==='instant' ? (responsesBySlide[slide.id]||[]) : []}
             onDragStart={()=>setDragIndex(i)}
             onDragOver={e=>{ e.preventDefault(); setOverIndex(i) }}
             onDrop={e=>{

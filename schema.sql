@@ -276,10 +276,16 @@ CREATE TABLE IF NOT EXISTS allowed_emails (
 );
 
 ALTER TABLE allowed_emails ENABLE ROW LEVEL SECURITY;
--- No policies added: RLS with zero policies denies all access from
--- anon/authenticated clients. The table is only readable by
--- supabase_auth_admin (granted below, used by the hook function) —
--- manage entries directly via the Supabase SQL editor.
+-- Zero policies denies all access from anon/authenticated clients.
+-- supabase_auth_admin also needs an explicit policy below — the
+-- GRANT SELECT further down is not sufficient on its own, since RLS
+-- still applies to any role without BYPASSRLS or table ownership.
+-- Manage entries directly via the Supabase SQL editor.
+CREATE POLICY "Allow auth admin to read allowed emails"
+ON allowed_emails
+AS PERMISSIVE FOR SELECT
+TO supabase_auth_admin
+USING (true);
 
 INSERT INTO allowed_emails (email) VALUES
   ('amandathianwl@gmail.com'),
@@ -303,7 +309,7 @@ DECLARE
   new_email TEXT;
 BEGIN
   new_email := lower(event->'user'->>'email');
-  IF EXISTS (SELECT 1 FROM allowed_emails WHERE lower(email) = new_email) THEN
+  IF EXISTS (SELECT 1 FROM public.allowed_emails WHERE lower(email) = new_email) THEN
     RETURN '{}'::jsonb;
   END IF;
   RETURN jsonb_build_object(
