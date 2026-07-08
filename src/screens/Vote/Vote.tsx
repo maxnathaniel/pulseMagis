@@ -51,7 +51,6 @@ export function Vote({session,slide,voted,choiceInput,setChoiceInput,textInput,s
   if (ended) {
     return(
       <div style={{flex:1,display:'flex',flexDirection:'column',padding:'18px',minHeight:0}}>
-        <TopBar onBack={onLeave} label="Leave"/>
         <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:'0 24px'}}>
           <div style={{width:56,height:56,borderRadius:'50%',background:C.surfaceAlt,border:`2px solid ${C.border}`,
             display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16}}>

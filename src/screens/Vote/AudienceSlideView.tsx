@@ -28,7 +28,7 @@ export function AudienceSlideView({session,slide,voted,choiceInput,setChoiceInpu
     <div style={{flex:1,minHeight:0,display:'flex',flexDirection:'column',justifyContent:'center',maxWidth:480,margin:'0 auto',width:'100%'}}>
       <div style={{fontSize:12,color:C.txt4,letterSpacing:1.5,textAlign:'center',marginBottom:8,fontWeight:500}}>{session.title.toUpperCase()}</div>
       {slide.contentImage&&(
-        <img src={slide.contentImage} alt="" style={{width:'100%',height:'45vh',objectFit:'cover',borderRadius:6,marginBottom:16,display:'block'}}/>
+        <img src={slide.contentImage} alt="" style={{display:'block',margin:'0 auto 16px',maxWidth:'100%',maxHeight:'45vh',borderRadius:6}}/>
       )}
       {slide.type!=='plain'&&(
         <h2 style={{fontFamily:FONT_DISPLAY,fontSize:26,fontWeight:500,textAlign:'center',margin:'0 0 26px',color:C.txt1}}>
