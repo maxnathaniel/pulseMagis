@@ -587,13 +587,17 @@ export default function App() {
     setJoinLoading(true)
     const{data:sd,error}=await supabase.from('sessions').select('*').eq('code',code).single()
     if (error||!sd){setJoinLoading(false);setAutoJoining(false);setJoinError("We couldn't find that presentation. Check the code and try again.");return}
-    const{data:slides}=await supabase.from('slides').select('*').eq('session_code',code).order('position')
+    const[{data:slides},{data:priorResponses}]=await Promise.all([
+      supabase.from('slides').select('*').eq('session_code',code).order('position'),
+      supabase.from('responses').select('slide_id').eq('session_code',code).eq('participant_id',participantId),
+    ])
     setJoinLoading(false)
     setSession({code:sd.code,title:sd.title,currentSlideIndex:sd.current_slide_index,
       qnaEnabled:sd.qna_enabled,qnaModeration:sd.qna_moderation,pinHash:sd.pin_hash,isLive:sd.is_live!==false,
       hasPresented:sd.has_presented===true,
       slides:(slides||[]).map(mapSlide)})
-    setVotedSlides({});setChoiceInput(null);setTextInput('');setQnaList([])
+    setVotedSlides(Object.fromEntries((priorResponses||[]).map(r=>[r.slide_id,true])))
+    setChoiceInput(null);setTextInput('');setQnaList([])
     setScreen(role==='moderator'?'moderate':'vote')
   }
 
