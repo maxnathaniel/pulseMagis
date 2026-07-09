@@ -66,8 +66,13 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,o
     }
     setPanelOpen(false)
   }, [showJoinPanel])
+  // Sized against the card's own flex row (not a nested wrapper) so its 25%
+  // basis stays constant regardless of whether the join panel column is
+  // also taking up space in that row — otherwise the image would visibly
+  // shrink/crop tighter every time the panel opens.
   const imageCol=slide.contentImage&&(
-    <div style={{flex:'0 0 25%',minWidth:0,overflow:'hidden',borderRadius:5}}>
+    <div style={{flex:'0 0 25%',minWidth:0,overflow:'hidden',borderRadius:5,
+      marginRight:slide.layout==='left'?24:0,marginLeft:slide.layout==='left'?0:24}}>
       <img src={slide.contentImage} alt="" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
     </div>
   )
@@ -79,7 +84,7 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,o
   const contentIsLeftEdge=!imageBeforeContent
   const contentIsRightEdge=!imageAfterContent&&!panelOpen
   return(
-    <div style={{position:'relative',background:C.surface,borderRadius:4,boxShadow:C.shadow,padding:'48px 0',
+    <div style={{position:'relative',background:C.surface,borderRadius:4,boxShadow:C.shadow,
       width:'auto',maxWidth:'100%',height:'100%',aspectRatio:'16/9',overflowY:'auto',display:'flex'}}>
       {showChrome&&(
         <>
@@ -116,10 +121,9 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,o
         </>
       )}
 
-      <div style={{flex:'1 1 0%',minWidth:0,display:'flex',gap:24}}>
       {slide.layout==='left'&&imageCol}
       <div style={{flex:'1 1 0%',minWidth:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
-        paddingLeft:contentIsLeftEdge?56:0,paddingRight:contentIsRightEdge?56:0,
+        paddingTop:48,paddingBottom:48,paddingLeft:contentIsLeftEdge?56:0,paddingRight:contentIsRightEdge?56:0,
         transition:'padding 1.1s cubic-bezier(0.34,1.15,0.64,1)'}}>
         {slide.type==='qa'?(
           <div style={{flex:1,minHeight:0,width:'100%',display:'flex',flexDirection:'column'}}>
@@ -201,7 +205,6 @@ export function PresenterSlideCard({slide,list,revealedSlides,onReveal,qnaList,o
         )}
       </div>
       {slide.layout!=='left'&&imageCol}
-      </div>
       {/* Spacing to this column comes from its own marginLeft (not the row's
         gap) so a closed panel — still mounted at maxWidth 0 for its
         open/close transition — contributes zero gap instead of leaving a
