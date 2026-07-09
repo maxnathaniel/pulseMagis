@@ -106,7 +106,7 @@ async function main() {
   console.log(`Cleaned up ${count ?? 0} existing responses for dot-matrix slide ${slide.id}.`)
 
   const rows = Array.from({length: total}, () => ({
-    session_code: code, slide_id: slide.id, value: Math.floor(Math.random() * 2),
+    session_code: code, slide_id: slide.id, value: Math.floor(Math.random() * 2), participant_id: crypto.randomUUID(),
   }))
 
   const {error: insertError} = await supabase.from('responses').insert(rows)

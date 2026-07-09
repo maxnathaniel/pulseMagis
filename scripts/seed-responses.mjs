@@ -85,12 +85,12 @@ async function main() {
       const numOptions = (slide.options || []).length
       if (!numOptions) { console.log(`Skipping choice slide ${slide.id} — no options.`); continue }
       rows = Array.from({length: countPerSlide}, () => ({
-        session_code: code, slide_id: slide.id, value: Math.floor(Math.random() * numOptions),
+        session_code: code, slide_id: slide.id, value: Math.floor(Math.random() * numOptions), participant_id: crypto.randomUUID(),
       }))
     } else if (slide.type === 'wordcloud') {
-      rows = Array.from({length: countPerSlide}, () => ({session_code: code, slide_id: slide.id, value: pick(WORDS)}))
+      rows = Array.from({length: countPerSlide}, () => ({session_code: code, slide_id: slide.id, value: pick(WORDS), participant_id: crypto.randomUUID()}))
     } else if (slide.type === 'open') {
-      rows = Array.from({length: countPerSlide}, () => ({session_code: code, slide_id: slide.id, value: pick(SENTENCES)}))
+      rows = Array.from({length: countPerSlide}, () => ({session_code: code, slide_id: slide.id, value: pick(SENTENCES), participant_id: crypto.randomUUID()}))
     } else {
       continue // qa slides use the separate `questions` table, not `responses`
     }

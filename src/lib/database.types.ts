@@ -110,6 +110,7 @@ export interface Database {
           session_code: string
           slide_id: string
           value: number | string
+          participant_id: string | null
           created_at: string
         }
         Insert: {
@@ -117,6 +118,7 @@ export interface Database {
           session_code: string
           slide_id: string
           value: number | string
+          participant_id?: string | null
           created_at?: string
         }
         Update: {
@@ -124,6 +126,7 @@ export interface Database {
           session_code?: string
           slide_id?: string
           value?: number | string
+          participant_id?: string | null
           created_at?: string
         }
         Relationships: []

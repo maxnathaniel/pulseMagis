@@ -103,6 +103,35 @@
 -- with a PGRST204 "column not found in schema cache" error until the
 -- NOTIFY runs — silently rejecting the WHOLE multi-column write as one
 -- unit, same failure mode already documented above for is_live/has_presented.
+--
+-- Additionally, if your live `responses` table predates per-participant
+-- vote dedup, it will be missing the participant_id column and the unique
+-- index that stops the same audience member (tracked via a localStorage-
+-- backed id, stable across tab close/reopen) from voting twice on the same
+-- slide. Run this once, manually, in the Supabase SQL editor:
+--
+--   ALTER TABLE responses ADD COLUMN IF NOT EXISTS participant_id TEXT;
+--   CREATE UNIQUE INDEX IF NOT EXISTS idx_responses_unique_vote
+--     ON responses(slide_id, participant_id);
+--   DROP POLICY IF EXISTS "public_access" ON responses;
+--   CREATE POLICY "public_access" ON responses FOR ALL TO anon
+--     USING (true) WITH CHECK (participant_id IS NOT NULL);
+--   NOTIFY pgrst, 'reload schema';
+--
+-- Existing rows keep participant_id NULL, and are safe under this index as
+-- written — Postgres unique indexes never treat NULL as equal to NULL, so
+-- old rows never conflict with each other regardless. (An earlier version of
+-- this migration added `WHERE participant_id IS NOT NULL` to spell that out
+-- explicitly, but that turns the index partial, and Postgres refuses to use
+-- a partial index as the ON CONFLICT arbiter unless the conflicting INSERT
+-- repeats the same WHERE clause — which the Supabase client's
+-- `.upsert(..., {onConflict: 'slide_id,participant_id'})` has no way to do.
+-- The result was every vote failing outright, not just duplicates, with
+-- "no unique or exclusion constraint matching the ON CONFLICT specification".
+-- If you already ran the WHERE-clause version, correct it with:
+--   DROP INDEX IF EXISTS idx_responses_unique_vote;
+--   CREATE UNIQUE INDEX idx_responses_unique_vote ON responses(slide_id, participant_id);
+--   NOTIFY pgrst, 'reload schema';
 -- ============================================================
 
 -- Sessions
@@ -141,11 +170,12 @@ CREATE TABLE IF NOT EXISTS slides (
 
 -- Responses (one row per audience submission)
 CREATE TABLE IF NOT EXISTS responses (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_code  TEXT NOT NULL REFERENCES sessions(code) ON DELETE CASCADE,
-  slide_id      TEXT NOT NULL REFERENCES slides(id) ON DELETE CASCADE,
-  value         JSONB NOT NULL, -- integer (choice index) or string (text)
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_code   TEXT NOT NULL REFERENCES sessions(code) ON DELETE CASCADE,
+  slide_id       TEXT NOT NULL REFERENCES slides(id) ON DELETE CASCADE,
+  value          JSONB NOT NULL, -- integer (choice index) or string (text)
+  participant_id TEXT,           -- localStorage-backed audience id, used to dedup votes per slide
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Q&A Questions
@@ -169,6 +199,14 @@ ALTER TABLE questions REPLICA IDENTITY FULL;
 CREATE INDEX IF NOT EXISTS idx_slides_session      ON slides(session_code);
 CREATE INDEX IF NOT EXISTS idx_responses_slide     ON responses(slide_id);
 CREATE INDEX IF NOT EXISTS idx_responses_session   ON responses(session_code);
+-- Not partial: a partial index can't serve as the ON CONFLICT arbiter for
+-- .upsert(..., {onConflict:'slide_id,participant_id'}) (Postgres requires the
+-- INSERT's ON CONFLICT clause to repeat the index's WHERE predicate, which
+-- the Supabase client can't express) — see the migration note above. NULL
+-- participant_id rows (pre-dedup history) are unaffected either way, since
+-- Postgres unique indexes never treat NULL as equal to NULL.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_responses_unique_vote
+  ON responses(slide_id, participant_id);
 CREATE INDEX IF NOT EXISTS idx_questions_session   ON questions(session_code);
 
 -- ============================================================
@@ -220,7 +258,11 @@ CREATE POLICY "public_access" ON slides FOR ALL TO anon
 CREATE POLICY "owner_access" ON responses FOR ALL TO authenticated
   USING (EXISTS (SELECT 1 FROM sessions WHERE sessions.code = responses.session_code AND sessions.owner_id = auth.uid()))
   WITH CHECK (EXISTS (SELECT 1 FROM sessions WHERE sessions.code = responses.session_code AND sessions.owner_id = auth.uid()));
-CREATE POLICY "public_access" ON responses FOR ALL TO anon USING (true) WITH CHECK (true);
+-- WITH CHECK requires participant_id so every new anon-submitted response is
+-- eligible for the idx_responses_unique_vote dedup index above — a NULL
+-- participant_id would otherwise slip past that (partial) index entirely.
+CREATE POLICY "public_access" ON responses FOR ALL TO anon
+  USING (true) WITH CHECK (participant_id IS NOT NULL);
 
 -- questions: owner-facing access for the Presenter's Q&A moderation panel
 -- (approve/reject/delete/mark-answered, plus just reading the list) — same

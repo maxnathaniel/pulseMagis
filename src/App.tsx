@@ -55,7 +55,17 @@ export default function App() {
   const [choiceInput, setChoiceInput]=useState<number | null>(null)
   const [textInput,   setTextInput] = useState('')
   const [submitting,  setSubmitting] = useState(false)
-  const [participantId]             = useState(() => uid('p'))
+  const [participantId]             = useState(() => {
+    try {
+      const stored = localStorage.getItem('pulsemagis_participant_id')
+      if (stored) return stored
+      const id = uid('p')
+      localStorage.setItem('pulsemagis_participant_id', id)
+      return id
+    } catch {
+      return uid('p')
+    }
+  })
   const [qnaList,     setQnaList]   = useState<Question[]>([])
   const [qnaDraft,    setQnaDraft]  = useState('')
   const [qnaSubmitting,setQnaSubmitting]=useState(false)
@@ -612,7 +622,9 @@ export default function App() {
     if (slide.type==='choice'){if(choiceInput===null)return;value=choiceInput}
     else{if(!textInput.trim())return;value=textInput.trim().slice(0,140)}
     setSubmitting(true)
-    await supabase.from('responses').insert({session_code:session.code,slide_id:slide.id,value})
+    await supabase.from('responses')
+      .upsert({session_code:session.code,slide_id:slide.id,value,participant_id:participantId},
+              {onConflict:'slide_id,participant_id',ignoreDuplicates:true})
     setSubmitting(false);setVotedSlides(v=>({...v,[slide.id]:true}))
   }
   const submitQuestion=async()=>{

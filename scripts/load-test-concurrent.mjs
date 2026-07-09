@@ -126,7 +126,7 @@ async function main() {
 
     const insertStart = Date.now()
     const { error: insertError } = await client.from('responses').insert({
-      session_code: code, slide_id: slideId, value: Math.floor(Math.random() * 4),
+      session_code: code, slide_id: slideId, value: Math.floor(Math.random() * 4), participant_id: participantId,
     })
     const insertResult = { ok: !insertError, ms: Date.now() - insertStart, error: insertError?.message }
 
